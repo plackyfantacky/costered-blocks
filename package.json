@@ -1,0 +1,33 @@
+{
+    "name": "costered-blocks",
+    "version": "0.1.0",
+    "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
+    "main": "costered-blocks.php",
+    "scripts": {
+        "dev": "node ./node/dev.config.mjs",
+        "watch": "node ./node/dev.config.mjs -- --watch",
+        "build": "node ./node/dev.config.mjs -- --build"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.5",
+        "glob": "^11.0.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/plackyfantacky/costered-blocks.git"
+    },
+    "keywords": [
+        "wordpress",
+        "gutenberg",
+        "blocks"
+    ],
+    "author": "Adam Trickett",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/plackyfantacky/costered-blocks/issues"
+    },
+    "homepage": "https://github.com/plackyfantacky/costered-blocks#readme",
+    "dependencies": {
+        "-": "^0.0.1"
+    }
+}
