@@ -11,10 +11,12 @@
  * Text Domain:       costered-blocks
  */
 
-add_action('enqueue_block_editor_assets', function () {
+define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
+define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
-    $base_url = plugin_dir_url(__FILE__);
-    $base_path = plugin_dir_path(__FILE__);
+require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+
+add_action('enqueue_block_editor_assets', function () {
 
     $files = [
         'costered--hide-inner-blocks' => ['file' => 'js/admin/hide-inner-blocks-use-content-width.js', 'dependencies' => []],
@@ -26,10 +28,16 @@ add_action('enqueue_block_editor_assets', function () {
     foreach ($files as $handle => $data) {
         wp_enqueue_script(
             $handle,
-            $base_url . $data['file'],
+            COSTERED_BLOCKS_URL . $data['file'],
             $data['dependencies'],
-            filemtime($base_path . $data['file']),
+            filemtime(COSTERED_BLOCKS_PATH . $data['file']),
             true
         );
     }
+
+    wp_enqueue_style('costered--blocks-style-resets', COSTERED_BLOCKS_URL . 'css/resets.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/resets.css'));
+});
+
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_style('costered--blocks-style-resets', COSTERED_BLOCKS_URL . 'css/resets.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/resets.css'));
 });
