@@ -1,7 +1,9 @@
 import {
     BaseControl,
     __experimentalToggleGroupControl as ToggleGroupControl,
-    __experimentalToggleGroupControlOption as ToggleGroupControlOption
+    __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+    __experimentalUnitControl as UnitControl
+
 } from '@wordpress/components';
 import { TextControl } from '@wordpress/components';
 
@@ -21,11 +23,11 @@ export default function ContainerSizingControls({ attributes, setAttributes }) {
                 <ToggleGroupControlOption value="boxed" label="Boxed" />
             </ToggleGroupControl>
             {attributes.containerType === 'boxed' && (
-                <TextControl
+                <UnitControl
                     label="Container Width"
                     value={attributes.containerWidth}
                     onChange={updateContainerWidth}
-                    placeholder="e.g. 1200px, 80%"
+                    placeholder="0"
                     help="Set a custom width for the container when using 'Boxed' layout."
                 />
             )}

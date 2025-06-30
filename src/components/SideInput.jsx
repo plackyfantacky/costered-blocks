@@ -1,14 +1,14 @@
-import { FlexItem, TextControl } from '@wordpress/components';
+import { __experimentalUnitControl as UnitControl, FlexItem, TextControl } from '@wordpress/components';
 
-export default function SideInput({ value, onChange, placeholder }) {
+export default function SideInput({ value, onChange, label, placeholder }) {
     return (
         <FlexItem>
-            <TextControl
+            <UnitControl
+                label={label}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                label={placeholder}
-                style={{ textAlign: 'center', margin: 0, padding: '4px 6px', border: '1px solid #ddd', borderRadius: 2 }}
+                style={{ padding: '0 2px' }}
             />
         </FlexItem>
     );

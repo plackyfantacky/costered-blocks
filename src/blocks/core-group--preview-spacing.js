@@ -14,7 +14,6 @@ const withEditorSpacingStyles = createHigherOrderComponent((BlockListBlock) => {
             ...rest
         } = attributes;
 
-
         const style = {
             paddingTop: attributes.paddingTop,
             paddingRight: attributes.paddingRight,
@@ -51,10 +50,10 @@ const withEditorSpacingStyles = createHigherOrderComponent((BlockListBlock) => {
             },
         });
     };
-}, 'withLayoutPreviewStyles');
+}, 'withEditorSpacingStyles');
 
 addFilter(
     'editor.BlockListBlock',
-    'costered-blocks/core-group--layout-controls-blocklist-style',
+    'costered-blocks/core-group--preview-spacing-blocklist-block',
     withEditorSpacingStyles
 );

@@ -10,14 +10,7 @@ import PaddingControls from '../components/PaddingControls.jsx';
 import GapControls from '../components/GapControls.jsx';
 import ContainerSizingControls from '../components/ContainerSizingControls.jsx';
 
-console.log({
-    Fragment: typeof Fragment,
-    InspectorControls: typeof InspectorControls,
-    PanelBody: typeof PanelBody,
-});
-
-
-addFilter('blocks.registerBlockType', 'costered-blocks/core-group--layout-controls-register-block-type', (settings, name) => {
+addFilter('blocks.registerBlockType', 'costered-blocks/core-group--spacing-controls-register-block-type', (settings, name) => {
     if (name !== 'core/group') return settings;
     return {
         ...settings,
@@ -69,7 +62,7 @@ domReady(() => {
         };
     }, 'withGroupSpacingControls');
     
-    addFilter('editor.BlockEdit', 'costered-blocks/core-group--spacing-controls-block-edit', withGroupSpacingControls);
+    addFilter('editor.BlockEdit', 'costered-blocks/core-group--spacing-controls-blockedit', withGroupSpacingControls);
     
 });
 
