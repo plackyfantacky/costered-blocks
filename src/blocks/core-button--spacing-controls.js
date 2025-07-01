@@ -20,6 +20,7 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--spacing-cont
         paddingRight: { type: 'string', default: '' },
         paddingBottom: { type: 'string', default: '' },
         paddingLeft: { type: 'string', default: '' },
+        marginMode: { type: 'string', default: 'default' }, // 'default' or 'custom'
         marginTop: { type: 'string', default: '' },
         marginRight: { type: 'string', default: '' },
         marginBottom: { type: 'string', default: '' },

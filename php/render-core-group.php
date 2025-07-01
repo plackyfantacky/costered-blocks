@@ -4,6 +4,17 @@ add_filter('render_block_core/group', function ($block_content, $block) {
     $attrs  = $block['attrs'] ?? [];
     $layout = $attrs['layout'] ?? [];
 
+    $type = $layout['type'] ?? '';
+    $orientation  = $layout['orientation'] ?? 'horizontal';
+
+    $justify = $attrs['layout']['justifyContent'] ?? $attrs['justifyContent'] ?? '';
+    $align_items = $attrs['layout']['alignItems'] ?? $attrs['alignItems'] ?? '';
+
+    $attrStyle = $attrs['style'] ?? [];
+    $styleLayout = $attrStyle['layout'] ?? [];
+    $columnSpan = $styleLayout['columnSpan'] ?? '';
+    $rowSpan = $styleLayout['rowSpan'] ?? '';
+
     $style_map = [
         'paddingTop' => 'padding-top',
         'paddingRight' => 'padding-right',
@@ -25,45 +36,59 @@ add_filter('render_block_core/group', function ($block_content, $block) {
         }
     }
 
-    //Justification
-    if (!empty($attrs['justifyContent'])) {
-        
-        // Alignment centre (both flex and non-flex)
-        if(in_array($layout['justifyContent'], ['center', 'space-between', 'space-around', 'space-evenly'])) {
-            $style[] = 'margin-left: auto;';
-            $style[] = 'margin-right: auto;';
-        }
-
-        $justify_map = [
-            'left' => 'flex-start',
-            'right' => 'flex-end',
-            'center' => 'center',
-            'space-between' => 'space-between',
-            'space-around' => 'space-around',
-            'space-evenly' => 'space-evenly',
-        ];
-
-        if(in_array($layout['justifyContent'], array_keys($justify_map))) {
-            $justify = $layout['justifyContent'];
-            $style[] = 'justify-content: ' . $justify_map[$justify] . ';';
-        }
-    }
-
     // Container type
     if (($attrs['containerType'] ?? '') === 'boxed') {
         $width = $attrs['containerWidth'] ?? '1200px';
         $style[] = "max-width: {$width};";
+        $style[] = 'width: 100%;';
+        // TO DO: might need to add a third layout type to boxed layouts without centering
+        // $style[] = 'margin-left: auto;';
+        // $style[] = 'margin-right: auto;';
+    }
+
+    // Grid column/row span (if group is a child of a grid container)
+    // we need to process this regardless of the layout type
+
+    if ($columnSpan) {
+        $style[] = 'grid-column: span ' . esc_attr($columnSpan) . ';';
+    }
+
+    if ($rowSpan) {
+        $style[] = 'grid-row: span ' . esc_attr($rowSpan) . ';';
     }
 
     // Layout: flex/grid
-    if (!empty($layout['type'])) {
-        if ($layout['type'] === 'flex') {
+    if (is_array($layout)) {
+
+        if ($type === 'flex') {
             $style[] = 'display: flex;';
-            $direction = ($layout['orientation'] ?? '') === 'vertical' ? 'column' : 'row';
-            $style[] = "flex-direction: {$direction};";
-        
-        } elseif ($layout['type'] === 'grid') {
+
+
+            if ($orientation === 'vertical') {
+                $style[] = 'flex-direction: column;';
+                if ($justify) {
+                    $style[] = 'align-items: ' . esc_attr($justify) . ';';
+                }
+            } elseif ($orientation === 'horizontal') {
+                $style[] = 'flex-direction: row;';
+                if ($justify) {
+                    $style[] = 'justify-content: ' . esc_attr($justify) . ';';
+                }
+                if ($align_items) {
+                    $style[] = 'align-items: ' . esc_attr($align_items) . ';';
+                }
+            }
+        }
+
+        if ($type === 'grid') {
             $style[] = 'display: grid;';
+            if ($justify) {
+                $style[] = 'justify-content: ' . esc_attr($justify) . ';';
+            }
+            if (!empty($layout['alignItems'])) {
+                $style[] = 'align-items: ' . esc_attr($layout['alignItems']) . ';';
+            }
+
             if (!empty($layout['columnCount'])) {
                 $style[] = "grid-template-columns: repeat({$layout['columnCount']}, 1fr);";
             } elseif (!empty($layout['minimumColumnWidth'])) {
@@ -71,28 +96,30 @@ add_filter('render_block_core/group', function ($block_content, $block) {
                 $style[] = "grid-template-columns: repeat(auto-fit, minmax({$min}, 1fr));";
             }
         }
-    }
 
-    // Fallback content alignment for non-flex layouts
-    if (
-        empty($layout['type']) ||
-        $layout['type'] === 'default' ||
-        $layout['type'] === 'constrained'
-    ) {
-        $justify = $layout['justifyContent'] ?? null;
+        // Fallback content alignment for non-flex layouts
+        if (empty($type) || $type === 'default' || $type === 'constrained') {
+            $fallback_map = [
+                'left'   => 'flex-start',
+                'center' => 'center',
+                'right'  => 'flex-end',
+            ];
 
-        $fallback_map = [
-            'left'   => 'flex-start',
-            'center' => 'center',
-            'right'  => 'flex-end',
-        ];
+            $mapped_justify = $fallback_map[$justify] ?? null;
 
-        if ($justify && isset($fallback_map[$justify])) {
-            $style[] = 'display: flex;';
-            $style[] = 'flex-direction: column;';
-            $style[] = 'align-items: ' . $fallback_map[$justify] . ';';
+            if ($justify && isset($fallback_map[$justify])) {
+                $style[] = 'display: flex;';
+                $style[] = 'flex-direction: column;';
+                $style[] = 'align-items: ' . esc_attr($mapped_justify) . ';';
+            }
+
+            if ($align_items) {
+                $style[] = 'align-items: ' . esc_attr($align_items) . ';';
+            }
         }
     }
+
+    error_log('Costered: Group block styles: ' . print_r($style, true));
 
     $style = array_unique($style);
 
