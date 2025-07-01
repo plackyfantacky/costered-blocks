@@ -1,9 +1,10 @@
-import { __experimentalUnitControl as UnitControl, FlexItem, TextControl } from '@wordpress/components';
+import { FlexItem, TextControl } from '@wordpress/components';
 
-export default function SideInput({ value, onChange, label, placeholder }) {
+export default function TextControlInput({ value, onChange, label, placeholder }) {
     return (
         <FlexItem>
-            <UnitControl
+            <TextControl
+                __next40pxDefaultSize
                 label={label}
                 value={value}
                 onChange={onChange}

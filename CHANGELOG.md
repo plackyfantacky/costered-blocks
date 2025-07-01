@@ -1,5 +1,34 @@
 # Changelog
 
+## What's Changed in 0.1.2
+* fix: add server-side render for core/group block
+  - added server-side rendering for the core/group block because I forgot
+most people don't run headless WordPress and need to see their changes
+on the frontend.
+
+- generated a set of minified JS files for the block editor. This means
+you can now use the plugin without needing to run a build step.
+
+- refactored the build script to handle input/outputs a little better.
+
+- added CSS input/output for the one stylesheet this plugin uses.
+
+- added CHANGELOG.md
+
+
+* feat: add size/spacing controls to button block
+  - refactor: renamed `hide-inner-blocks-use-content-width.js` to
+`hide-core-ui-elements.js` to add more general functionality
+
+- refactor: changed TextControls to UnitControls so we can have things
+like `px`, `%`, `em`, etc. in the controls.
+
+- chore: cleaned up some leftover log outputs
+
+
+* feat: margins can now be strings eg. auto calc()
+  
+
 ## What's Changed in 0.1.1
 * fix: add server-side render for core/group block
   - added server-side rendering for the core/group block because I forgot

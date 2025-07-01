@@ -23,7 +23,9 @@ add_action('enqueue_block_editor_assets', function () {
         'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
         'costered--blocks-core-group--spacing-controls' => ['file' => 'js/blocks/core-group--spacing-controls.js', 'dependencies' => ['wp-dom-ready', 'wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
         'costered--blocks-core-group--preview-spacing' => ['file' => 'js/blocks/core-group--preview-spacing.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-compose', 'wp-element']],
-        'costered--hide-core-ui-elements' => ['file' => 'js/admin/hide-core-ui-elements.js', 'dependencies' => []]
+        'costered--hide-core-ui-elements' => ['file' => 'js/common/hide-core-ui-elements.js', 'dependencies' => []],
+        'costered--inject-margin-styles' => ['file' => 'js/common/inject-margin-styles.js', 'dependencies' => ['wp-hooks', 'wp-element']]
+
     ];
 
     foreach ($files as $handle => $data) {
