@@ -19,6 +19,7 @@ export default function ContainerSizingControls({ attributes, setAttributes }) {
                 value={attributes.containerType}
                 onChange={updateContainerType}
             >
+                <ToggleGroupControlOption value="none" label="None" />
                 <ToggleGroupControlOption value="full" label="Full Width" />
                 <ToggleGroupControlOption value="boxed" label="Boxed" />
             </ToggleGroupControl>

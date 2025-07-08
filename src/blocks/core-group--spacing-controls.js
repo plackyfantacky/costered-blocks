@@ -27,7 +27,7 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-group--spacing-contr
             marginLeft: { type: 'string', default: '' },
             gapHorizontal: { type: 'string', default: '' },
             gapVertical: { type: 'string', default: '' },
-            containerType: { type: 'string', default: 'full' },
+            containerType: { type: 'string', default: 'none' },
             containerWidth: { type: 'string', default: '' },
             // Additional attributes for grid layout until WP supports it natively
             gridTemplateColumns: { type: 'string' },

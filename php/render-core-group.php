@@ -38,12 +38,15 @@ add_filter('render_block_core/group', function ($block_content, $block) {
 
     // Container type
     if (($attrs['containerType'] ?? '') === 'boxed') {
+        //TODO: add support for a custom global layout width
         $width = $attrs['containerWidth'] ?? '1200px';
         $style[] = "max-width: {$width};";
         $style[] = 'width: 100%;';
         // TO DO: might need to add a third layout type to boxed layouts without centering
-        // $style[] = 'margin-left: auto;';
-        // $style[] = 'margin-right: auto;';
+    } elseif (($attrs['containerType'] ?? '') === 'full') {
+        // Full width, no max-width
+        $style[] = 'width: 100%;';
+        $style[] = 'max-width: none;';
     }
 
     // Grid column/row span (if group is a child of a grid container)
