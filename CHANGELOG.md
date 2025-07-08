@@ -1,5 +1,12 @@
 # Changelog
 
+## What's Changed in 0.1.3
+* feat: margins can now be strings eg. auto calc()
+  
+
+* fix: add 'none' containerType to core/group block
+  
+
 ## What's Changed in 0.1.2
 * fix: add server-side render for core/group block
   - added server-side rendering for the core/group block because I forgot
