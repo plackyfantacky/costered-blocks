@@ -1,10 +1,19 @@
 # Changelog
 
+## What's Changed in 0.1.4
+* feat: Add innerblocks support to core/button block
+  - feat: added button-text block for custom button text
+- feat: added URL input support for core/button block
+
+
 ## What's Changed in 0.1.3
 * feat: margins can now be strings eg. auto calc()
   
 
 * fix: add 'none' containerType to core/group block
+  
+
+* update changelog
   
 
 ## What's Changed in 0.1.2
