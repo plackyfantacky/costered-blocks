@@ -122,8 +122,6 @@ add_filter('render_block_core/group', function ($block_content, $block) {
         }
     }
 
-    error_log('Costered: Group block styles: ' . print_r($style, true));
-
     $style = array_unique($style);
 
     // Extract the opening <div ...> from innerHTML

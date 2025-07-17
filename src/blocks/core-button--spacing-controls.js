@@ -98,7 +98,6 @@ const withSpacingControls = createHigherOrderComponent((BlockEdit) => (props) =>
         if (!wrapperRef.current) return;
         const link = wrapperRef.current.querySelector('.wp-block-button__link');
     
-        console.log('Found link:', link);
         if (!link) return;
 
         Object.assign(link.style, {

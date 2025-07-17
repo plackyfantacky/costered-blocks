@@ -10,6 +10,7 @@ const withEditorSpacingStyles = createHigherOrderComponent((BlockListBlock) => {
 
         const {
             containerType,
+            containerMXAuto,
             containerWidth,
             ...rest
         } = attributes;
@@ -29,10 +30,23 @@ const withEditorSpacingStyles = createHigherOrderComponent((BlockListBlock) => {
 
         if (containerType === 'boxed' && containerWidth) {
             style.maxWidth = containerWidth;
-            style.marginLeft = 'auto';
-            style.marginRight = 'auto';
+            if(containerMXAuto && containerMXAuto !== 'false') {
+                style.marginLeft = 'auto';
+                style.marginRight = 'auto';
+            } else {
+                style.marginLeft = 'initial !important';
+                style.marginRight = 'initial !important';
+            }
+        } else if (containerType === 'flex') {
+            style.flex = '1';
         } else if (containerType === 'full') {
             style.width = '100%';
+        } else if (containerType === 'none') {
+            style.maxWidth = 'initial';
+            style.width = 'initial';
+            style.marginLeft = 'initial';
+            style.marginRight = 'initial';
+            style.flex = 'initial';
         }
 
         // Remove undefined/empty values to avoid invalid styles

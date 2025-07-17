@@ -28,6 +28,7 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-group--spacing-contr
             gapHorizontal: { type: 'string', default: '' },
             gapVertical: { type: 'string', default: '' },
             containerType: { type: 'string', default: 'none' },
+            containerMXAuto: { type: 'boolean', default: false }, // Whether to apply 'margin: auto' for centering
             containerWidth: { type: 'string', default: '' },
             // Additional attributes for grid layout until WP supports it natively
             gridTemplateColumns: { type: 'string' },

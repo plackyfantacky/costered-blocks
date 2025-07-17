@@ -1,6 +1,6 @@
 {
     "name": "costered-blocks",
-    "version": "0.1.0",
+    "version": "0.1.4",
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
     "main": "costered-blocks.php",
     "scripts": {
@@ -26,8 +26,5 @@
     "bugs": {
         "url": "https://github.com/plackyfantacky/costered-blocks/issues"
     },
-    "homepage": "https://github.com/plackyfantacky/costered-blocks#readme",
-    "dependencies": {
-        "-": "^0.0.1"
-    }
+    "homepage": "https://github.com/plackyfantacky/costered-blocks#readme"
 }
