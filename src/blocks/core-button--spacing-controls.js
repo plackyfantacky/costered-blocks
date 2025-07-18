@@ -117,7 +117,7 @@ const withSpacingControls = createHigherOrderComponent((BlockEdit) => (props) =>
 
     return (
         <Fragment>
-            <div className="beans" ref={wrapperRef}>
+            <div className="cb-button-wrap" ref={wrapperRef}>
                 <BlockEdit {...props} />
             </div>
             <InspectorControls>
