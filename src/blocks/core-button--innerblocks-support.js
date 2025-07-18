@@ -3,19 +3,39 @@ import { InnerBlocks, InspectorControls, URLInput, useBlockProps } from '@wordpr
 import { PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
+const BLOCK_TEMPLATE = [
+    ['costered-blocks/button-text', { content: 'Button Text' }],
+];
+
 addFilter('blocks.registerBlockType', 'costered-blocks/core-button--innerblocks-support-registerblocktype', (settings, name) => {
     if (name !== 'core/button') return settings;
 
     return {
         ...settings,
-        edit: (props) => {
-            const blockProps = useBlockProps({ className: 'wp-block-button cb-button--with-innerblocks' });
+        supports: {
+            ...settings.supports,
+            innerBlocks: true,
+            color: true,
+            background: true,
+            textColor:true
+        },
+        attributes: {
+            ...settings.attributes,
+            url: {
+                type: 'string',
+                default: '#',
+            }
+        },
+        edit: () => {
+            const blockProps = useBlockProps({
+                className: 'cb-button--with-innerblocks',
+            });
 
-            const { attributes } = props;
+            const { outerProps, innerProps } = splitBlockProps(blockProps);
 
             return (
-                <div {...blockProps}>
-                    <div className="wp-block-button__link">
+                <div {...outerProps}>
+                    <div {...innerProps}>
                         <InnerBlocks
                             allowedBlocks={[
                                 'core/image',
@@ -24,23 +44,13 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--innerblocks-
                                 'core/shortcode',
                                 'outermost/icon-block'
                             ]}
-                            orientation="horizontal"
+                            template={BLOCK_TEMPLATE}
                             templateLock={false}
+                            orientation="horizontal"
                         />
                     </div>
                 </div>
             );
-        },
-        supports: {
-            ...settings.supports,
-            innerBlocks: true
-        },
-        attributes: {
-            ...settings.attributes,
-            url: {
-                type: 'string',
-                default: '#',
-            }
         }
     };
 });
@@ -48,9 +58,12 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--innerblocks-
 addFilter('blocks.getSaveElement', 'costered-blocks/core-button--innerblocks-support-save', (element, blockType, attributes) => {
     if (blockType.name !== 'core/button') return element;
 
+    const rawProps = useBlockProps.save();
+    const { outerProps, innerProps } = splitBlockProps(rawProps);
+
     return (
-        <div className="wp-block-button">
-            <a href={attributes.url} className="wp-block-button__link">
+        <div {...outerProps}>
+            <a href={attributes.url} {...innerProps }>
                 <InnerBlocks.Content />
             </a>
         </div>
@@ -170,10 +183,40 @@ registerBlockType('costered-blocks/button-text', {
                     {attributes.content || 'Add text'}
                 </span>
             </div>
-            
+
         );
     },
     save: ({ attributes }) => {
         return <span className="cb-button-text">{attributes.content}</span>;
     },
 });
+
+function splitBlockProps({ className = '', style, ...rest }) {
+    const classList = className.trim().split(/\s+/);
+
+    const visualClassNames = new Set();
+    const structuralClassNames = [];
+
+    for (const cls of classList) {
+        if (
+            /^has-[\w-]+-(color|background-color)$/.test(cls) ||
+            /^has-(text|background|link)-color$/.test(cls) ||
+            cls.startsWith('is-style-')
+        ) {
+            visualClassNames.add(cls);
+        } else {
+            structuralClassNames.push(cls);
+        }
+    }
+
+    return {
+        outerProps: {
+            ...rest,
+            className: structuralClassNames.join(' '),
+        },
+        innerProps: {
+            className: ['wp-block-button__link', ...visualClassNames].join(' '),
+            style,
+        },
+    };
+}
