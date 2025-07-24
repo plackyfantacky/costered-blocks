@@ -24,9 +24,26 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--innerblocks-
             url: {
                 type: 'string',
                 default: '#',
+            },
+            buttonGap: {
+                type: 'string',
+                default: '',
             }
         },
-        edit: () => {
+        edit: ({attributes, setAttributes}) => {
+            
+            const { buttonGap } = attributes;
+            const wrapperRef = useRef();
+            
+            useEffect(() => {
+                if (wrapperRef.current) {
+                    const layoutdiv = wrapperRef.current.querySelector('.block-editor-block-list__layout');
+                    if (layoutdiv) {
+                        layoutdiv.style.gap = buttonGap;
+                    }
+                }
+            }, [buttonGap]);
+            
             const blockProps = useBlockProps({
                 className: 'cb-button--with-innerblocks',
             });
@@ -35,7 +52,7 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--innerblocks-
 
             return (
                 <div {...outerProps}>
-                    <div {...innerProps}>
+                    <div {...innerProps} ref={wrapperRef}>
                         <InnerBlocks
                             allowedBlocks={[
                                 'core/image',

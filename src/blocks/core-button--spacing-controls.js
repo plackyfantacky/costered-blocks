@@ -7,6 +7,7 @@ import { Fragment, cloneElement, useEffect, useRef } from '@wordpress/element';
 import WidthHeightControls from "../components/WidthHeightControls.jsx";
 import MarginControls from '../components/MarginControls.jsx';
 import PaddingControls from '../components/PaddingControls.jsx';
+import ButtonGapControls from "../components/ButtonGapControls.jsx";
 
 // Extend attributes
 addFilter('blocks.registerBlockType', 'costered-blocks/core-button--spacing-controls-register-block-type', (settings, name) => {
@@ -24,7 +25,8 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--spacing-cont
         marginTop: { type: 'string', default: '' },
         marginRight: { type: 'string', default: '' },
         marginBottom: { type: 'string', default: '' },
-        marginLeft: { type: 'string', default: '' }
+        marginLeft: { type: 'string', default: '' },
+        buttonGap: { type: 'string', default: '' },
     };
 
     const originalSave = settings.save;
@@ -43,7 +45,8 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--spacing-cont
             marginTop,
             marginRight,
             marginBottom,
-            marginLeft
+            marginLeft,
+            buttonGap
         } = props.attributes;
 
         const style = {
@@ -56,7 +59,8 @@ addFilter('blocks.registerBlockType', 'costered-blocks/core-button--spacing-cont
             ...(marginTop && { marginTop }),
             ...(marginRight && { marginRight }),
             ...(marginBottom && { marginBottom }),
-            ...(marginLeft && { marginLeft })
+            ...(marginLeft && { marginLeft }),
+            ...(buttonGap && { gap: buttonGap })
         };
 
         const inner = el.props.children;
@@ -90,7 +94,8 @@ const withSpacingControls = createHigherOrderComponent((BlockEdit) => (props) =>
         marginTop,
         marginRight,
         marginBottom,
-        marginLeft
+        marginLeft,
+        buttonGap
     } = props.attributes;
 
     useEffect(() => {
@@ -110,7 +115,8 @@ const withSpacingControls = createHigherOrderComponent((BlockEdit) => (props) =>
             ...(marginBottom && { marginBottom }),
             ...(marginLeft && { marginLeft }),
             ...(buttonWidth && { width: buttonWidth }),
-            ...(buttonHeight && { height: buttonHeight })
+            ...(buttonHeight && { height: buttonHeight }),
+            ...(buttonGap && { gap: buttonGap })
         });
 
     }, [buttonWidth, buttonHeight, paddingTop, paddingRight, paddingBottom, paddingLeft, marginTop, marginRight, marginBottom, marginLeft]);
@@ -125,6 +131,7 @@ const withSpacingControls = createHigherOrderComponent((BlockEdit) => (props) =>
                     <WidthHeightControls attributes={attributes} setAttributes={setAttributes} />
                     <PaddingControls attributes={attributes} setAttributes={setAttributes} />
                     <MarginControls attributes={attributes} setAttributes={setAttributes} />
+                    <ButtonGapControls attributes={attributes} setAttributes={setAttributes} />
                 </PanelBody>
             </InspectorControls>
         </Fragment>

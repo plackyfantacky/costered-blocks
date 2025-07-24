@@ -15,6 +15,7 @@ define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
 require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+require_once COSTERED_BLOCKS_PATH . 'php/render-core-image.php';
 
 /**
  * Register scripts for custom blocks and functionality. These are all first-party.
