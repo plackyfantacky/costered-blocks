@@ -2,12 +2,18 @@ import esbuild from 'esbuild';
 import { context, build } from 'esbuild';
 import { glob } from 'glob';
 import fs from 'fs';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import path, { resolve } from 'path';
+import pathAlias from 'esbuild-plugin-path-alias';
 
 const isWatch = process.argv.includes('--watch');
 const justBuild = process.argv.includes('--build');
 const jsOutDir = './js';
 const cssOutDir = './css';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const pluginRoot = path.resolve(__dirname, '..');
 
 function importAsGlobals(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); // https://stackoverflow.com/a/3561711/153718
@@ -62,6 +68,7 @@ const globalsMap = {
     "@wordpress/date": "wp.date",
     "@wordpress/data": "wp.data",
     "@wordpress/dom-ready": "wp.domReady",
+    "@wordpress/i18n": "wp.i18n",
     "react": "React",
     "react-dom": "ReactDOM",
 };
@@ -73,13 +80,13 @@ function cleanOutputDir(outdir) {
 }
 
 const jsConfig = {
-    entryPoints: await glob('src/**/*.{js,jsx,ts,tsx}').then((files) => 
+    entryPoints: await glob('src/**/*.{js,jsx,ts,tsx}').then((files) =>
         files
             .filter((file) => !file.includes('/components/')) // Exclude components
             .map((file) => {
                 let out = path.relative('src', file);
-                out = out.replace(/\.jsx?$/, '').replace(/\.tsx?$/, '')
-                return { in: file, out }
+                out = out.replace(/\.jsx?$/, '').replace(/\.tsx?$/, '');
+                return { in: file, out };
             })
     ),
     entryNames: '[dir]/[name]',
@@ -97,8 +104,15 @@ const jsConfig = {
     format: 'iife',
     plugins: [
         importAsGlobals(globalsMap),
+        pathAlias({
+            '@registry': path.resolve(pluginRoot, 'src/editor/registry.js'),
+            '@panels': path.resolve(pluginRoot, 'src/editor/panels'),
+            '@components': path.resolve(pluginRoot, 'src/components'),
+            '@lib': path.resolve(pluginRoot, 'src/lib')
+        })
     ],
-    logLevel: 'info'
+    logLevel: 'info',
+    resolveExtensions: ['.js', '.jsx', '.ts', '.tsx']
 };
 
 const cssConfig = {
@@ -118,25 +132,25 @@ if (isWatch) {
 
     const jsContext = await esbuild.context({ ...jsConfig, sourcemap: true, minify: false, bundle: true });
     const cssContext = await esbuild.context({ ...cssConfig, sourcemap: true, minify: false, bundle: true });
-    
+
     await Promise.all([
         jsContext.watch(),
         cssContext.watch(),
     ]);
 } else {
-    if(justBuild) {
+    if (justBuild) {
         console.log('Cleaning output directories...');
-        
+
         cleanOutputDir(jsOutDir);
         cleanOutputDir(cssOutDir);
 
         console.log('Building for production...');
-        
+
         await build({ ...jsConfig, sourcemap: false, minify: true, bundle: true });
         await build({ ...cssConfig, sourcemap: false, minify: true, bundle: true });
     } else {
         console.log('Building...');
-        
+
         await build({ ...jsConfig, sourcemap: true, minify: false, bundle: true });
         await build({ ...cssConfig, sourcemap: true, minify: false, bundle: true });
     }

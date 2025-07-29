@@ -1,16 +1,17 @@
-import { FlexItem, TextControl } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 
 export default function TextControlInput({ value, onChange, label, placeholder }) {
+    const formattedLabel = label.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     return (
-        <FlexItem>
+        <div style={{ padding: '0 2px' }}>
             <TextControl
                 __next40pxDefaultSize
-                label={label}
+                __nextHasNoMarginBottom
+                label={formattedLabel}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                style={{ padding: '0 2px' }}
             />
-        </FlexItem>
+        </div>
     );
 }
