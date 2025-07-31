@@ -1,5 +1,5 @@
 import { BaseControl, Flex } from '@wordpress/components';
-import UnitControlInput from "./UnitContolInput.jsx";
+import UnitControlInput from "@components/UnitControlInput";
 
 export default function ButtonGapControls({ attributes, setAttributes }) {
     const update = (key) => (value) => setAttributes({ [key]: value });

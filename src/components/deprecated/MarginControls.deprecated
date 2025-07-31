@@ -3,8 +3,8 @@ import {
     Flex,
     ToggleControl
 } from "@wordpress/components";
-import UnitControlInput from "./UnitContolInput.jsx";
-import TextControlInput from "./TextControlInput.jsx";
+import UnitControlInput from "@components/UnitControlInput";
+import TextControlInput from "@components/TextControlInput";
 
 export default function MarginControls({ attributes, setAttributes }) {
     const { marginMode = 'default' } = attributes;

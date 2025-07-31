@@ -17,7 +17,7 @@ This plugin is a toolbox for devs who want blocks that behave like normal code, 
 
 ## What It *Is*
 - A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's irritating decisions.
-- and nothing more.
+
 
 ## Developer-Centric/Sane by Design 
 This plugin assumes:
@@ -55,3 +55,8 @@ File issues, submit PRs, or just fork it and rename it **Fust & Furious** — yo
 
 ## Licence
 MIT. Because you should be free to do whatever you like, just like Gutenberg was... before Gutenberg.
+
+## Acknowledgements
+Interface icons are SVG files found at [Iconify](https://iconify.design/). Set used:
+- Radix Icons (radix-icons:dimensions / license: MIT)
+- Lucide (lucide:box / license: ISC)

@@ -25,16 +25,8 @@ add_action('enqueue_block_editor_assets', function () {
     $files = [
         'costered--hooks' => ['file' => 'js/lib/hooks.js', 'dependencies' => ['wp-hooks', 'wp-element']],
         'costered--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered--hooks']],
-        'costered--editor--display-controls' => ['file' => 'js/editor/panels/display-controls.js', 'dependencies' => ['wp-components', 'wp-data','costered--editor--plugin-sidebar', 'costered--hooks']],
-        'costered--editor--dimension-controls' => ['file' => 'js/editor/panels/dimension-controls.js', 'dependencies' => ['wp-components', 'wp-data','costered--editor--plugin-sidebar', 'costered--hooks']],
-        'costered--editor--spacing-controls' => ['file' => 'js/editor/panels/spacing-controls.js', 'dependencies' => ['wp-components', 'wp-data','costered--editor--plugin-sidebar', 'costered--hooks']],
         'costered--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
-        //'costered--blocks-core-button--spacing-controls' => ['file' => 'js/blocks/core-button--spacing-controls.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        //'costered--blocks-core-group--spacing-controls' => ['file' => 'js/blocks/core-group--spacing-controls.js', 'dependencies' => ['wp-dom-ready', 'wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        //'costered--blocks-core-group--preview-spacing' => ['file' => 'js/blocks/core-group--preview-spacing.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-compose', 'wp-element']],
-        //'costered--hide-core-ui-elements' => ['file' => 'js/common/hide-core-ui-elements.js', 'dependencies' => []],
-        //'costered--inject-margin-styles' => ['file' => 'js/common/inject-margin-styles.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']]
     ];
 
     foreach ($files as $handle => $data) {

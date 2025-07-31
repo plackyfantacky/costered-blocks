@@ -1,23 +1,22 @@
 import { BaseControl, Flex, FlexItem, Rect, ToggleControl } from '@wordpress/components';
 import { __experimentalGrid as Grid } from "@wordpress/components";
-import { Fragment } from "@wordpress/element";
 
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-function DirectionalInputGroup({ label, prefix, attributes, clientId, updateAttributes }) {
+function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes }) {
     const mode = attributes?.[`${prefix}Mode`] || 'unit';
 
     const toggleMode = () => {
         const next = mode === 'unit' ? 'text' : 'unit';
-        updateAttributes.updateBlockAttributes(clientId, {
+        updateAttributes(clientId, {
             ...attributes,
             [`${prefix}Mode`]: next
         });
     };
 
     const handleChange = (direction) => (val) => {
-        updateAttributes.updateBlockAttributes(clientId, {
+        updateAttributes(clientId, {
             ...attributes,
             [`${prefix}${direction}`]: val
         });

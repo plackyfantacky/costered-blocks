@@ -107,6 +107,7 @@ const jsConfig = {
         pathAlias({
             '@registry': path.resolve(pluginRoot, 'src/editor/registry.js'),
             '@panels': path.resolve(pluginRoot, 'src/editor/panels'),
+            '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
             '@components': path.resolve(pluginRoot, 'src/components'),
             '@lib': path.resolve(pluginRoot, 'src/lib')
         })

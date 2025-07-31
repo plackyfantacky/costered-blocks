@@ -1,5 +1,5 @@
 const displayProps = {
-    'display': { type: 'string' },
+     'display': { type: 'string' },
     'visibility': { type: 'string' },
     'overflow': { type: 'string' }
 };
