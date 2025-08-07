@@ -1,5 +1,24 @@
 # Changelog
 
+## What's Changed in 1.0.0a
+- feat!: Add a plugin sidebar and registry system for managing sidebar panels.
+- feat: add new tab panels for separating controls into categories "display-controls",
+"dimensions", and "spacing"
+tab and enable for all blocks
+- feat: add new min/max variants of width/height to "dimensions" tab
+- feat: add new controls for display and visibility to "display-controls"
+- feat: add info panel with name of currently selected block
+- refactor: update margin/padding controls with new UI and move from core/block to 
+- refactor: update and move width/height controls from core/group block to "dimensions" 
+"spacing" tab
+- refactor: width/height, margin, and padding controls will now use the new global
+attribute schema
+- chore: remove previous block specific UI
+
+BREAKING CHANGE: previous methods of storing style attributes for certain blocks
+are removed in favour of a registry/schema of allowed attrbiutes that can apply
+to ANY block. Some existing styles may be lost due to this change.
+
 ## What's Changed in 0.1.4-hotfix
 - fix: colour classes not apply to core/button
 - chore: cleaned up changelog

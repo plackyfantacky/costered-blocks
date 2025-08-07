@@ -1,4 +1,4 @@
-import { COSTERED_LAYOUT_SCHEMA } from "@lib/attribute-schema";
+import { COSTERED_LAYOUT_SCHEMA } from "@lib/schema";
 import { addFilter } from '@wordpress/hooks';
 import { useDispatch, useSelect } from '@wordpress/data';
 

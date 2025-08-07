@@ -51,3 +51,11 @@
         }
     }
 }
+
+.costered-blocks-sidebar {
+    .components-notice.is-warning {
+        .components-notice__content{
+            margin-right:0 !important;
+        }
+    }
+}

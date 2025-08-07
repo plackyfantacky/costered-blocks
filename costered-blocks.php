@@ -14,7 +14,8 @@
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
-require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+//require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-core-image.php';
 
 /**
@@ -26,7 +27,8 @@ add_action('enqueue_block_editor_assets', function () {
         'costered--hooks' => ['file' => 'js/lib/hooks.js', 'dependencies' => ['wp-hooks', 'wp-element']],
         'costered--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered--hooks']],
         'costered--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']]
+        'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered--blocks-render-blocks' => ['file' => 'js/common/render-blocks.js', 'dependencies' => ['wp-blocks', 'wp-hooks', 'wp-element', 'wp-data']],
     ];
 
     foreach ($files as $handle => $data) {

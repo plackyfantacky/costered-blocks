@@ -1,10 +1,10 @@
-const displayProps = {
+export const displayProps = {
      'display': { type: 'string' },
     'visibility': { type: 'string' },
     'overflow': { type: 'string' }
 };
 
-const dimensionProps = {
+export const dimensionProps = {
     'width': { type: 'string' },
     'height': { type: 'string' },
     'maxWidth': { type: 'string' },
@@ -13,21 +13,21 @@ const dimensionProps = {
     'minHeight': { type: 'string' },
 };
 
-const marginProps = {
+export const marginProps = {
     'marginTop': { type: 'string' },
     'marginRight': { type: 'string' },
     'marginBottom': { type: 'string' },
     'marginLeft': { type: 'string' }
 };
 
-const paddingProps = {
+export const paddingProps = {
     'paddingTop': { type: 'string' },
     'paddingRight': { type: 'string' },
     'paddingBottom': { type: 'string' },
     'paddingLeft': { type: 'string' }
 };
 
-const modeProps = {
+export const modeProps = {
     'dimensionMode': { type: 'string' },
     'minDimensionMode': { type: 'string' },
     'maxDimensionMode': { type: 'string' },
@@ -47,3 +47,12 @@ export const COSTERED_SCHEMA = Object.assign(
     {},
     ...Object.values(COSTERED_LAYOUT_SCHEMA)
 )
+
+export const BLOCKS_WITH_EDITOR_STYLES = [
+    'core/paragraph',
+    'core/heading',
+    'core/list',
+    'core/quote',
+    'core/pullquote',
+    'core/table'
+]
