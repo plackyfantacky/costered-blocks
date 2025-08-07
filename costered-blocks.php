@@ -14,7 +14,8 @@
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
-require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+//require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
+require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-core-image.php';
 
 /**
@@ -23,13 +24,11 @@ require_once COSTERED_BLOCKS_PATH . 'php/render-core-image.php';
 add_action('enqueue_block_editor_assets', function () {
 
     $files = [
+        'costered--hooks' => ['file' => 'js/lib/hooks.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered--hooks']],
         'costered--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        'costered--blocks-core-button--spacing-controls' => ['file' => 'js/blocks/core-button--spacing-controls.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
         'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
-        'costered--blocks-core-group--spacing-controls' => ['file' => 'js/blocks/core-group--spacing-controls.js', 'dependencies' => ['wp-dom-ready', 'wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        'costered--blocks-core-group--preview-spacing' => ['file' => 'js/blocks/core-group--preview-spacing.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-compose', 'wp-element']],
-        'costered--hide-core-ui-elements' => ['file' => 'js/common/hide-core-ui-elements.js', 'dependencies' => []],
-        'costered--inject-margin-styles' => ['file' => 'js/common/inject-margin-styles.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered--blocks-render-blocks' => ['file' => 'js/common/render-blocks.js', 'dependencies' => ['wp-blocks', 'wp-hooks', 'wp-element', 'wp-data']],
     ];
 
     foreach ($files as $handle => $data) {
