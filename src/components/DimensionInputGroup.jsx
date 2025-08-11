@@ -1,4 +1,4 @@
-import { BaseControl, Flex, FlexItem, PanelRow, ToggleControl } from '@wordpress/components';
+import { Flex, FlexItem, PanelRow, ToggleControl } from '@wordpress/components';
 import UnitControlInput from '@components/UnitControlInput';
 import TextControlInput from '@components/TextControlInput';
 

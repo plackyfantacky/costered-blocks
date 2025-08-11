@@ -1,35 +1,19 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { Panel, PanelBody, TabPanel, Flex, FlexItem, Notice } from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { isValidElement, cloneElement } from 'react';
 
 import { useSelectedBlockInfo } from "@lib/hooks";
 import { BLOCKS_WITH_EDITOR_STYLES } from "../lib/schema";
+import SidebarTabs from "@editor/SidebarTabs";
 
-import DimensionsControls from "@tabs/DimensionsControls";
-import DisplayControls from "@tabs/DisplayControls";
-import SpacingControls from "@tabs/SpacingControls";
+import { UnknownIcon } from "@components/Icons";
 
-const tabs = [
-    DisplayControls,
-    DimensionsControls,
-    SpacingControls,
-];
+const TabIcon = ({ name, size = 24, style = {} }) => {
 
-const Icon = ({ name, size = 24, style = {} }) => {
-
-    const DefaultIcon = (
-        <>
-            { /* Default icon if no name is provided. Icon from iconify.design: mdi--question-box-multiple (Material Design Icons | License: Apache 2.0) */}
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
-                <path fill="currentColor" d="M16 20v2H4c-1.1 0-2-.9-2-2V7h2v13zm4-18H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m-5 12h-2v-2h2zm1.8-5.2c-.3.4-.7.7-1.1.9c-.2.2-.4.3-.5.5c-.2.2-.2.5-.2.8h-2q0-.75.3-1.2c.2-.3.5-.6 1-.9q.45-.3.6-.6c.2-.2.2-.5.2-.8s-.1-.6-.3-.8s-.4-.3-.8-.3c-.3 0-.5.1-.7.2c-.2.2-.3.4-.3.7h-1.9c0-.8.2-1.4.8-1.8c.7-.3 1.4-.5 2.3-.5s1.7.2 2.2.7s.8 1.1.8 1.8c0 .5-.2.9-.4 1.3"></path>
-            </svg>
-        </>
-    );
-
-    if (!name) return <DefaultIcon />;
+    if (!name) return <UnknownIcon />;
 
     const blockType = getBlockType(name);
     if (!blockType || !blockType.icon) return null;
@@ -85,7 +69,7 @@ const Icon = ({ name, size = 24, style = {} }) => {
     }
 
     // Fallback
-    return <DefaultIcon />;
+    return <UnknownIcon />;
 };
 
 const Sidebar = () => {
@@ -111,7 +95,7 @@ const Sidebar = () => {
                         </FlexItem>
                         <FlexItem>
                             <Flex align="center" gap={0.5}>
-                                <Icon name={selectedBlock.name} size={24} />
+                                <TabIcon name={selectedBlock.name} size={24} />
                                 <strong>{selectedBlock.name}</strong>
                             </Flex>
                         </FlexItem>
@@ -131,15 +115,7 @@ const Sidebar = () => {
                     )}
                 </PanelBody>
             </Panel>
-            <TabPanel
-                className="costered-blocks-sidebar-tabs"
-                tabs={tabs.map(({ name, title, icon }) => ({ name, title, icon }))}
-            >
-                {(tab) => {
-                    const tabDef = tabs.find(t => t.name === tab.name);
-                    return tabDef?.content ? tabDef.content : null;
-                }}
-            </TabPanel>
+            <SidebarTabs />
         </PluginSidebar>
     );
 };

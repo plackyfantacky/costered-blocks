@@ -35,11 +35,31 @@ export const modeProps = {
     'paddingMode': { type: 'string' }
 };
 
+export const flexProps = {
+    'flexDirection': { type: 'string' },
+    'flexWrap': { type: 'string' },
+    'justifyContent': { type: 'string' },
+    'alignItems': { type: 'string' },
+    'alignContent': { type: 'string' },
+    'gapColumn': { type: 'string' },
+    'gapRow': { type: 'string' }
+};
+
+export const flexItemProps = {
+    'flexGrow': { type: 'number' },
+    'flexShrink': { type: 'number' },
+    'flexBasis': { type: 'string' },
+    'alignSelf': { type: 'string' },
+    'order': { type: 'number' }
+};
+
 export const COSTERED_LAYOUT_SCHEMA = {
     ...displayProps,
     ...dimensionProps,
     ...marginProps,
     ...paddingProps,
+    ...flexProps,
+    ...flexItemProps,
     ...modeProps
 }
 

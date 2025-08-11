@@ -1,4 +1,4 @@
-import { BaseControl, Flex, FlexItem, Rect, ToggleControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { __experimentalGrid as Grid } from "@wordpress/components";
 
 import UnitControlInput from "@components/UnitControlInput";

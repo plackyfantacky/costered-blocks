@@ -2,9 +2,83 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 
-import DisplayInputControl from "@components/DisplayInputControl";
-import VisibilityInputControl from "../../components/VisibilityInputControl";
 import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
+
+import CustomSelectControl from "@components/CustomSelectControl";
+import {
+    BoxIcon,
+    BrickOulineRounded,
+    MatchWordRounded,
+    FlexNoWrapRounded,
+    GridViewRounded,
+    BorderNoneVariant,
+    EyeOutlineIcon,
+    EyeOffOutlineIcon,
+    CollapseIcon 
+} from "@components/Icons";
+
+const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
+    const handleChange = (value) => {
+        if (!value) {
+            updateAttributes(clientId, {
+                ...attributes,
+                display: undefined
+            });
+        } else {
+            updateAttributes(clientId, {
+                ...attributes,
+                display: value
+            });
+        }
+    };
+    const displayOptions = [
+        { value: 'block', content: __('Block', 'costered-blocks'), icon: <BrickOulineRounded /> },
+        { value: 'inline', content: __('Inline', 'costered-blocks'), icon: <MatchWordRounded /> },
+        { value: 'flex', content: __('Flex', 'costered-blocks'), icon: <FlexNoWrapRounded /> },
+        { value: 'grid', content: __('Grid', 'costered-blocks'), icon: <GridViewRounded /> },
+        { value: 'none', content: __('None', 'costered-blocks'), icon: <BorderNoneVariant /> },
+    ];
+
+    return (
+        <CustomSelectControl
+            label={__('Display', 'costered-blocks')}
+            value={typeof attributes?.display === "string" ? attributes.display : ""}
+            onChange={handleChange}
+            options={displayOptions}
+        />
+    );
+};
+
+const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => {
+    const handleChange = (value) => {
+        if (!value) {
+            updateAttributes(clientId, {
+                ...attributes,
+                visibility: undefined
+            });
+        } else {
+            updateAttributes(clientId, {
+                ...attributes,
+                visibility: value
+            });
+        }
+    };
+
+    const visibilityOptions = [
+        { value: 'visible', content: __('Visible', 'costered-blocks'), icon: <EyeOutlineIcon /> },
+        { value: 'hidden', content: __('Hidden', 'costered-blocks'), icon: <EyeOffOutlineIcon /> },
+        { value: 'collapse', content: __('Collapse', 'costered-blocks'), icon: <CollapseIcon /> },
+    ];
+
+    return (
+        <CustomSelectControl
+            label={__('Visibility', 'costered-blocks')}
+            value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
+            onChange={handleChange}
+            options={visibilityOptions}
+        />
+    );
+};
 
 const DisplayControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
@@ -20,7 +94,7 @@ const DisplayControls = () => {
             <PanelBody title={__('Display', 'costered-blocks')} initialOpen={true} style={{ gap: '10rem' }}>
                 <Flex direction="column" gap={4} style={{ marginBottom: '1rem' }}>
                     <FlexItem>
-                        <DisplayInputControl
+                        <DisplaySelectControl
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
@@ -28,7 +102,7 @@ const DisplayControls = () => {
                         />
                     </FlexItem>
                     <FlexItem>
-                        <VisibilityInputControl
+                        <VisibilitySelectControl
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
@@ -41,19 +115,9 @@ const DisplayControls = () => {
     );
 };
 
-// lucide:box (Lucide / license: ISC)
-const icon = (
-    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
-            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-            <path d="m3.3 7l8.7 5l8.7-5M12 22V12"></path>
-        </g>
-    </svg>
-);
-
 export default {
     name: "display-controls",
     title: __('Display Controls', 'costered-blocks'),
-    icon,
-    content: <DisplayControls />
+    icon: <BoxIcon />,
+    render: () => <DisplayControls />
 };
