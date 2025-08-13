@@ -119,3 +119,107 @@ export const ArrowRightThin = ({ size = 24 }) => (
         <path fill="currentColor" d="M14 16.94v-4H5.08l-.03-2.01H14V6.94l5 5Z"></path>
     </svg>
 );
+
+/* humbleicons:align-objects-center (Humbleicons / License: MIT) */
+export const AlignObjectsCenterHorizontal = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m4-8h5m-3-3l-3 3l3 3M8 12H3m3-3l3 3l-3 3"></path>
+    </svg>
+);
+
+/* material-symbols:vertical-align-center-rounded (Material Design Icons / License: Apache 2.0) */
+export const AlignObjectsCenterVertical = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="m11 17.8l-.9.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l2.6-2.6q.15-.15.325-.212t.375-.063t.375.063t.325.212l2.6 2.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-.9-.9V21q0 .425-.288.713T12 22t-.712-.288T11 21zM5 13q-.425 0-.712-.288T4 12t.288-.712T5 11h14q.425 0 .713.288T20 12t-.288.713T19 13zm6-6.8V3q0-.425.288-.712T12 2t.713.288T13 3v3.2l.9-.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-2.6 2.6q-.15.15-.325.213T12 9.575t-.375-.062T11.3 9.3L8.7 6.7q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275z"></path>
+    </svg>
+);
+
+/* material-symbols:align-space-around */
+export const AlignSpaceAround = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M2 4V2h20v2zm0 18v-2h20v2zM7 9V6h10v3zm0 9v-3h10v3z" />
+    </svg>);
+
+/* material-symbols:align-justify-space-around */
+export const JustifySpaceAround = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M20 22V2h2v20zM2 22V2h2v20zm13-5V7h3v10zm-9 0V7h3v10z" />
+    </svg>);
+
+/* material-symbols:align-space-between */
+export const AlignSpaceBetween = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M7 7V4H2V2h20v2h-5v3zM2 22v-2h5v-3h10v3h5v2z" />
+    </svg>
+);
+
+/* material-symbols:align-justify-space-between */
+export const JustifySpaceBetween = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M20 22V2h2v20zM2 22V2h2v20zm13-5V7h3v10zm-9 0V7h3v10z" />
+    </svg>
+);
+/* material-symbols:align-space-evenly */
+export const AlignSpaceEvenly = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M2 4V2h20v2zm0 18v-2h20v2zm5-12V7h10v3zm0 7v-3h10v3z" />
+    </svg>);
+
+/* material-symbols:align-justify-space-evenly */
+export const JustifySpaceEvenly = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path fill="currentColor" d="M20 22V2h2v20zM2 22V2h2v20zm12-5V7h3v10zm-7 0V7h3v10z" />
+    </svg>
+);
+
+/* Entypo+ Icons (all CC BY-SA 4.0 ) */
+export const EntypoAlignRight = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 20 20">
+        <path fill="currentColor" d="M11 7v2H3v2h8v2l3-3zm4-4.4v14.8c0 .551.448.6 1 .6c.553 0 1-.049 1-.6V2.6c0-.553-.447-.6-1-.6s-1 .047-1 .6"></path>
+    </svg>
+);
+
+export const EntypoAlignLeft = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 20 20">
+        <path fill="currentColor" d="m6 10l3 3v-2h8V9H9V7zM4 2c-.553 0-1 .047-1 .6v14.8c0 .551.447.6 1 .6s1-.049 1-.6V2.6c0-.553-.448-.6-1-.6"></path>
+    </svg>
+);
+
+export const EntypoAlignTop = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 20 20">
+        <path fill="currentColor" d="M10 6L7 9h2v8h2V9h2zm8-2c0-.553-.048-1-.6-1H2.6c-.552 0-.6.447-.6 1s.048 1 .6 1h14.8c.552 0 .6-.447.6-1"></path>
+    </svg>
+);
+
+export const EntypoAlignBottom = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 20 20">
+        <path fill="currentColor" d="M13 11h-2V3H9v8H7l3 3zm4.4 4H2.6c-.552 0-.6.447-.6 1s.048 1 .6 1h14.8c.552 0 .6-.447.6-1s-.048-1-.6-1"></path>
+    </svg>
+);
+
+/* custom icons made by Adam Trickett (all license: MIT ) */
+export const CustomFlexNoWrap = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path d="M6.5,11.05l0,1.9c0,0.442 -0.358,0.8 -0.8,0.8l-1.9,-0c-0.442,-0 -0.8,-0.358 -0.8,-0.8l0,-1.9c0,-0.442 0.358,-0.8 0.8,-0.8l1.9,0c0.442,0 0.8,0.358 0.8,0.8Z" />
+        <path d="M11.5,11.05l0,1.9c0,0.442 -0.358,0.8 -0.8,0.8l-1.9,-0c-0.442,-0 -0.8,-0.358 -0.8,-0.8l0,-1.9c0,-0.442 0.358,-0.8 0.8,-0.8l1.9,0c0.442,0 0.8,0.358 0.8,0.8Z" />
+        <path d="M18.586,13l-4.42,0c-0.552,-0 -1,-0.448 -1,-1c0,-0.552 0.448,-1 1,-1l4.42,0l-0.293,-0.293c-0.39,-0.39 -0.39,-1.024 -0,-1.414c0.39,-0.39 1.024,-0.39 1.414,-0l2,2c0.188,0.188 0.293,0.441 0.293,0.707c-0,0.266 -0.105,0.519 -0.293,0.707l-2,2c-0.39,0.39 -1.024,0.39 -1.414,0c-0.39,-0.39 -0.39,-1.024 -0,-1.414l0.293,-0.293Z" />
+    </svg>
+);
+
+export const CustomFlexWrap = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path d="M17.861,19.61l-11.215,-0c-2.334,-0 -3.47,-1.58 -3.487,-3.083c-0.018,-1.508 1.077,-3.104 3.487,-3.104l10.855,0c0.959,0 1.492,-0.571 1.492,-1.205c-0,-0.634 -0.533,-1.204 -1.492,-1.204l-13.368,-0c-0.51,-0 -0.925,-0.415 -0.925,-0.925c0,-0.51 0.415,-0.924 0.925,-0.924l13.368,-0c2.264,-0 3.34,1.557 3.34,3.053c0,1.497 -1.076,3.054 -3.34,3.054l-10.855,0c-1.059,0 -1.646,0.571 -1.639,1.234c0.008,0.666 0.604,1.255 1.639,1.255l11.215,-0l-0.347,-0.347c-0.312,-0.312 -0.312,-0.819 0,-1.131c0.313,-0.313 0.82,-0.313 1.132,-0l1.837,1.837c0.312,0.312 0.312,0.819 -0,1.131l-1.837,1.837c-0.312,0.312 -0.819,0.312 -1.132,-0c-0.312,-0.312 -0.312,-0.819 0,-1.131l0.347,-0.347Z" />
+        <path d="M8.362,4.278l-0,2.56c-0,0.441 -0.358,0.8 -0.8,0.8l-2.56,-0c-0.441,-0 -0.8,-0.359 -0.8,-0.8l0,-2.56c0,-0.442 0.359,-0.8 0.8,-0.8l2.56,-0c0.442,-0 0.8,0.358 0.8,0.8Z" />
+        <path d="M14.14,4.278l-0,2.56c-0,0.441 -0.359,0.8 -0.8,0.8l-2.56,-0c-0.442,-0 -0.8,-0.359 -0.8,-0.8l-0,-2.56c-0,-0.442 0.358,-0.8 0.8,-0.8l2.56,-0c0.441,-0 0.8,0.358 0.8,0.8Z" />
+        <path d="M19.917,4.278l0,2.56c0,0.441 -0.358,0.8 -0.8,0.8l-2.56,-0c-0.441,-0 -0.8,-0.359 -0.8,-0.8l0,-2.56c0,-0.442 0.359,-0.8 0.8,-0.8l2.56,-0c0.442,-0 0.8,0.358 0.8,0.8Z" />
+    </svg>
+);
+
+export const CustomFlexWrapReverse = ({ size = 24 }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+        <path d="M17.861,6.239l-11.215,0c-1.035,0 -1.631,0.589 -1.639,1.255c-0.007,0.663 0.58,1.234 1.639,1.234l10.855,-0c2.264,-0 3.34,1.557 3.34,3.054c0,1.496 -1.076,3.053 -3.34,3.053l-13.368,0c-0.51,0 -0.925,-0.414 -0.925,-0.924c0,-0.51 0.415,-0.925 0.925,-0.925l13.368,0c0.959,0 1.492,-0.57 1.492,-1.204c-0,-0.634 -0.533,-1.205 -1.492,-1.205l-10.855,-0c-2.41,-0 -3.505,-1.596 -3.487,-3.104c0.017,-1.503 1.153,-3.083 3.487,-3.083l11.215,0l-0.347,-0.347c-0.312,-0.312 -0.312,-0.819 0,-1.131c0.313,-0.312 0.82,-0.312 1.132,0l1.837,1.837c0.312,0.312 0.312,0.819 -0,1.131l-1.837,1.837c-0.312,0.313 -0.819,0.313 -1.132,0c-0.312,-0.312 -0.312,-0.819 0,-1.131l0.347,-0.347Z" />
+        <path d="M8.362,19.722l-0,-2.56c-0,-0.441 -0.358,-0.8 -0.8,-0.8l-2.56,0c-0.441,0 -0.8,0.359 -0.8,0.8l0,2.56c0,0.442 0.359,0.8 0.8,0.8l2.56,0c0.442,0 0.8,-0.358 0.8,-0.8Z" />
+        <path d="M14.14,19.722l-0,-2.56c-0,-0.441 -0.359,-0.8 -0.8,-0.8l-2.56,0c-0.442,0 -0.8,0.359 -0.8,0.8l-0,2.56c-0,0.442 0.358,0.8 0.8,0.8l2.56,0c0.441,0 0.8,-0.358 0.8,-0.8Z" />
+        <path d="M19.917,19.722l0,-2.56c0,-0.441 -0.358,-0.8 -0.8,-0.8l-2.56,0c-0.441,0 -0.8,0.359 -0.8,0.8l0,2.56c0,0.442 0.359,0.8 0.8,0.8l2.56,0c0.442,0 0.8,-0.358 0.8,-0.8Z" />
+    </svg>
+);

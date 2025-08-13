@@ -3,7 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
 import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
-import DimensionInputGroup from "@components/DimensionInputGroup";
+import DimensionInputGroup from "@components/composite/DimensionInputGroup";
 
 import { DimensionsIcon } from "@components/Icons";
 

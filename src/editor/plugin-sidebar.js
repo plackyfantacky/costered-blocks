@@ -3,7 +3,7 @@ import { PluginSidebar } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { isValidElement, cloneElement } from 'react';
+import { isValidElement, cloneElement, useEffect } from '@wordpress/element';
 
 import { useSelectedBlockInfo } from "@lib/hooks";
 import { BLOCKS_WITH_EDITOR_STYLES } from "../lib/schema";
@@ -73,8 +73,8 @@ const TabIcon = ({ name, size = 24, style = {} }) => {
 };
 
 const Sidebar = () => {
-    const { selectedBlock, clientId } = useSelectedBlockInfo();
-
+    const { selectedBlock } = useSelectedBlockInfo();
+    
     if (!selectedBlock) {
         return <PluginSidebar name="costered-blocks-sidebar" title={__('Costered Blocks', 'costered-blocks')}>
             <Panel>

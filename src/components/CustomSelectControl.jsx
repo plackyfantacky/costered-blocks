@@ -98,8 +98,10 @@ const wrapperStyle = {
 
 const labelStyle = {
     display: "block",
-    fontWeight: 600,
-    marginBottom: 4
+    marginBottom: 4,
+    fontSize: "0.875em",
+    fontWeight: 500,
+    textTransform: "uppercase",
 };
 
 const buttonStyle = {

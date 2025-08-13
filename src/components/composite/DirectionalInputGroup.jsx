@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
 import { __experimentalGrid as Grid } from "@wordpress/components";
 
@@ -67,7 +68,7 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes 
             <InputField direction="Bottom" label="Bottom" />
             <div style={{ gridColumn: '1 / span 10', gridRow: '4' }}>
                 <ToggleControl
-                    label="Use custom values (e.g auto, calc)"
+                    label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
                     checked={mode === 'unit'}
                     onChange={toggleMode}
                     __nextHasNoMarginBottom

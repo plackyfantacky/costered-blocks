@@ -1,31 +1,28 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { Panel, PanelBody } from '@wordpress/components';
+import {
+    Panel, PanelBody, Flex, FlexItem,
+    __experimentalToggleGroupControl as ToggleGroupControl,
+    __experimentalToggleGroupControlOption as ToggleGroupControlOption
+} from '@wordpress/components';
 
 import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
 
 import CustomSelectControl from "@components/CustomSelectControl";
+import FlexPropertyButtonGroup from "@components/composite/FlexPropertyButtonGroup";
+import { setOrUnsetAttrs } from "@lib/utils";
 import {
     FlexNoWrapRounded,
     ArrowUpThin,
     ArrowDownThin,
     ArrowLeftThin,
-    ArrowRightThin } from "@components/Icons";
+    ArrowRightThin,
+    CustomFlexNoWrap,
+    CustomFlexWrap,
+    CustomFlexWrapReverse
+} from "@components/Icons";
 
 const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
-    const handleChange = (value) => {
-        if (!value) {
-            updateAttributes(clientId, {
-                ...attributes,
-                flexDirection: undefined
-            });
-        } else {
-            updateAttributes(clientId, {
-                ...attributes,
-                flexDirection: value
-            });
-        }
-    };
     const directionOptions = [
         { value: 'row', content: __('Row', 'costered-blocks'), icon: <ArrowRightThin />, altIcon: <ArrowLeftThin /> },
         { value: 'row-reverse', content: __('Row Reverse', 'costered-blocks'), icon: <ArrowLeftThin />, altIcon: <ArrowRightThin /> },
@@ -37,18 +34,59 @@ const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
         <CustomSelectControl
             label={__('Flex Direction', 'costered-blocks')}
             value={typeof attributes?.flexDirection === "string" ? attributes.flexDirection : ""}
-            onChange={handleChange}
+            onChange={setOrUnsetAttrs('flexDirection', attributes, updateAttributes, clientId)}
             options={directionOptions}
         />
     );
 };
 
+const FlexWrapButtonGroupControl = ({ attributes, clientId, updateAttributes }) => {
+    const wrapOptions = [
+        { value: 'nowrap', content: __('No Wrap', 'costered-blocks'), icon: <CustomFlexNoWrap /> },
+        { value: 'wrap', content: __('Wrap', 'costered-blocks'), icon: <CustomFlexWrap /> },
+        { value: 'wrap-reverse', content: __('Wrap Reverse', 'costered-blocks'), icon: <CustomFlexWrapReverse /> },
+    ];
+
+    return (
+        <FlexPropertyButtonGroup
+            type="both"
+            label={__('Flex Wrap', 'costered-blocks')}
+            value={attributes?.flexWrap || 'nowrap'}
+            onChange={setOrUnsetAttrs('flexWrap', attributes, updateAttributes, clientId)}
+            options={wrapOptions}
+        />
+    );
+};
+
+// const MainAxisAlignmentSelectControl = ({ attributes, clientId, updateAttributes }) => {
+//     const handleChange = (value) => {
+//         if (!value) {
+//             updateAttributes(clientId, {
+//                 ...attributes,
+//                 justifyContent: undefined
+//             });
+//         } else {
+//             updateAttributes(clientId, {
+//                 ...attributes,
+//                 justifyContent: value
+//             });
+//         }
+//     }
+
+//     const justifyOptions = [
+//         { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <ArrowLeftThin />, altIcon: <ArrowRightThin /> },
+//         { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <ArrowRightThin />, altIcon: <ArrowLeftThin /> },
+//         { value: 'center', content: __('Center', 'costered-blocks'), icon: <CustomFlexNoWrap /> },
+//         { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <CustomFlexWrap /> },
+//         { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <CustomFlexWrapReverse /> },
+//     ];
 
 
 
 
-
-
+    
+        
+// }
 
 
 const FlexBoxControls = () => {
@@ -63,15 +101,24 @@ const FlexBoxControls = () => {
     return (
         <Panel>
             <PanelBody title={__('Flexbox Controls', 'costered-blocks')} initialOpen={true}>
-                <div className="flexbox-controls">
-                    <DirectionSelectControl
-                        attributes={attributes}
-                        clientId={clientId}
-                        updateAttributes={updateBlockAttributes}
-                        unsetAttrs={() => unsetAttrs(['flexDirection'])}
-                    />
-                    {/* Add your Flexbox controls here */}
-                </div>
+                <Flex direction="column" className="flexbox-controls">
+                    <FlexItem>
+                        <DirectionSelectControl
+                            attributes={attributes}
+                            clientId={clientId}
+                            updateAttributes={updateBlockAttributes}
+                            //unsetAttrs={() => unsetAttrs(['flexDirection'])}
+                        />
+                    </FlexItem>
+                    <FlexItem>
+                        <FlexWrapButtonGroupControl
+                            attributes={attributes}
+                            clientId={clientId}
+                            updateAttributes={updateBlockAttributes}
+                            //unsetAttrs={() => unsetAttrs(['flexWrap'])}
+                        />
+                    </FlexItem>
+                </Flex>
             </PanelBody>
         </Panel>
     );

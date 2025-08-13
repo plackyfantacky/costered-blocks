@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 
-import DirectionalInputGroup from "@components/DirectionalInputGroup";
+import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
 import { useSelectedBlockInfo } from "@lib/hooks";
 
 import { BoxMarginIcon } from "@components/Icons";

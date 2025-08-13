@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { Flex, FlexItem, PanelRow, ToggleControl } from '@wordpress/components';
 import UnitControlInput from '@components/UnitControlInput';
 import TextControlInput from '@components/TextControlInput';
@@ -41,7 +42,7 @@ export default function DimensionInputGroup({ keys, modeKey, attributes, clientI
                 <Flex style={{ marginTop: '0.5rem' }}>
                     <FlexItem>
                         <ToggleControl
-                            label="Use custom values (e.g auto, calc)"
+                            label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
                             checked={mode === 'unit'}
                             onChange={toggleMode}
                             __nextHasNoMarginBottom
