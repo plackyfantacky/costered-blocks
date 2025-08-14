@@ -3,6 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 
 import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
+import { setOrUnsetAttrs } from "@lib/utils";
 
 import CustomSelectControl from "@components/CustomSelectControl";
 import {
@@ -18,19 +19,6 @@ import {
 } from "@components/Icons";
 
 const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
-    const handleChange = (value) => {
-        if (!value) {
-            updateAttributes(clientId, {
-                ...attributes,
-                display: undefined
-            });
-        } else {
-            updateAttributes(clientId, {
-                ...attributes,
-                display: value
-            });
-        }
-    };
     const displayOptions = [
         { value: 'block', content: __('Block', 'costered-blocks'), icon: <BrickOulineRounded /> },
         { value: 'inline', content: __('Inline', 'costered-blocks'), icon: <MatchWordRounded /> },
@@ -43,27 +31,13 @@ const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
         <CustomSelectControl
             label={__('Display', 'costered-blocks')}
             value={typeof attributes?.display === "string" ? attributes.display : ""}
-            onChange={handleChange}
+            onChange={ setOrUnsetAttrs('display', attributes, updateAttributes, clientId) }
             options={displayOptions}
         />
     );
 };
 
 const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => {
-    const handleChange = (value) => {
-        if (!value) {
-            updateAttributes(clientId, {
-                ...attributes,
-                visibility: undefined
-            });
-        } else {
-            updateAttributes(clientId, {
-                ...attributes,
-                visibility: value
-            });
-        }
-    };
-
     const visibilityOptions = [
         { value: 'visible', content: __('Visible', 'costered-blocks'), icon: <EyeOutlineIcon /> },
         { value: 'hidden', content: __('Hidden', 'costered-blocks'), icon: <EyeOffOutlineIcon /> },
@@ -74,7 +48,7 @@ const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => 
         <CustomSelectControl
             label={__('Visibility', 'costered-blocks')}
             value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
-            onChange={handleChange}
+            onChange={ setOrUnsetAttrs('visibility', attributes, updateAttributes, clientId) }
             options={visibilityOptions}
         />
     );

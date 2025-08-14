@@ -1,0 +1,20 @@
+{
+    "plugins": [
+        {
+            "name": "removeEditorsNSData"
+        },
+        {
+            "name": "removeAttrs",
+            "params": {
+                "elemSeparator": "|",
+                "attrs": [
+                    "style",
+                    "svg|xml:space"
+                ]
+            }
+        },
+        {
+            "name": "removeUnusedNS"
+        }
+    ]
+}

@@ -9,6 +9,7 @@
         "build": "node ./node/dev.config.mjs -- --build"
     },
     "devDependencies": {
+        "@svgr/core": "^8.1.0",
         "esbuild": "^0.25.5",
         "esbuild-plugin-path-alias": "^1.0.7",
         "glob": "^11.0.3"
