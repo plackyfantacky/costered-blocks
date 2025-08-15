@@ -5,7 +5,7 @@ import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/compon
 import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
 import { useSelectedBlockInfo } from "@lib/hooks";
 
-import { BoxMarginIcon } from "@components/Icons";
+import { BoxMargin } from "@components/Icons";
 
 const SpacingControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
@@ -48,6 +48,6 @@ const SpacingControls = () => {
 export default {
     name: "spacing-controls",
     title: __('Spacing Controls', 'costered-blocks'),
-    icon: <BoxMarginIcon />,
+    icon: <BoxMargin />,
     render: () => <SpacingControls />
 };

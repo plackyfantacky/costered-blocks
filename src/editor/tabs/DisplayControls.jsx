@@ -13,9 +13,9 @@ import {
     FlexNoWrapRounded,
     GridViewRounded,
     BorderNoneVariant,
-    EyeOutlineIcon,
-    EyeOffOutlineIcon,
-    CollapseIcon 
+    EyeOutline,
+    EyeOffOutline,
+    Collapse 
 } from "@components/Icons";
 
 const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
@@ -39,9 +39,9 @@ const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
 
 const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => {
     const visibilityOptions = [
-        { value: 'visible', content: __('Visible', 'costered-blocks'), icon: <EyeOutlineIcon /> },
-        { value: 'hidden', content: __('Hidden', 'costered-blocks'), icon: <EyeOffOutlineIcon /> },
-        { value: 'collapse', content: __('Collapse', 'costered-blocks'), icon: <CollapseIcon /> },
+        { value: 'visible', content: __('Visible', 'costered-blocks'), icon: <EyeOutline /> },
+        { value: 'hidden', content: __('Hidden', 'costered-blocks'), icon: <EyeOffOutline /> },
+        { value: 'collapse', content: __('Collapse', 'costered-blocks'), icon: <Collapse /> },
     ];
 
     return (

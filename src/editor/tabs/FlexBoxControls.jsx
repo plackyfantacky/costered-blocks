@@ -19,7 +19,19 @@ import {
     FlexDirectionRowReverse,
     FlexWrapNone,
     FlexWrapWrap,
-    FlexWrapReverse
+    FlexWrapReverse,
+    FlexJustifyStart,
+    FlexJustifyEnd,
+    FlexJustifyCenter,
+    FlexJustifySpaceAround,
+    FlexJustifySpaceBetween,
+    FlexJustifySpaceEven,
+    FlexAlignStart,
+    FlexAlignEnd,
+    FlexAlignCenter,
+    FlexAlignSpaceAround,
+    FlexAlignSpaceBetween,
+    FlexAlignSpaceEven
 } from "@components/Icons";
 
 const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
@@ -58,36 +70,70 @@ const FlexWrapButtonGroupControl = ({ attributes, clientId, updateAttributes }) 
     );
 };
 
-// const MainAxisAlignmentSelectControl = ({ attributes, clientId, updateAttributes }) => {
-//     const handleChange = (value) => {
-//         if (!value) {
-//             updateAttributes(clientId, {
-//                 ...attributes,
-//                 justifyContent: undefined
-//             });
-//         } else {
-//             updateAttributes(clientId, {
-//                 ...attributes,
-//                 justifyContent: value
-//             });
-//         }
-//     }
+const MainAxisAlignmentToggleGroupControl = ({ attributes, clientId, updateAttributes }) => {
 
-//     const justifyOptions = [
-//         { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <ArrowLeftThin />, altIcon: <ArrowRightThin /> },
-//         { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <ArrowRightThin />, altIcon: <ArrowLeftThin /> },
-//         { value: 'center', content: __('Center', 'costered-blocks'), icon: <CustomFlexNoWrap /> },
-//         { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <CustomFlexWrap /> },
-//         { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <CustomFlexWrapReverse /> },
-//     ];
+    //row/row-reverse
+    const alignOptions = [
+        { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <FlexJustifyStart />, altIcon: <FlexJustifyEnd /> },
+        { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <FlexJustifyEnd />, altIcon: <FlexJustifyStart /> },
+        { value: 'center', content: __('Center', 'costered-blocks'), icon: <FlexJustifyCenter /> },
+        { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <FlexJustifySpaceAround /> },
+        { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <FlexJustifySpaceBetween /> },
+        { value: 'space-evenly', content: __('Space Evenly', 'costered-blocks'), icon: <FlexJustifySpaceEven /> },
+    ];
+
+    const altAlignOptions = [
+        { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <FlexAlignEnd />, altIcon: <FlexAlignStart /> },
+        { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <FlexAlignStart />, altIcon: <FlexAlignEnd /> },
+        { value: 'center', content: __('Center', 'costered-blocks'), icon: <FlexAlignCenter /> },
+        { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <FlexAlignSpaceAround /> },
+        { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <FlexAlignSpaceBetween /> },
+        { value: 'space-evenly', content: __('Space Evenly', 'costered-blocks'), icon: <FlexAlignSpaceEven /> },
+    ];
+
+    return (
+        <FlexPropertyButtonGroup
+            type="icon"
+            label={__('Main Axis Alignment', 'costered-blocks')}
+            value={attributes?.justifyContent || 'flex-start'}
+            onChange={setOrUnsetAttrs('justifyContent', attributes, updateAttributes, clientId)}
+            options={attributes?.flexDirection?.includes('row') ? alignOptions : altAlignOptions}
+        />
+    )
+};
+
+const CrossAxisAlignmentToggleGroupControl = ({ attributes, clientId, updateAttributes }) => {
+
+    //column/column-reverse
+    const alignOptions = [
+        { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <FlexJustifyEnd />, altIcon: <FlexJustifyStart /> },
+        { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <FlexJustifyStart />, altIcon: <FlexJustifyEnd /> },
+        { value: 'center', content: __('Center', 'costered-blocks'), icon: <FlexJustifyCenter /> },
+        { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <FlexJustifySpaceAround /> },
+        { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <FlexJustifySpaceBetween /> },
+        { value: 'space-evenly', content: __('Space Evenly', 'costered-blocks'), icon: <FlexJustifySpaceEven /> },
+    ];
+
+    const altAlignOptions = [
+        { value: 'flex-start', content: __('Start', 'costered-blocks'), icon: <FlexAlignStart />, altIcon: <FlexAlignEnd /> },
+        { value: 'flex-end', content: __('End', 'costered-blocks'), icon: <FlexAlignEnd />, altIcon: <FlexAlignStart /> },
+        { value: 'center', content: __('Center', 'costered-blocks'), icon: <FlexAlignCenter /> },
+        { value: 'space-around', content: __('Space Around', 'costered-blocks'), icon: <FlexAlignSpaceAround /> },
+        { value: 'space-between', content: __('Space Between', 'costered-blocks'), icon: <FlexAlignSpaceBetween /> },
+        { value: 'space-evenly', content: __('Space Evenly', 'costered-blocks'), icon: <FlexAlignSpaceEven /> },
+    ];
 
 
-
-
-    
-        
-// }
-
+    return (
+        <FlexPropertyButtonGroup
+            type="icon"
+            label={__('Cross Axis Alignment', 'costered-blocks')}
+            value={attributes?.alignItems || 'flex-start'}
+            onChange={setOrUnsetAttrs('alignItems', attributes, updateAttributes, clientId)}
+            options={attributes?.flexDirection?.includes('column') ? alignOptions : altAlignOptions}
+        />
+    );
+};
 
 const FlexBoxControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
@@ -96,7 +142,6 @@ const FlexBoxControls = () => {
     if (!selectedBlock) return null;
 
     const { attributes } = selectedBlock;
-    const unsetAttrs = useUnsetBlockAttributes(clientId);
 
     return (
         <Panel>
@@ -107,7 +152,6 @@ const FlexBoxControls = () => {
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
-                            //unsetAttrs={() => unsetAttrs(['flexDirection'])}
                         />
                     </FlexItem>
                     <FlexItem>
@@ -115,7 +159,20 @@ const FlexBoxControls = () => {
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
-                            //unsetAttrs={() => unsetAttrs(['flexWrap'])}
+                        />
+                    </FlexItem>
+                    <FlexItem>
+                        <MainAxisAlignmentToggleGroupControl
+                            attributes={attributes}
+                            clientId={clientId}
+                            updateAttributes={updateBlockAttributes}
+                        />
+                    </FlexItem>
+                    <FlexItem>
+                        <CrossAxisAlignmentToggleGroupControl
+                            attributes={attributes}
+                            clientId={clientId}
+                            updateAttributes={updateBlockAttributes}
                         />
                     </FlexItem>
                 </Flex>

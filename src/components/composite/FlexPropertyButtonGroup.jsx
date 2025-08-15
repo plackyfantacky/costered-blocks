@@ -9,7 +9,7 @@ import {
 import { DefaultIcon } from '@components/Icons';
 
 export default function FlexPropertyButtonGroup({ value, onChange, options, label = "", type = "text" }) {
-    
+
     const buttonOptions = options.map((opt) => {
         if (type === "text") {
             return (
@@ -36,7 +36,7 @@ export default function FlexPropertyButtonGroup({ value, onChange, options, labe
                     <FlexItem>{isRTL() ? opt.altIcon : opt.icon || DefaultIcon}</FlexItem>
                     <FlexItem>{opt.content}</FlexItem>
                 </Flex>
-            )
+            );
             return (
                 <ToggleGroupControlOption
                     key={opt.value}
@@ -48,21 +48,17 @@ export default function FlexPropertyButtonGroup({ value, onChange, options, labe
     }) || [];
 
     return (
-        <>
-            <PanelRow>
-                <Flex gap="0" justify="space-between">
-                    <ToggleGroupControl
-                        label={label}
-                        onChange={onChange}
-                        value={value}
-                        isBlock
-                        __nextHasNoMarginBottom
-                        __next40pxDefaultSize
-                    >
-                        {buttonOptions}
-                    </ToggleGroupControl>
-                </Flex>
-            </PanelRow>
-        </>
+        <PanelRow>
+            <ToggleGroupControl
+                label={label}
+                onChange={onChange}
+                value={value}
+                isBlock
+                __nextHasNoMarginBottom
+                __next40pxDefaultSize
+            >
+                {buttonOptions}
+            </ToggleGroupControl>
+        </PanelRow>
     );
 }
