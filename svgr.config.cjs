@@ -10,22 +10,30 @@ module.exports = {
     expandProps: 'end',
     dimensions: false,
     svgProps: { width: '{size}', height: '{size}' },
-    template: (api, _opts, state) => {
+    template: (...args) => {
+        // v6/v7: (variables, { tpl })
+        if (args.length === 2) {
+            const [variables, { tpl }] = args;
+            const { componentName, jsx } = variables;
+            return tpl`
+                const ${componentName} = ({ size = 24, ...props }) => (
+                    ${jsx}
+                );
+
+                export default ${componentName};
+            `;
+        }
+
+        // v8: (api, opts, state)
+        const [api, _opts, state] = args;
         const { template } = api;
-        const { jsx, filePath } = state;
-
-        const baseName = path.basename(filePath, path.extname(filePath));
-        const cleanName = baseName
-            .replace(/^Svg/i, '')              // drop Svg prefix if present
-            .replace(/[-_](.)/g, (_, c) => c.toUpperCase()) // kebab/snake to camel
-            .replace(/^(.)/, (_, c) => c.toUpperCase());    // uppercase first char
-
+        const { componentName, jsx } = state;
         return template.ast`
-            const ${cleanName} = ({ size = 24, ...props }) => (
+            const ${componentName} = ({ size = 24, ...props }) => (
                 ${jsx}
             );
 
-            export default ${cleanName};
+            export default ${componentName};
         `;
     },
 
@@ -56,25 +64,42 @@ module.exports = {
                     },
                 }),
             },
-
-            // Fill normalization: set any fill to currentColor; ensure <path> has fill
             {
-                name: 'normalizeCurrentColorFill',
+                name: 'dropArtboardRect',
                 type: 'visitor',
                 fn: () => ({
                     element: {
                         enter(node) {
-                            if (!node.attributes) return;
-                            if (Object.prototype.hasOwnProperty.call(node.attributes, 'fill')) {
-                                node.attributes.fill = 'currentColor';
-                            }
-                            if (node.name === 'path' && !Object.prototype.hasOwnProperty.call(node.attributes, 'fill')) {
-                                node.attributes.fill = 'currentColor';
-                            }
+                            if (node.name !== 'svg' || !node.children) return;
+
+                            const vb = String(node.attributes?.viewBox || '').trim().split(/\s+/).map(Number);
+                            const vbW = Number.isFinite(vb[2]) ? vb[2] : null;
+                            const vbH = Number.isFinite(vb[3]) ? vb[3] : null;
+
+                            const num = (v) => {
+                                if (v == null) return NaN;
+                                return parseFloat(String(v).replace(/px$/i, ''));
+                            };
+
+                            node.children = node.children.filter((child) => {
+                                if (child.name !== 'rect' || !child.attributes) return true;
+
+                                const x = num(child.attributes.x);
+                                const y = num(child.attributes.y);
+                                const w = num(child.attributes.width);
+                                const h = num(child.attributes.height);
+
+                                const atOrigin = (x === 0 || x === 0.0) && (y === 0 || y === 0.0);
+                                const matches24 = w === 24 && h === 24;
+                                const matchesVB = vbW != null && vbH != null && w === vbW && h === vbH;
+
+                                // remove if it’s an artboard-covering rect
+                                return !(atOrigin && (matches24 || matchesVB));
+                            });
                         },
                     },
                 }),
-            },
+            }
         ],
     },
 

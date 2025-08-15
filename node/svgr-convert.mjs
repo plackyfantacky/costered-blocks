@@ -30,6 +30,16 @@ function toComponentName(fileBase) {
     return name;
 }
 
+// Strip namespaced attributes (e.g. xmlns:attr) from SVG XML. We need to run this one before SVGO
+// because SVGO will throw an error if it encounters namespaced attributes AND that is before it even runs
+// any of the plugins that would remove them!
+function stripNamespacedAttributes(xml) {
+    xml = xml.replace(/\s+xlink:href=(["'])/gi, ' href=$1');
+    xml = xml.replace(/\s+xmlns:[A-Za-z_][\w.\-]*=(?:"[^"]*"|'[^']*')/g, '');
+    xml = xml.replace(/\s+(?!xml:)[A-Za-z_][\w.\-]*:[\w.\-]+=(?:"[^"]*"|'[^']*')/gi, '');
+    return xml;
+}
+
 async function convertOneSvg(inPath, outPath) {
     const svgCode = await fs.readFile(inPath, 'utf8');
 
@@ -44,7 +54,9 @@ async function convertOneSvg(inPath, outPath) {
     const base = path.basename(inPath, path.extname(inPath));
     const cleanName = toComponentName(base);
 
-    let jsCode = await transform(svgCode, config, { filePath: inPath, componentName: cleanName });
+    const sanitizedSvg = stripNamespacedAttributes(svgCode);
+
+    let jsCode = await transform(sanitizedSvg, config, { filePath: inPath, componentName: cleanName });
 
     jsCode = await prettier.format(jsCode, {
         parser: 'babel',
