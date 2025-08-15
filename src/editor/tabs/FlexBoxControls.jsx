@@ -13,21 +13,21 @@ import FlexPropertyButtonGroup from "@components/composite/FlexPropertyButtonGro
 import { setOrUnsetAttrs } from "@lib/utils";
 import {
     FlexNoWrapRounded,
-    ArrowUpThin,
-    ArrowDownThin,
-    ArrowLeftThin,
-    ArrowRightThin,
-    CustomFlexNoWrap,
-    CustomFlexWrap,
-    CustomFlexWrapReverse
+    FlexDirectionColumn,
+    FlexDirectionColumnReverse,
+    FlexDirectionRow,
+    FlexDirectionRowReverse,
+    FlexWrapNone,
+    FlexWrapWrap,
+    FlexWrapReverse
 } from "@components/Icons";
 
 const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
     const directionOptions = [
-        { value: 'row', content: __('Row', 'costered-blocks'), icon: <ArrowRightThin />, altIcon: <ArrowLeftThin /> },
-        { value: 'row-reverse', content: __('Row Reverse', 'costered-blocks'), icon: <ArrowLeftThin />, altIcon: <ArrowRightThin /> },
-        { value: 'column', content: __('Column', 'costered-blocks'), icon: <ArrowDownThin /> },
-        { value: 'column-reverse', content: __('Column Reverse', 'costered-blocks'), icon: <ArrowUpThin /> },
+        { value: 'row', content: __('Row', 'costered-blocks'), icon: <FlexDirectionRow />, altIcon: <FlexDirectionRowReverse /> },
+        { value: 'row-reverse', content: __('Row Reverse', 'costered-blocks'), icon: <FlexDirectionRowReverse />, altIcon: <FlexDirectionRow /> },
+        { value: 'column', content: __('Column', 'costered-blocks'), icon: <FlexDirectionColumn /> },
+        { value: 'column-reverse', content: __('Column Reverse', 'costered-blocks'), icon: <FlexDirectionColumnReverse /> },
     ];
 
     return (
@@ -42,9 +42,9 @@ const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
 
 const FlexWrapButtonGroupControl = ({ attributes, clientId, updateAttributes }) => {
     const wrapOptions = [
-        { value: 'nowrap', content: __('No Wrap', 'costered-blocks'), icon: <CustomFlexNoWrap /> },
-        { value: 'wrap', content: __('Wrap', 'costered-blocks'), icon: <CustomFlexWrap /> },
-        { value: 'wrap-reverse', content: __('Wrap Reverse', 'costered-blocks'), icon: <CustomFlexWrapReverse /> },
+        { value: 'nowrap', content: __('No Wrap', 'costered-blocks'), icon: <FlexWrapNone /> },
+        { value: 'wrap', content: __('Wrap', 'costered-blocks'), icon: <FlexWrapWrap /> },
+        { value: 'wrap-reverse', content: __('Wrap Reverse', 'costered-blocks'), icon: <FlexWrapReverse /> },
     ];
 
     return (

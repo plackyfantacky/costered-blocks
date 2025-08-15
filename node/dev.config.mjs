@@ -108,7 +108,8 @@ const jsConfig = {
             '@editor': path.resolve(pluginRoot, 'src/editor'),
             '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
             '@components': path.resolve(pluginRoot, 'src/components'),
-            '@lib': path.resolve(pluginRoot, 'src/lib')
+            '@lib': path.resolve(pluginRoot, 'src/lib'),
+            '@assets': path.resolve(pluginRoot, 'src/assets'),
         })
     ],
     logLevel: 'info',
