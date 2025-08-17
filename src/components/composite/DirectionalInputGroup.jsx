@@ -5,27 +5,19 @@ import { __experimentalGrid as Grid } from "@wordpress/components";
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
+import { useSetOrUnsetAttrs } from "@lib/hooks";
+
 function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes }) {
     const mode = attributes?.[`${prefix}Mode`] || 'unit';
 
     const toggleMode = () => {
         const next = mode === 'unit' ? 'text' : 'unit';
-        updateAttributes(clientId, {
-            ...attributes,
-            [`${prefix}Mode`]: next
-        });
-    };
-
-    const handleChange = (direction) => (val) => {
-        updateAttributes(clientId, {
-            ...attributes,
-            [`${prefix}${direction}`]: val
-        });
+        useSetOrUnsetAttrs(`${prefix}Mode`, attributes, updateAttributes, clientId)(next);
     };
 
     const InputField = ({ direction, label = direction }) => {
         const key = `${prefix}${direction}`;
-        const value = attributes?.[key];
+        const value = attributes?.[key] || '';
         const gridMap = {
             Top: { col: '4 / span 4', row: '1' },
             Left: { col: '1 / span 4', row: '2' },
@@ -36,7 +28,11 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes 
         const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
         return (
             <div style={{ gridColumn: gridMap[direction].col, gridRow: gridMap[direction].row, zIndex: 2 }}>
-                <Input value={value} onChange={handleChange(direction)} label={label} />
+                <Input
+                    value={value}
+                    onChange={useSetOrUnsetAttrs(key, attributes, updateAttributes, clientId)}
+                    label={label}
+                />
             </div>
         );
     };
@@ -69,7 +65,7 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes 
             <div style={{ gridColumn: '1 / span 10', gridRow: '4' }}>
                 <ToggleControl
                     label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
-                    checked={mode === 'unit'}
+                    checked={mode === 'text'}
                     onChange={toggleMode}
                     __nextHasNoMarginBottom
                 />

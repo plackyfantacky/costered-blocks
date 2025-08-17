@@ -26,6 +26,13 @@ export function useBlockByClientId(clientId) {
     );
 }
 
+export const useSetOrUnsetAttrs = (key, attributes, updateAttributes, clientId) => (value) => {
+    updateAttributes(clientId, {
+        ...attributes,
+        [key]: (value === '' || value == null) ? undefined : value
+    });
+}
+
 export function useUnsetBlockAttributes(clientId) {
     const { updateBlockAttributes } = useDispatch('core/block-editor');
 
@@ -35,26 +42,18 @@ export function useUnsetBlockAttributes(clientId) {
     };
 }
 
-export function useCleanBlockAttributes(clientId) {
-    const block = useBlockByClientId(clientId);
-    const { updateBlock } = useDispatch('core/block-editor');
+export function useParentAttrs() {
+    return useSelect((select) => {
+        const be = select('core/block-editor');
+        const selectedId = be.getSelectedBlockClientId();
+        if (!selectedId) return { parentId: null, parentAttrs: null, parentBlock: null };
 
-    const unsetAttributes = (keys) => {
-        if (!clientId || !block) return;
+        const parentId = be.getBlockRootClientId(selectedId);
+        if (!parentId) return { parentId: null, parentAttrs: null, parentBlock: null };
 
-        const cleanedAttrs = { ...block.attributes };
+        const parentBlock = be.getBlock(parentId) || null;
+        const parentAttrs = parentBlock?.attributes ?? null;
 
-        keys.forEach((key) => {
-            if (key in cleanedAttrs) {
-                delete cleanedAttrs[key];
-            }
-        });
-
-        updateBlock(clientId, {
-            ...block,
-            attributes: cleanedAttrs,
-        });
-    };
-
-    return unsetAttributes;
+        return { parentId, parentAttrs, parentBlock };
+    }, []);
 }

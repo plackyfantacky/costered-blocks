@@ -10,6 +10,7 @@ import {
     FlexWrapNone,
     FlexWrapReverse,
     FlexWrapWrap,
+    FluentRowChild16Regular,
     HumbleiconsAlignObjectsCenter,
     IconoirCollapse,
     LucideBox,
@@ -46,6 +47,7 @@ export {
     MdiEyeOffOutline as EyeOffOutline,
     IconoirCollapse as Collapse,
     TablerBoxMargin as BoxMargin,
+    FluentRowChild16Regular as FlexChildItem,
     //flex justify/main axis alignment icons
     EntypoAlignLeft as FlexJustifyStart,
     EntypoAlignRight as FlexJustifyEnd,

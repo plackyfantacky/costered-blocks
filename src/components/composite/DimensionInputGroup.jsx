@@ -3,22 +3,14 @@ import { Flex, FlexItem, PanelRow, ToggleControl } from '@wordpress/components';
 import UnitControlInput from '@components/UnitControlInput';
 import TextControlInput from '@components/TextControlInput';
 
+import { useSetOrUnsetAttrs } from "@lib/hooks";
+
 export default function DimensionInputGroup({ keys, modeKey, attributes, clientId, updateAttributes }) {
     const mode = attributes?.[modeKey] || 'unit';
 
     const toggleMode = () => {
         const next = mode === 'unit' ? 'text' : 'unit';
-        updateAttributes(clientId, {
-            ...attributes,
-            [modeKey]: next
-        });
-    };
-
-    const handleChange = (key) => (value) => {
-        updateAttributes(clientId, {
-            ...attributes,
-            [key]: value
-        });
+        useSetOrUnsetAttrs(modeKey, attributes, updateAttributes, clientId)(next);
     };
 
     const InputField = mode === 'unit' ? UnitControlInput : TextControlInput;
@@ -32,7 +24,7 @@ export default function DimensionInputGroup({ keys, modeKey, attributes, clientI
                             <InputField
                                 label={key.replace(/^./, c => c.toUpperCase())}
                                 value={attributes[key] || ''}
-                                onChange={handleChange(key)}
+                                onChange={ useSetOrUnsetAttrs(key, attributes, updateAttributes, clientId) }
                             />
                         </FlexItem>
                     ))}
@@ -43,7 +35,7 @@ export default function DimensionInputGroup({ keys, modeKey, attributes, clientI
                     <FlexItem>
                         <ToggleControl
                             label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
-                            checked={mode === 'unit'}
+                            checked={mode === 'text'}
                             onChange={toggleMode}
                             __nextHasNoMarginBottom
                         />

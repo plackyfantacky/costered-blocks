@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
-import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
+import { useSelectedBlockInfo } from "@lib/hooks";
 import DimensionInputGroup from "@components/composite/DimensionInputGroup";
 
 import { DimensionsIcon } from "@components/Icons";
@@ -14,7 +14,6 @@ const DimensionControls = () => {
     if (!selectedBlock) return null;
 
     const { attributes } = selectedBlock;
-    const unsetAttrs = useUnsetBlockAttributes(clientId);
 
     return (
         <Panel>
@@ -25,7 +24,6 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
-                    unsetAttrs={() => unsetAttrs(['width', 'height'])}
                 />
             </PanelBody>
             <PanelBody title={__('Minimum Dimensions', 'costered-blocks')} initialOpen={false}>
@@ -35,7 +33,6 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
-                    unsetAttrs={() => unsetAttrs(['minWidth', 'minHeight'])}
                 />
             </PanelBody>
             <PanelBody title={__('Maximum Dimensions', 'costered-blocks')} initialOpen={false}>
@@ -45,7 +42,6 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
-                    unsetAttrs={() => unsetAttrs(['maxWidth', 'maxHeight'])}
                 />
             </PanelBody>
         </Panel>

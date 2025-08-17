@@ -9,13 +9,19 @@ export default function CustomSelectControl({ value, onChange, options, label = 
 
     const DefaultText = __('default / unset', 'costered-blocks');
     const DefaultOption = isRTL() ? (
-        <><span>{DefaultText}</span><DefaultIcon /></>
+        <>
+            <span>{DefaultText}</span>
+            <DefaultIcon />
+        </>
     ) : (
-        <><DefaultIcon /><span>{DefaultText}</span></>
+        <>
+            <DefaultIcon />
+            <span>{DefaultText}</span>
+        </>
     );
 
     const newOptions = [
-        { value: "", content: DefaultText, icon: DefaultIcon },
+        { value: "", content: DefaultText, icon: <DefaultIcon /> },
         ...options
     ];
     return (

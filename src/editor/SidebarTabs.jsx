@@ -3,16 +3,20 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
 
+import { useParentAttrs } from "@lib/hooks";
+
 import DimensionsControls from "@tabs/DimensionsControls";
 import DisplayControls from "@tabs/DisplayControls";
 import SpacingControls from "@tabs/SpacingControls";
 import FlexBoxControls from "@tabs/FlexBoxControls";
+import FlexItemControls from "@tabs/FlexItemControls";
 
 const tabs = [
     DisplayControls,
     DimensionsControls,
     SpacingControls,
     FlexBoxControls,
+    FlexItemControls,
 ];
 
 export default function SidebarTabs() {
@@ -21,23 +25,22 @@ export default function SidebarTabs() {
         return { attributes: b ? b.attributes : {} };
     }, []);
 
+    const { parentAttrs } = useParentAttrs();
+
     const visibleTabs = useMemo(() => {
         return tabs.filter(t => {
             if (typeof t.isVisible === 'function') {
+                const ctx = { attributes, parentAttrs };
                 try {
-                    return (
-                        t.isVisible({attributes}) === true || 
-                        t.isVisible(attributes) === true
-                    );
+                    return t.isVisible(ctx) === true;
                 } catch (e) {
                     console.error(`Error evaluating visibility for tab "${t.name}":`, e);
-                    // If a tab throws using one signature, fall back to the other.
-                    try { return t.isVisible(attributes) === true; } catch { return false; }
+                    return false;
                 }
             }
             return true;
         });
-    }, [attributes]);
+    }, [attributes, parentAttrs]);
 
     const [activeName, setActiveName] = useState(visibleTabs[0]?.name);
 
@@ -53,6 +56,7 @@ export default function SidebarTabs() {
 
     return (
         <TabPanel
+            key={visibleTabs.map((t) => t.name).join('|')}
             className="costered-blocks-sidebar-tabs"
             tabs={visibleTabs.map(({ name, title, icon }) => ({ name, title, icon }))}
             onSelect={setActiveName}
@@ -60,9 +64,11 @@ export default function SidebarTabs() {
         >
             {(tab) => {
                 const tabDef = visibleTabs.find((t) => t.name === tab.name);
-                return typeof tabDef?.render === 'function'
-                    ? tabDef.render()
-                    : (tabDef?.content ?? null);
+                const Component = tabDef?.render || null;
+                if (Component) {
+                    return <Component />;
+                }
+                return tabDef?.content ?? null;
             }}
         </TabPanel>
     );

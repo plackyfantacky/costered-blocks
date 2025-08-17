@@ -4,14 +4,15 @@
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
     "main": "costered-blocks.php",
     "scripts": {
-        "dev": "node ./node/dev.config.mjs",
-        "watch": "node ./node/dev.config.mjs -- --watch",
-        "build": "node ./node/dev.config.mjs -- --build",
+        "dev": "cross-env NODE_ENV=development node ./node/dev.config.mjs",
+        "watch": "cross-env NODE_ENV=development node ./node/dev.config.mjs -- --watch",
+        "build": "cross-env NODE_ENV=production node ./node/dev.config.mjs -- --build",
         "svgr:convert": "node ./node/svgr-convert.mjs"
     },
     "devDependencies": {
         "@svgr/core": "^8.1.0",
         "@svgr/plugin-svgo": "^8.1.0",
+        "cross-env": "^10.0.0",
         "esbuild": "^0.25.5",
         "esbuild-plugin-path-alias": "^1.0.7",
         "glob": "^11.0.3",

@@ -1,16 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import {
-    Panel, PanelBody, Flex, FlexItem,
-    __experimentalToggleGroupControl as ToggleGroupControl,
-    __experimentalToggleGroupControlOption as ToggleGroupControlOption
-} from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 
-import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
+import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@lib/hooks";
 
 import CustomSelectControl from "@components/CustomSelectControl";
 import FlexPropertyButtonGroup from "@components/composite/FlexPropertyButtonGroup";
-import { setOrUnsetAttrs } from "@lib/utils";
+
 import {
     FlexNoWrapRounded,
     FlexDirectionColumn,
@@ -46,7 +42,7 @@ const DirectionSelectControl = ({ attributes, clientId, updateAttributes }) => {
         <CustomSelectControl
             label={__('Flex Direction', 'costered-blocks')}
             value={typeof attributes?.flexDirection === "string" ? attributes.flexDirection : ""}
-            onChange={setOrUnsetAttrs('flexDirection', attributes, updateAttributes, clientId)}
+            onChange={useSetOrUnsetAttrs('flexDirection', attributes, updateAttributes, clientId)}
             options={directionOptions}
         />
     );
@@ -64,7 +60,7 @@ const FlexWrapButtonGroupControl = ({ attributes, clientId, updateAttributes }) 
             type="both"
             label={__('Flex Wrap', 'costered-blocks')}
             value={attributes?.flexWrap || 'nowrap'}
-            onChange={setOrUnsetAttrs('flexWrap', attributes, updateAttributes, clientId)}
+            onChange={useSetOrUnsetAttrs('flexWrap', attributes, updateAttributes, clientId)}
             options={wrapOptions}
         />
     );
@@ -96,7 +92,7 @@ const MainAxisAlignmentToggleGroupControl = ({ attributes, clientId, updateAttri
             type="icon"
             label={__('Main Axis Alignment', 'costered-blocks')}
             value={attributes?.justifyContent || 'flex-start'}
-            onChange={setOrUnsetAttrs('justifyContent', attributes, updateAttributes, clientId)}
+            onChange={useSetOrUnsetAttrs('justifyContent', attributes, updateAttributes, clientId)}
             options={attributes?.flexDirection?.includes('row') ? alignOptions : altAlignOptions}
         />
     )
@@ -123,13 +119,12 @@ const CrossAxisAlignmentToggleGroupControl = ({ attributes, clientId, updateAttr
         { value: 'space-evenly', content: __('Space Evenly', 'costered-blocks'), icon: <FlexAlignSpaceEven /> },
     ];
 
-
     return (
         <FlexPropertyButtonGroup
             type="icon"
             label={__('Cross Axis Alignment', 'costered-blocks')}
             value={attributes?.alignItems || 'flex-start'}
-            onChange={setOrUnsetAttrs('alignItems', attributes, updateAttributes, clientId)}
+            onChange={useSetOrUnsetAttrs('alignItems', attributes, updateAttributes, clientId)}
             options={attributes?.flexDirection?.includes('column') ? alignOptions : altAlignOptions}
         />
     );

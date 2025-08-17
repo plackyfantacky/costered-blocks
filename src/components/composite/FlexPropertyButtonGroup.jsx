@@ -1,6 +1,8 @@
 import { __, isRTL } from '@wordpress/i18n';
-import { Flex, FlexItem, PanelRow, ToggleControl, TextControl } from '@wordpress/components';
 import {
+    Flex,
+    FlexItem,
+    PanelRow,
     __experimentalToggleGroupControl as ToggleGroupControl,
     __experimentalToggleGroupControlOption as ToggleGroupControlOption,
     __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon

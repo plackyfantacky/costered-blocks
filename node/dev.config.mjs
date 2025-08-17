@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import path, { resolve } from 'path';
 import pathAlias from 'esbuild-plugin-path-alias';
 
+const isDev = process.env.NODE_ENV !== 'production';
 const isWatch = process.argv.includes('--watch');
 const justBuild = process.argv.includes('--build');
 const jsOutDir = './js';
@@ -100,8 +101,9 @@ const jsConfig = {
     jsx: 'transform',
     jsxFactory: 'React.createElement',
     jsxFragment: 'React.Fragment',
-    target: ['es2018'],
+    target: ['es2020'],
     format: 'iife',
+    platform: 'browser',
     plugins: [
         importAsGlobals(globalsMap),
         pathAlias({
@@ -113,7 +115,10 @@ const jsConfig = {
         })
     ],
     logLevel: 'info',
-    resolveExtensions: ['.js', '.jsx', '.ts', '.tsx']
+    resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
+    define: {
+        'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
+    }
 };
 
 const cssConfig = {

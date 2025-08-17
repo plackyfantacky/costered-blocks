@@ -2,8 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 
-import { useSelectedBlockInfo, useUnsetBlockAttributes } from "@lib/hooks";
-import { setOrUnsetAttrs } from "@lib/utils";
+import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@lib/hooks";
+
 
 import CustomSelectControl from "@components/CustomSelectControl";
 import {
@@ -30,8 +30,8 @@ const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
     return (
         <CustomSelectControl
             label={__('Display', 'costered-blocks')}
-            value={typeof attributes?.display === "string" ? attributes.display : ""}
-            onChange={ setOrUnsetAttrs('display', attributes, updateAttributes, clientId) }
+            value={attributes?.display || ""}
+            onChange={useSetOrUnsetAttrs('display', attributes, updateAttributes, clientId) }
             options={displayOptions}
         />
     );
@@ -47,8 +47,8 @@ const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => 
     return (
         <CustomSelectControl
             label={__('Visibility', 'costered-blocks')}
-            value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
-            onChange={ setOrUnsetAttrs('visibility', attributes, updateAttributes, clientId) }
+            value={attributes?.visibility || ''}
+            onChange={useSetOrUnsetAttrs('visibility', attributes, updateAttributes, clientId) }
             options={visibilityOptions}
         />
     );
@@ -61,7 +61,6 @@ const DisplayControls = () => {
     if (!selectedBlock) return null;
 
     const { attributes } = selectedBlock;
-    const unsetAttrs = useUnsetBlockAttributes(clientId);
 
     return (
         <Panel>
@@ -72,7 +71,6 @@ const DisplayControls = () => {
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
-                            unsetAttrs={() => unsetAttrs(['display'])}
                         />
                     </FlexItem>
                     <FlexItem>
@@ -80,7 +78,6 @@ const DisplayControls = () => {
                             attributes={attributes}
                             clientId={clientId}
                             updateAttributes={updateBlockAttributes}
-                            unsetAttrs={() => unsetAttrs(['visibility'])}
                         />
                     </FlexItem>
                 </Flex>

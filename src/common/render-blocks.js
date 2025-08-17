@@ -1,4 +1,6 @@
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { memo, useMemo } from '@wordpress/element';
 
 import {
     displayProps,
@@ -130,9 +132,6 @@ subscribe(() => {
     }
 });
 
-
-
-
 // Filter to add inline styles based on block attributes. Currently only applies to blocks registered by this plugin.
 addFilter(
     'blocks.getBlockProps',
@@ -147,3 +146,84 @@ addFilter(
     }
 );
 
+// AND even then, all of the above isn't enough. Some styles/attributes just can't be tamed by the above methods.
+// For those, we use a custom editor stylesheet.
+
+const PADDING_KEYS = ['padding','paddingTop','paddingRight','paddingBottom','paddingLeft'];
+const MARGIN_KEYS  = ['margin','marginTop','marginRight','marginBottom','marginLeft'];
+const SIZE_KEYS = [ 'width', 'minWidth', 'maxWidth', 'height', 'minHeight', 'maxHeight' ];
+
+const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
+
+function buildMirror(attrs = {}) {
+    const style = {};
+    let any = false;
+    let hasMt = false;
+    let hasMb = false;
+
+    //dimensions
+    for (const k of SIZE_KEYS) {
+        const v = attrs[k];
+        if (hasValue(v)) {
+            style[k] = String(v);
+            any = true;
+        }
+    }
+
+    // padding
+    for (const k of PADDING_KEYS) {
+        const v = attrs[k];
+        if (hasValue(v)) { style[k] = String(v); any = true; }
+    }
+
+    // margin
+    // top: also set the logical property so we override blockGap cleanly
+    if (hasValue(attrs.marginTop)) {
+        const v = String(attrs.marginTop);
+        style.marginTop = v;
+        style.marginBlockStart = v; // <- beats parent’s blockGap rule
+        any = true;
+        hasMt = true;
+    }
+
+    if (hasValue(attrs.marginBottom)) {
+        style.marginBottom = String(attrs.marginBottom);
+        any = true;
+        hasMb = true;
+    }
+
+    return { style, any, hasMt, hasMb };
+}
+
+function withCosteredMirror(BlockListBlock) {
+    const Wrapped = memo((props) => {
+        const block = useSelect(
+            (sel) => (props.clientId ? sel('core/block-editor').getBlock(props.clientId) : null),
+            [props.clientId]
+        );
+        const attrs = block?.attributes || {};
+
+        const { style, any, hasMt, hasMb } = useMemo(() => buildMirror(attrs), [attrs]);
+
+        const className = [
+            props?.wrapperProps?.className || '',
+            any ? 'is-cb-mirrored' : '',
+            hasMt ? 'has-cb-mt' : '',
+            hasMb ? 'has-cb-mb' : '',
+        ].filter(Boolean).join(' ');
+
+        const wrapperProps = {
+            ...(props.wrapperProps || {}),
+            className,
+            // IMPORTANT: if `any` is false, provide an empty style object to clear old inline styles
+            style: any ? { ...(props.wrapperProps?.style || {}), ...style } : {},
+        };
+
+        return <BlockListBlock {...props} wrapperProps={wrapperProps} />;
+    });
+
+    Wrapped.displayName = 'CosteredBlocks/EditorSizeMirror';
+    return Wrapped;
+}
+
+addFilter('editor.BlockListBlock', 'costered-blocks/editor-size-mirror', withCosteredMirror, 100);
