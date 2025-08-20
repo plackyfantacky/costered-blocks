@@ -1,165 +1,58 @@
-import { addFilter } from '@wordpress/hooks';
-import { useSelect } from '@wordpress/data';
-import { memo, useMemo } from '@wordpress/element';
-
-import {
-    displayProps,
-    dimensionProps,
-    marginProps,
-    paddingProps
-} from '@lib/schema';
-
-const ALLOWED = [
-    ...Object.keys(displayProps),
-    ...Object.keys(dimensionProps),
-    ...Object.keys(marginProps),
-    ...Object.keys(paddingProps)
-];
-
 /**
- * MutationObserver to watch for changes in the block editor. For anyone reading this and are curious as to what we're doing, continue reading.
- * 
- * The WP Block Editor/Gutenberg doesn't display block attributes (the 'attrs') in the markup inside the block editor. What it does instead is
- * it assigns each block a clientID (stored in the data-block attribute e.g data-block="9e4ed1fc-c9e9-4196-8730-b42c36a57c00"). The clientID
- * corresponds to a data object within the global data store. That data object has all of the block data attributes needed to render our style
- * attributes.
- * 
- * Becuase of this we need to watch the HTML dom for changes (new blocks being added/edited/removed) AND subscribe to the block data store for changes.
- * (TODO: expand this explanation more later)
- * 
- * The parts of this moving machine:
- * - updateBlockStyles() - handles the attribute lookup and style injection
- * - observer - a MutationObserver that watches for changes in the editor DOM
- * - subscribe - a WP hook that listens for changes in javascript object and act accordingly.
- * 
- * both observer and subscibe run updateBlockStyles
+ * Costered Blocks – Editor Style Mirror
+ *
+ * These utilities let block attributes (like width, margin, padding, flex settings, etc.)
+ * automatically reflect in the block editor’s inline styles, so the editor layout
+ * stays visually consistent with the saved frontend output.
+ *
+ * - buildMirror(attrs):
+ *     Examines a block’s attributes and builds an inline `style` object
+ *     (plus some helper flags) for supported properties:
+ *       • dimensions (width/height/min/max)
+ *       • spacing (padding, margin)
+ *       • misc layout (display, flexDirection)
+ *     It also handles quirks like overriding blockGap with logical properties
+ *     and ensuring null/empty values don’t bleed through.
+ *
+ * - withCosteredMirror(BlockListBlock):
+ *     A Higher-Order Component (HOC) that wraps Gutenberg’s BlockListBlock.
+ *     It uses `useSelect` to grab the current block’s attributes, runs them
+ *     through `buildMirror`, and merges the result into the block’s wrapperProps.
+ *     This ensures the editor preview updates live as attributes change,
+ *     without extra re-renders or manual MutationObservers.
  */
 
-function camelToKebab(str) {
-    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
+import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
-function findStyleTarget(blockEl, blockName) {
-    const containerBlocks = ['core/group', 'core/columns', 'core/column', 'core/cover', 'core/media-text'];
-    if (containerBlocks.includes(blockName)) return blockEl;
-
-
-    // If this element is a block editor editable (e.g. <p>), style it directly
-    if (
-        blockEl.classList.contains('block-editor-rich-text__editable') ||
-        blockEl.classList.contains('wp-block-paragraph') ||
-        blockEl.classList.contains('wp-block-heading')
-    ) {
-        return blockEl;
-    }
-
-    const editable = blockEl.querySelector('.block-editor-rich-text__editable');
-    if (editable) return editable;
-    if (blockEl.firstElementChild) return blockEl.firstElementChild;
-    return null;
-}
-
-// find all blocks in the editor DOM
-const allBlocks = document.querySelectorAll('[data-block]');
-if (allBlocks.length > 0) {
-    console.log(`Found ${allBlocks.length} blocks in the editor.`);
-    allBlocks.forEach(blockEl => {
-        console.log('Found block element:', blockEl.id);
-    });
-}
-
-function updateBlockStyles() {
-    const { select } = window.wp.data;
-    const blocks = select('core/block-editor').getBlocks();
-
-    document.querySelectorAll('[data-block]').forEach(blockEl => {
-        //pick a block, any block... (not really, actually do this for every block).
-        const match = blockEl.id && blockEl.id.match(/^block-(.+)$/);
-        if (!match) return;
-
-        //find the corresponding (data-store) block in the blocks array
-        const clientId = match[1];
-        const block = blocks.find(b => b.clientId === clientId);
-        if (!block || !block.attributes) return;
-
-        // now we have the block, we can loop through the attributes and apply styles
-        let styleString = '';
-        //we cycle through our entries only, leaving other attributes alone
-        ALLOWED.forEach(attrKey => {
-            const value = block.attributes[attrKey];
-            if (value) styleString += `${camelToKebab(attrKey)}: ${value};`;
-        });
-
-        // inject/overwrite the style attribute
-        const blockName = block?.name || '';
-        const target = findStyleTarget(blockEl, blockName);
-
-        if (target) {
-            if (styleString) {
-                target.style.cssText = styleString;
-            } else {
-                //clean up old styles if attribute is removed
-                ALLOWED.forEach(attrKey => {
-                    target.style.removeProperty(camelToKebab(attrKey));
-                });
-
-            }
-        }
-    });
-}
-
-
-// MutationObserver to watch for changes in the block editor
-document.addEventListener('DOMContentLoaded', () => {
-    const root = document.body; // works in both iframe and inline contexts
-    const mo = new MutationObserver(updateBlockStyles);
-    mo.observe(root, { childList: true, subtree: true });
-
-    // Initial run for present blocks
-    updateBlockStyles();
-});
-
-// Subscribe to changes in the block data store
-const { subscribe } = window.wp.data;
-let lastAttrs = {};
-
-subscribe(() => {
-    const blocks = window.wp.data.select('core/block-editor').getBlocks();
-    const attrJSON = JSON.stringify(blocks.map(b => b.attributes));
-    if (attrJSON !== lastAttrs.json) {
-        lastAttrs.json = attrJSON;
-        updateBlockStyles();
-    }
-});
-
-// Filter to add inline styles based on block attributes. Currently only applies to blocks registered by this plugin.
-addFilter(
-    'blocks.getBlockProps',
-    'costered-blocks/add-inline-styles',
-    (props, blockType, attributes) => {
-        const style = { ...(props.style || {}) };
-        ALLOWED.forEach(attrKey => {
-            if (attributes[attrKey]) style[camelToKebab(attrKey)] = attributes[attrKey];
-        });
-        if (Object.keys(style).length > 0) props.style = style;
-        return props;
-    }
-);
-
-// AND even then, all of the above isn't enough. Some styles/attributes just can't be tamed by the above methods.
-// For those, we use a custom editor stylesheet.
-
-const PADDING_KEYS = ['padding','paddingTop','paddingRight','paddingBottom','paddingLeft'];
-const MARGIN_KEYS  = ['margin','marginTop','marginRight','marginBottom','marginLeft'];
-const SIZE_KEYS = [ 'width', 'minWidth', 'maxWidth', 'height', 'minHeight', 'maxHeight' ];
+const PADDING_KEYS = ['padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
+const SIZE_KEYS = ['width', 'minWidth', 'maxWidth', 'height', 'minHeight', 'maxHeight'];
+const MISC_KEYS = ['display', 'flexDirection'];
 
 const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
 
+/**
+ * Build a style object from block attributes.
+ *
+ * Iterates over dimension, spacing, and layout keys, converting attribute values into valid 
+ * inline styles. Also sets logical margin properties to override blockGap and returns flags 
+ * for which sides are set.
+ * 
+ * @param {Object} attrs - Block attributes to process.
+ * @returns {Object} An object containing:
+ *   - style: The constructed style object.
+ *   - any: Boolean indicating if any styles were set.
+ *   - hasMt, hasMb, hasMl, hasMr: Booleans indicating if specific margins are set.
+ *   - haveFlexDir: Boolean indicating if flexDirection is set
+ */
 function buildMirror(attrs = {}) {
     const style = {};
     let any = false;
     let hasMt = false;
     let hasMb = false;
+    let hasMl = false;
+    let hasMr = false;
 
     //dimensions
     for (const k of SIZE_KEYS) {
@@ -192,9 +85,48 @@ function buildMirror(attrs = {}) {
         hasMb = true;
     }
 
-    return { style, any, hasMt, hasMb };
+    // left/right: also set the logical property so we override blockGap cleanly. we also need to add !important to override parent styles
+    if (hasValue(attrs.marginLeft)) { style.marginLeft = String(attrs.marginLeft); style.marginInlineStart = String(attrs.marginLeft); any = true; hasMl = true; }
+    if (hasValue(attrs.marginRight)) { style.marginRight = String(attrs.marginRight); style.marginInlineEnd = String(attrs.marginRight); any = true; hasMr = true; }
+
+    // misc
+    for (const k of MISC_KEYS) {
+        const v = attrs[k];
+        if (hasValue(v)) {
+            style[k] = String(v);
+            any = true;
+        }
+    }
+
+    const haveFlexDir = hasValue(attrs.flexDirection);
+
+    // ensure flexDirection “sticks”
+    if (haveFlexDir && !style.display) {
+        style.display = 'flex';
+        any = true;
+    }
+
+    return { style, any, hasMt, hasMb, hasMl, hasMr, haveFlexDir };
 }
 
+const cssName = {
+    marginLeft: 'margin-left',
+    marginRight: 'margin-right',
+    marginInlineStart: 'margin-inline-start',
+    marginInlineEnd: 'margin-inline-end',
+    flexDirection: 'flex-direction',
+};
+
+/**
+ * Wrap BlockListBlock with live style mirroring.
+ *
+ * Reads the block’s attributes via useSelect, runs them through buildMirror, and merges the
+ * resulting styles/class flags into wrapperProps. Ensures editor reflects frontend layout 
+ * instantly.
+ * 
+ * @param {Function} BlockListBlock - The original BlockListBlock component.
+ * @returns {Function} A memoized component that applies the style mirror.
+ */
 function withCosteredMirror(BlockListBlock) {
     const Wrapped = memo((props) => {
         const block = useSelect(
@@ -203,20 +135,69 @@ function withCosteredMirror(BlockListBlock) {
         );
         const attrs = block?.attributes || {};
 
-        const { style, any, hasMt, hasMb } = useMemo(() => buildMirror(attrs), [attrs]);
+        const {
+            style: mirrorStyle,
+            any, hasMt, hasMb, hasMl, hasMr, haveFlexDir
+        } = useMemo(() => buildMirror(attrs), [attrs]);
+
+        // Apply !important where the editor forces auto centering etc. 
+        useLayoutEffect(() => {
+            if (!props.clientId) return;
+
+            // a little helper to set styles with !important
+            function setImportantStyle(el, name, value) {
+                if (value != null && value !== '') {
+                    el.style.setProperty(name, value, 'important');
+                } else {
+                    el.style.removeProperty(name);
+                }
+            }
+
+            const root = document.querySelector(`[data-block="${props.clientId}"]`);
+            if (!root) return;
+
+            // The wrapper itself can be the layout container; fall back to inner if present
+            let el = root;
+            if (!el.classList.contains('block-editor-block-list__layout')) {
+                el = root.querySelector(':scope > .block-editor-inner-blocks > .block-editor-block-list__layout') || el;
+            }
+
+            setImportantStyle(el, cssName.marginLeft, mirrorStyle.marginLeft);
+            setImportantStyle(el, cssName.marginRight, mirrorStyle.marginRight);
+            setImportantStyle(el, cssName.marginInlineStart, mirrorStyle.marginInlineStart);
+            setImportantStyle(el, cssName.marginInlineEnd, mirrorStyle.marginInlineEnd);
+
+            if (mirrorStyle.flexDirection) {
+                setImportantStyle(el, cssName.flexDirection, mirrorStyle.flexDirection);
+                if (!el.style.display) el.style.setProperty('display', 'flex', 'important');
+            } else {
+                el.style.removeProperty(cssName.flexDirection);
+            }
+        }, [
+            props.clientId,
+            mirrorStyle.marginLeft,
+            mirrorStyle.marginRight,
+            mirrorStyle.marginInlineStart,
+            mirrorStyle.marginInlineEnd,
+            mirrorStyle.flexDirection,
+            hasMl, hasMr, haveFlexDir
+        ]);
+
 
         const className = [
             props?.wrapperProps?.className || '',
             any ? 'is-cb-mirrored' : '',
             hasMt ? 'has-cb-mt' : '',
             hasMb ? 'has-cb-mb' : '',
+            hasMl ? 'has-cb-ml' : '',
+            hasMr ? 'has-cb-mr' : '',
         ].filter(Boolean).join(' ');
 
         const wrapperProps = {
             ...(props.wrapperProps || {}),
             className,
             // IMPORTANT: if `any` is false, provide an empty style object to clear old inline styles
-            style: any ? { ...(props.wrapperProps?.style || {}), ...style } : {},
+            style: any ? { ...(props.wrapperProps?.style || {}), ...mirrorStyle } : {},
         };
 
         return <BlockListBlock {...props} wrapperProps={wrapperProps} />;
