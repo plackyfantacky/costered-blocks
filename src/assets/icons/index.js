@@ -10,6 +10,7 @@ export { default as FlexWrapNone } from './FlexWrapNone.jsx';
 export { default as FlexWrapReverse } from './FlexWrapReverse.jsx';
 export { default as FlexWrapWrap } from './FlexWrapWrap.jsx';
 export { default as FluentRowChild16Regular } from './fluent--row-child-16-regular.jsx';
+export { default as GameIconsHammerBreak } from './game-icons--hammer-break.jsx';
 export { default as HumbleiconsAlignObjectsCenter } from './humbleicons--align-objects-center.jsx';
 export { default as IconoirCollapse } from './iconoir--collapse.jsx';
 export { default as LucideBox } from './lucide--box.jsx';

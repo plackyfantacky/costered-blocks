@@ -5,7 +5,7 @@ import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@lib/hooks";
 
 
-import CustomSelectControl from "@components/CustomSelectControl";
+import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import {
     BoxIcon,
     BrickOulineRounded,
@@ -19,38 +19,32 @@ import {
 } from "@components/Icons";
 
 const DisplaySelectControl = ({ attributes, clientId, updateAttributes }) => {
-    const displayOptions = [
-        { value: 'block', content: __('Block', 'costered-blocks'), icon: <BrickOulineRounded /> },
-        { value: 'inline', content: __('Inline', 'costered-blocks'), icon: <MatchWordRounded /> },
-        { value: 'flex', content: __('Flex', 'costered-blocks'), icon: <FlexNoWrapRounded /> },
-        { value: 'grid', content: __('Grid', 'costered-blocks'), icon: <GridViewRounded /> },
-        { value: 'none', content: __('None', 'costered-blocks'), icon: <BorderNoneVariant /> },
-    ];
-
     return (
-        <CustomSelectControl
+        <SelectControl
             label={__('Display', 'costered-blocks')}
             value={attributes?.display || ""}
             onChange={useSetOrUnsetAttrs('display', attributes, updateAttributes, clientId) }
-            options={displayOptions}
-        />
+        >
+            <SelectControl.Option value="block"><BrickOulineRounded />{__('Block', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="inline"><MatchWordRounded />{__('Inline', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="flex"><FlexNoWrapRounded />{__('Flex', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="grid"><GridViewRounded />{__('Grid', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="none"><BorderNoneVariant />{__('None', 'costered-blocks')}</SelectControl.Option>
+        </SelectControl>
     );
 };
 
 const VisibilitySelectControl = ({ attributes, clientId, updateAttributes }) => {
-    const visibilityOptions = [
-        { value: 'visible', content: __('Visible', 'costered-blocks'), icon: <EyeOutline /> },
-        { value: 'hidden', content: __('Hidden', 'costered-blocks'), icon: <EyeOffOutline /> },
-        { value: 'collapse', content: __('Collapse', 'costered-blocks'), icon: <Collapse /> },
-    ];
-
     return (
-        <CustomSelectControl
+        <SelectControl
             label={__('Visibility', 'costered-blocks')}
             value={attributes?.visibility || ''}
-            onChange={useSetOrUnsetAttrs('visibility', attributes, updateAttributes, clientId) }
-            options={visibilityOptions}
-        />
+            onChange={useSetOrUnsetAttrs('visibility', attributes, updateAttributes, clientId) }    
+        >
+            <SelectControl.Option value="visible"><EyeOutline />{__('Visible', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="hidden"><EyeOffOutline />{__('Hidden', 'costered-blocks')}</SelectControl.Option>
+            <SelectControl.Option value="collapse"><Collapse />{__('Collapse', 'costered-blocks')}</SelectControl.Option>
+        </SelectControl>
     );
 };
 

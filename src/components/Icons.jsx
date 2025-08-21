@@ -11,6 +11,7 @@ import {
     FlexWrapReverse,
     FlexWrapWrap,
     FluentRowChild16Regular,
+    GameIconsHammerBreak,
     HumbleiconsAlignObjectsCenter,
     IconoirCollapse,
     LucideBox,
@@ -48,6 +49,7 @@ export {
     IconoirCollapse as Collapse,
     TablerBoxMargin as BoxMargin,
     FluentRowChild16Regular as FlexChildItem,
+    GameIconsHammerBreak as HammerBreakIcon,
     //flex justify/main axis alignment icons
     EntypoAlignLeft as FlexJustifyStart,
     EntypoAlignRight as FlexJustifyEnd,

@@ -3,7 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
 import { useSelectedBlockInfo } from "@lib/hooks";
-import DimensionInputGroup from "@components/composite/DimensionInputGroup";
+import { DimensionInputGroup } from "@components/composite/DimensionInputGroup";
 
 import { DimensionsIcon } from "@components/Icons";
 
@@ -12,15 +12,12 @@ const DimensionControls = () => {
     const { updateBlockAttributes } = useDispatch('core/block-editor');
 
     if (!selectedBlock) return null;
-
     const { attributes } = selectedBlock;
 
     return (
         <Panel>
             <PanelBody title={__('Dimensions', 'costered-blocks')} initialOpen={true}>
                 <DimensionInputGroup
-                    keys={['width', 'height']}
-                    modeKey="dimensionMode"
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
@@ -28,8 +25,7 @@ const DimensionControls = () => {
             </PanelBody>
             <PanelBody title={__('Minimum Dimensions', 'costered-blocks')} initialOpen={false}>
                 <DimensionInputGroup
-                    keys={['minWidth', 'minHeight']}
-                    modeKey="minDimensionMode"
+                    groupKey="min"
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
@@ -37,8 +33,7 @@ const DimensionControls = () => {
             </PanelBody>
             <PanelBody title={__('Maximum Dimensions', 'costered-blocks')} initialOpen={false}>
                 <DimensionInputGroup
-                    keys={['maxWidth', 'maxHeight']}
-                    modeKey="maxDimensionMode"
+                    groupKey="max"
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}

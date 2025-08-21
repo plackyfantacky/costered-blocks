@@ -14,9 +14,7 @@
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
-//require_once COSTERED_BLOCKS_PATH . 'php/render-core-group.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
-require_once COSTERED_BLOCKS_PATH . 'php/render-core-image.php';
 
 /**
  * Register scripts for custom blocks and functionality. These are all first-party.
@@ -47,3 +45,22 @@ add_action('enqueue_block_editor_assets', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('costered--blocks-style-resets', COSTERED_BLOCKS_URL . 'css/resets.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/resets.css'));
 });
+
+// Block specific. They could be their own files, but this is simpler for now.
+
+// core/image
+add_filter('render_block_core/image', function ($block_content, $block) {
+    // Defensive: only modify if 'align' exists
+    if (!empty($block['attrs']['align'])) {
+        unset($block['attrs']['align']);
+        // Re-render the block using updated attributes
+        return render_block([
+            'blockName' => 'core/image',
+            'attrs'     => $block['attrs'],
+            'innerBlocks' => $block['innerBlocks'] ?? [],
+            'innerContent' => $block['innerContent'] ?? [],
+            'innerHTML' => $block['innerHTML'] ?? '',
+        ]);
+    }
+    return $block_content;
+}, 10, 2);

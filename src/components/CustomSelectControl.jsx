@@ -1,99 +1,123 @@
 import { __, isRTL } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-
+import { useState, useEffect, useRef, createContext, useContext, useMemo, Children } from '@wordpress/element';
+import { Flex, FlexItem } from '@wordpress/components';
 import { DefaultIcon } from '@components/Icons';
 
-export default function CustomSelectControl({ value, onChange, options, label = "" }) {
+const Ctx = createContext();
+
+export function CustomSelectControl({ value, onChange, label = "", children }) {
     const [open, setOpen] = useState(false);
-    const selected = options.find(opt => opt.value === value || (!opt.value && !value));
+    const rootRef = useRef(null);
+
+    useEffect(() => {
+        if(!open) return;
+        const onDocDown = (e) => {
+            if (!rootRef.current) return;
+            if (!rootRef.current.contains(e.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('pointerdown', onDocDown, true);
+        return () => document.removeEventListener('pointerdown', onDocDown, true);
+    }, [open]);
+
+    const selectAndClose = useMemo(() => (next) => {
+        onChange(next);
+        setOpen(false);
+    }, [onChange]);
+
+    const ctxValue = useMemo(() => ({ value, onSelect: selectAndClose }), [value, selectAndClose]);
 
     const DefaultText = __('default / unset', 'costered-blocks');
-    const DefaultOption = isRTL() ? (
-        <>
-            <span>{DefaultText}</span>
-            <DefaultIcon />
-        </>
-    ) : (
-        <>
-            <DefaultIcon />
-            <span>{DefaultText}</span>
-        </>
-    );
 
-    const newOptions = [
-        { value: "", content: DefaultText, icon: <DefaultIcon /> },
-        ...options
-    ];
+    const getSelectedVisual = () => {
+        let icon = <DefaultIcon />;
+        let labelNode = DefaultText;
+        const arr = Children.toArray(children);
+        for (let i = 0; i < arr.length; i++) {
+            const el = arr[i];
+            if (el?.props?.value === value) {
+                const parts = Children.toArray(el.props.children);
+                icon = parts[0] ?? icon;
+                labelNode = parts.length > 1 ? parts.slice(1) : labelNode;
+                break;
+            }
+        }
+        return { icon, labelNode };
+    };
+
+    const { icon, labelNode } = getSelectedVisual();
+
     return (
-        <div style={wrapperStyle}>
-            {label && <label style={labelStyle}>{label}</label>}
-            <button
-                type="button"
-                aria-haspopup="listbox"
-                aria-expanded={open}
-                onClick={() => setOpen(o => !o)}
-                style={buttonStyle}
-            >
-                {selected ? (
-                    isRTL() ? (
-                        <>
-                            <span>{selected.content}</span>
-                            {selected?.altIcon || selected.icon || <DefaultIcon />}
-                        </>
-                    ) : (
-                        <>
-                            {selected.icon || <DefaultIcon />}
-                            <span>{selected.content}</span>
-                        </>
-                    )
-                ) : DefaultOption }
-                <span style={arrowStyle}>▼</span>
-            </button>
-            {open && (
-                <ul
-                    role="listbox"
-                    tabIndex={-1}
-                    style={listStyle}
+        <Ctx.Provider value={ctxValue}>
+            <div ref={rootRef} style={wrapperStyle}>
+                {label && <label style={labelStyle}>{label}</label>}
+                <button
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded={open}
+                    onClick={() => setOpen(o => !o)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown' && !open) setOpen(true);
+                        if (e.key === 'Escape' && open) setOpen(false);
+                    }}
+                    style={buttonStyle}
                 >
-                    {newOptions.map(opt => (
-                        <li
-                            key={opt.value}
-                            role="option"
-                            aria-selected={value === opt.value}
-                            tabIndex={0}
-                            onClick={() => {
-                                onChange(opt.value);
-                                setOpen(false);
-                            }}
-                            onKeyDown={e => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                    onChange(opt.value);
-                                    setOpen(false);
-                                }
-                            }}
-                            style={{
-                                ...listItemStyle,
-                                background: value === opt.value ? "#f0f0f0" : "#fff",
-                            }}
-                        >
-                            {isRTL() ? (
-                                <>
-                                    <span>{ opt.content }</span>
-                                    { opt?.altIcon || opt.icon }
-                                </>
-                            ) : (
-                                <>
-                                    {opt.icon}
-                                    <span>{opt.content}</span>
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
+                    <Flex direction={isRTL() ? "row-reverse" : "row"} align="center" gap={8}>
+                        <FlexItem isBlock style={selectedOptionStyle}>
+                            {icon}
+                            <span>{labelNode}</span>
+                        </FlexItem>
+                        <span style={arrowStyle}>▼</span>
+                    </Flex>
+                </button>
+
+                {open && (
+                    <ul
+                        role="listbox"
+                        tabIndex={-1}
+                        style={listStyle}
+                    >
+                        <Option value="">
+                            <DefaultIcon />{DefaultText}
+                        </Option>
+                        {children}
+                    </ul>
+                )}
+            </div>
+        </Ctx.Provider>
     );
 }
+
+const Option = React.memo(function Option({ value, children, ...rest }) {
+    const { value: current, onSelect} = useContext(Ctx) || {};
+    const isSelected = value === current || (!value && !current);
+
+    const activate = () => onSelect?.(value);
+
+    return (
+        <li
+            role="option"
+            aria-selected={isSelected}
+            tabIndex={0}
+            style={{ ...listItemStyle, ...(isSelected ? selectedOptionStyle : null) }}
+            onClick={activate}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    activate();
+                }
+            }}
+            {...rest}
+        >
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexDirection: isRTL() ? 'row-reverse' : 'row' }}>
+                {children}
+            </div>
+        </li>
+    );
+});
+
+CustomSelectControl.Option = Option;
 
 
 const wrapperStyle = {
@@ -123,6 +147,15 @@ const buttonStyle = {
     gap: 8
 };
 
+const selectedOptionStyle = {
+    display: "flex",
+    flexDirection: isRTL() === true ? "row-reverse" : "row",
+    alignItems: "center",
+    gap: 8,
+    flexGrow: 1,
+    color: "#333"
+};
+
 const arrowStyle = {
     marginLeft: "auto",
     color: "#888"
@@ -147,6 +180,7 @@ const listStyle = {
 
 const listItemStyle = {
     display: "flex",
+    flexDirection: isRTL() === true ? "row-reverse" : "row",
     alignItems: "center",
     gap: 8,
     padding: "8px 12px",

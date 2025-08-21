@@ -19,10 +19,17 @@ const tabs = [
     FlexItemControls,
 ];
 
+const EMPTY_ATTRS = Object.freeze({});
+
 export default function SidebarTabs() {
+
     const { attributes } = useSelect((select) => {
-        const b = select(blockEditorStore).getSelectedBlock();
-        return { attributes: b ? b.attributes : {} };
+        const be = select(blockEditorStore);
+        const id = be.getSelectedBlockClientId();
+        if (!id) return { attributes: EMPTY_ATTRS, clientId: null };
+
+        const attrs = be.getBlockAttributes(id) || EMPTY_ATTRS;
+        return { attributes: attrs, clientId: id };
     }, []);
 
     const { parentAttrs } = useParentAttrs();

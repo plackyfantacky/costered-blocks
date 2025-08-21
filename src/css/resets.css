@@ -63,3 +63,9 @@
 .components-base-control {
     width:100%;
 }
+
+.editor-styles-wrapper .is-layout-flex {
+    flex-wrap: unset;
+    align-items: unset;
+    justify-content: unset;
+}
