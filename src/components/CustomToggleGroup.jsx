@@ -10,16 +10,18 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
     const handleChange = useCallback((next) => onChange(next), [onChange]);
 
     return (
-        <ToggleGroupControl
-            label={label}
-            value={value}
-            onChange={handleChange}
-            isBlock={isBlock}
-            __nextHasNoMarginBottom
-            __next40pxDefaultSize
-        >
-            {children}
-        </ToggleGroupControl>
+            <ToggleGroupControl
+                className={`costered-custom-toggle-group ${value ? 'has-selection' : 'is-empty'}`}
+                label={label}
+                value={value}
+                onChange={handleChange}
+                isBlock={isBlock}
+                __nextHasNoMarginBottom
+                __next40pxDefaultSize
+                isDeselectable
+            >
+                {children}
+            </ToggleGroupControl>
     );
 }
 

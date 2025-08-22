@@ -5,7 +5,7 @@ import { Flex, FlexBlock, ToggleControl } from '@wordpress/components';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter } from "@lib/hooks";
+import { useAttrSetter } from "@hooks";
 
 const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, ' ').toUpperCase()) : '';
 

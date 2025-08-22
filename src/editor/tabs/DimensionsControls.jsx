@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
-import { useSelectedBlockInfo } from "@lib/hooks";
+import { useSelectedBlockInfo } from "@hooks";
 import { DimensionInputGroup } from "@components/composite/DimensionInputGroup";
 
 import { DimensionsIcon } from "@components/Icons";

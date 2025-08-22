@@ -1,7 +1,7 @@
 import { __, isRTL } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
-import { useSelectedBlockInfo, useAttrSetter } from "@lib/hooks";
+import { useSelectedBlockInfo, useAttrSetter } from "@hooks";
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";

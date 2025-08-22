@@ -112,6 +112,9 @@ const jsConfig = {
             '@components': path.resolve(pluginRoot, 'src/components'),
             '@lib': path.resolve(pluginRoot, 'src/lib'),
             '@assets': path.resolve(pluginRoot, 'src/assets'),
+            '@hooks': path.resolve(pluginRoot, 'src/lib/hooks'),
+            '@filters': path.resolve(pluginRoot, 'src/filters'),
+            '@config': path.resolve(pluginRoot, 'src/config.js'),
         })
     ],
     logLevel: 'info',

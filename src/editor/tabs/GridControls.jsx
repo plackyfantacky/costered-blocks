@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
 
-import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@lib/hooks";
+import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@hooks";
 
 import { CustomSelectControl } from "@components/CustomSelectControl";
 import CustomToggleGroup from "@components/CustomToggleGroup";

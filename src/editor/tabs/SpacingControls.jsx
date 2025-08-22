@@ -3,7 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 
 import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
-import { useSelectedBlockInfo } from "@lib/hooks";
+import { useSelectedBlockInfo } from "@hooks";
 
 import { BoxMargin } from "@components/Icons";
 

@@ -28,7 +28,7 @@ import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
 const PADDING_KEYS = ['padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
 const SIZE_KEYS = ['width', 'minWidth', 'maxWidth', 'height', 'minHeight', 'maxHeight'];
-const MISC_KEYS = ['display', 'flexDirection', 'flexWrap', 'alignItems', 'justifyContent', 'alignSelf', 'flexGrow', 'flexShrink'];
+const MISC_KEYS = ['display', 'flexDirection', 'flexWrap', 'alignItems', 'justifyContent', 'alignSelf', 'flexGrow', 'flexShrink', 'flexBasis', 'order'];
 
 const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
 

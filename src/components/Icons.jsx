@@ -1,4 +1,6 @@
 import {
+    AlignSelfBaseline,
+    AlignSelfStretch,
     EntypoAlignBottom,
     EntypoAlignLeft,
     EntypoAlignRight,
@@ -35,6 +37,8 @@ import {
     TablerBoxMargin } from '@assets/icons';
 
 export {
+    AlignSelfBaseline as AlignSelfBaseline,
+    AlignSelfStretch as AlignSelfStretch,
     MdiQuestionBoxMultiple as UnknownIcon,
     MaterialSymbolsRemoveSelectionRounded as DefaultIcon,
     RadixIconsDimensions as DimensionsIcon,

@@ -3,7 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
 
-import { useParentAttrs } from "@lib/hooks";
+import { useParentAttrs } from "@hooks";
 
 import DimensionsControls from "@tabs/DimensionsControls";
 import DisplayControls from "@tabs/DisplayControls";
@@ -49,6 +49,14 @@ export default function SidebarTabs() {
         });
     }, [attributes, parentAttrs]);
 
+    const panelTabs = useMemo(() => {
+        return visibleTabs.map(({name, title, icon}) => ({ name, title, icon }));
+    }, [visibleTabs]);
+
+    const tabByName = useMemo(() => {
+        return new Map(visibleTabs.map((t) => [t.name, t]));
+    }, [visibleTabs]);
+
     const [activeName, setActiveName] = useState(visibleTabs[0]?.name);
 
     useEffect(() => {
@@ -61,21 +69,21 @@ export default function SidebarTabs() {
         }
     }, [visibleTabs, activeName]);
 
+    const signature = useMemo(() => panelTabs.map((t) => t.name).join('|'), [panelTabs]);
+
     return (
         <TabPanel
-            key={visibleTabs.map((t) => t.name).join('|')}
+            key={signature}
             className="costered-blocks-sidebar-tabs"
-            tabs={visibleTabs.map(({ name, title, icon }) => ({ name, title, icon }))}
+            tabs={panelTabs}
             onSelect={setActiveName}
             initialTabName={activeName}
         >
             {(tab) => {
-                const tabDef = visibleTabs.find((t) => t.name === tab.name);
-                const Component = tabDef?.render || null;
-                if (Component) {
-                    return <Component />;
-                }
-                return tabDef?.content ?? null;
+                const def = tabByName.get(tab.name);
+                const Component = def?.render || null;
+                if (Component) return <Component />;
+                return def?.content ?? null;
             }}
         </TabPanel>
     );

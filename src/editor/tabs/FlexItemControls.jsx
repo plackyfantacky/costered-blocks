@@ -1,110 +1,96 @@
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
 
-import { FlexChildItem } from '@components/Icons';
+import {
+    AlignSelfBaseline, AlignSelfStretch, FlexChildItem, FlexJustifyStart, FlexJustifyEnd, FlexJustifyCenter,
+    FlexJustifySpaceAround, FlexJustifySpaceBetween, FlexAlignStart, FlexAlignEnd, FlexAlignCenter,
+    FlexAlignSpaceAround, FlexAlignSpaceBetween
+} from "@components/Icons";
 import NumberControlInput from '@components/NumberControlInput';
 import UnitControlInput from '@components/UnitControlInput';
+import CustomToggleGroup from '@components/CustomToggleGroup';
 
-import { useSelectedBlockInfo, useSetOrUnsetAttrs } from "@lib/hooks";
+import { useSelectedBlockInfo, useAttrSetter, useParentAttrs } from "@hooks";
 
-const FlexGrowControl = ({ attributes, clientId, updateAttributes }) => {
-    return (
-        <NumberControlInput
-            label={__('Flex Grow', 'costered-blocks')}
-            value={attributes?.flexGrow || 0}
-            onChange={useSetOrUnsetAttrs('flexGrow', attributes, updateAttributes, clientId)}
-            step={0.1}
-            min={0}
-            max={10}
-        />
-    );
-};
-
-const FlexShrinkControl = ({ attributes, clientId, updateAttributes }) => {
-    return (
-        <NumberControlInput
-            label={__('Flex Shrink', 'costered-blocks')}
-            value={attributes?.flexShrink || 0}
-            onChange={useSetOrUnsetAttrs('flexShrink', attributes, updateAttributes, clientId)}
-            step={0.1}
-            min={0}
-            max={10}
-        />
-    );
-};
-
-const FlexBasisControl = ({ attributes, clientId, updateAttributes }) => {
-    return (
-        <UnitControlInput
-            label={__('Flex Basis', 'costered-blocks')}
-            value={attributes?.flexBasis || ''}
-            onChange={useSetOrUnsetAttrs('flexBasis', attributes, updateAttributes, clientId)}
-            units={['px', '%', 'em', 'rem', 'vw', 'vh', 'auto']}
-            placeholder={__('Enter value', 'costered-blocks')}
-        />
-    );
-};
-
-const FlexOrderControl = ({ attributes, clientId, updateAttributes }) => {
-    
-    //set max and min to maxInteger values for order because who knows how many items there will be? someone will try to set it to a very high number.
-    const maxInteger = Number.MAX_SAFE_INTEGER;
-    const minInteger = -maxInteger;
-
-
-    return (
-        <NumberControlInput
-            label={__('Flex Order', 'costered-blocks')}
-            value={attributes?.order || 0}
-            onChange={useSetOrUnsetAttrs('order', attributes, updateAttributes, clientId)}
-            step={1}
-            min={minInteger}
-            max={maxInteger}
-        />
-    );
-}
+const maxInteger = Number.MAX_SAFE_INTEGER;
+const minInteger = -maxInteger;
 
 const FlexItemControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
     const { updateBlockAttributes } = useDispatch('core/block-editor');
-
     if (!selectedBlock) return null;
-    
+
+    const { parentAttrs } = useParentAttrs();
     const { attributes } = selectedBlock;
+    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+
+
+    const isRow = parentAttrs?.flexDirection ? parentAttrs.flexDirection.includes('row') : true;
+
+    const setFlexGrow = useCallback((v) => set('flexGrow', v), [set]);
+    const setFlexShrink = useCallback((v) => set('flexShrink', v), [set]);
+    const setFlexBasis = useCallback((v) => set('flexBasis', v), [set]);
+    const setOrder = useCallback((v) => set('order', v), [set]);
+    const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
+    const setJustifySelf = useCallback((v) => set('justifySelf', v), [set]);
 
     return (
         <Panel className="costered-blocks-flex-item-controls">
             <PanelBody title={__('Flex Item Controls', 'costered-blocks')}>
-                <Flex expanded={true} direction="column">
+                <Flex expanded={true} gap={4} direction="column" className="flex-item-controls">
                     <FlexBlock>
-                        <FlexGrowControl
-                            attributes={attributes}
-                            clientId={clientId}
-                            updateAttributes={updateBlockAttributes}
-                        />
+                        <Flex expanded={true} gap={0} direction="row">
+                            <FlexItem>
+                                <NumberControlInput
+                                    label={__('Grow', 'costered-blocks')}
+                                    value={attributes?.flexGrow || 0}
+                                    onChange={setFlexGrow}
+                                    step={0.1} min={0} max={10}
+                                />
+                            </FlexItem>
+                            <FlexItem>
+                                <NumberControlInput
+                                    label={__('Shrink', 'costered-blocks')}
+                                    value={attributes?.flexShrink || 0}
+                                    onChange={setFlexShrink}
+                                    step={0.1} min={0} max={10}
+                                />
+                            </FlexItem>
+                            <FlexBlock>
+                                <UnitControlInput
+                                    label={__('Basis', 'costered-blocks')}
+                                    value={attributes?.flexBasis || ''}
+                                    onChange={setFlexBasis}
+                                    placeholder={__('Enter value', 'costered-blocks')}
+                                />
+                            </FlexBlock>
+                        </Flex>
                     </FlexBlock>
                     <FlexBlock>
-                        <FlexShrinkControl
-                            attributes={attributes}
-                            clientId={clientId}
-                            updateAttributes={updateBlockAttributes}
+                        <NumberControlInput
+                            label={__('Flex Order', 'costered-blocks')}
+                            value={attributes?.order || 0}
+                            onChange={setOrder}
+                            step={1} min={minInteger} max={maxInteger}
                         />
                     </FlexBlock>
-                    <FlexBlock>
-                        <FlexBasisControl
-                            attributes={attributes}
-                            clientId={clientId}
-                            updateAttributes={updateBlockAttributes}
-                        />
-                    </FlexBlock>
-                    <FlexBlock>
-                        <FlexOrderControl
-                            attributes={attributes}
-                            clientId={clientId}
-                            updateAttributes={updateBlockAttributes}
-                        />
-                    </FlexBlock>
+                    {isRow && (
+                        <FlexBlock>
+                            <CustomToggleGroup
+                                label={__('Align Self', 'costered-blocks')}
+                                value={attributes?.alignSelf ?? ''}
+                                onChange={setAlignSelf}
+                            >
+                                <CustomToggleGroup.IconOption value="flex-start" icon={<FlexAlignStart />} label={__('Start', 'costered-blocks')} />
+                                <CustomToggleGroup.IconOption value="center" icon={<FlexJustifyCenter />} label={__('Center', 'costered-blocks')} />
+                                <CustomToggleGroup.IconOption value="flex-end" icon={<FlexAlignEnd />} label={__('End', 'costered-blocks')} />
+                                <CustomToggleGroup.IconOption value="baseline" icon={<AlignSelfBaseline />} label={__('Baseline', 'costered-blocks')} />
+                                <CustomToggleGroup.IconOption value="stretch" icon={<AlignSelfStretch />} label={__('Stretch', 'costered-blocks')} />
+                            </CustomToggleGroup>
+                        </FlexBlock>
+                    )}
                 </Flex>
             </PanelBody>
         </Panel>
@@ -115,6 +101,6 @@ export default {
     name: 'flex-item-controls',
     title: __('Flex Item Controls', 'costered-blocks'),
     icon: <FlexChildItem />,
-    isVisible: ({parentAttrs} = {}) => ['flex', 'inline-flex'].includes(parentAttrs?.display),
+    isVisible: ({ parentAttrs } = {}) => ['flex', 'inline-flex'].includes(parentAttrs?.display),
     render: () => <FlexItemControls />,
 };

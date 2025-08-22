@@ -22,11 +22,13 @@ require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 add_action('enqueue_block_editor_assets', function () {
 
     $files = [
-        'costered--hooks' => ['file' => 'js/lib/hooks.js', 'dependencies' => ['wp-hooks', 'wp-element']],
-        'costered--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered--hooks']],
-        'costered--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
-        'costered--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
-        'costered--blocks-render-blocks' => ['file' => 'js/common/render-blocks.js', 'dependencies' => ['wp-blocks', 'wp-hooks', 'wp-element', 'wp-data']],
+        'costered-blocks--hooks' => ['file' => 'js/lib/hooks/index.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered-blocks--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered-blocks--hooks']],
+        'costered-blocks--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
+        'costered-blocks--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered-blocks--blocks-core-group--disable-default-layout' => ['file' => 'js/blocks/core-group--disable-default-layout.js', 'dependencies' => ['wp-blocks', 'wp-hooks', 'wp-dom-ready']],
+        'costered-blocks--filters-editor-style-mirror' => ['file' => 'js/filters/editor-style-mirror.js', 'dependencies' => ['wp-blocks', 'wp-hooks', 'wp-element', 'wp-data']],
+        'costered-blocks--filters-setup-data-scheme' => ['file' => 'js/filters/setup-data-scheme.js', 'dependencies' => ['wp-hooks']],
     ];
 
     foreach ($files as $handle => $data) {

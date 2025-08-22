@@ -6,7 +6,7 @@ import { __experimentalGrid as Grid } from "@wordpress/components";
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter } from "@lib/hooks";
+import { useAttrSetter } from "@hooks";
 
 const GRID_MAP = {
     Top: { col: '4 / span 4', row: '1' },

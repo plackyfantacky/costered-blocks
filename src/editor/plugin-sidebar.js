@@ -1,16 +1,14 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
-import { getBlockType, getBlockVariations, unregisterBlockVariation } from '@wordpress/blocks';
-import { addFilter } from '@wordpress/hooks';
+import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import domReady from '@wordpress/dom-ready';
 
 import { isValidElement, cloneElement } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 
-import { useSelectedBlockInfo } from "@lib/hooks";
-import { BLOCKS_WITH_EDITOR_STYLES } from "@lib/schema";
-import SidebarTabs from "@editor/SidebarTabs";
+import { useSelectedBlockInfo } from "@hooks";
+import { BLOCKS_WITH_EDITOR_STYLES } from "@config";
+import SidebarTabs from "@tabs/SidebarTabs";
 
 import { UnknownIcon, HammerBreakIcon } from "@components/Icons";
 
@@ -128,36 +126,3 @@ registerPlugin('costered-blocks-sidebar', {
     icon: <HammerBreakIcon width={24} height={24} />,
 });
 
-// Disable layout controls for specific blocks
-const TARGETS = new Set(['core/group', 'core/columns', 'core/buttons']);
-
-addFilter('blocks.registerBlockType', 'costered-blocks/disable-layout', (settings, name) => {
-    if (!TARGETS.has(name)) return settings;
-    return {
-        ...settings,
-        supports: {
-            ...(settings.supports || {}),
-            align: false, // Disable alignment controls
-            layout: false, // Disable layout controls
-        }
-    };
-}, 10);
-
-domReady(() => {
-    //remove every non "Group" variation from the group block
-
-    function unregisterBlockVariations() {
-        (getBlockVariations('core/group') || []).forEach(v => {
-            if (!v.isDefault) {
-                unregisterBlockVariation('core/group', v.name);
-            };
-        });
-    }
-
-    unregisterBlockVariations();
-
-    //hunter/killer for any rogue group block variations or registrations
-    setTimeout(() => {
-        unregisterBlockVariations();
-    }, 0);
-});
