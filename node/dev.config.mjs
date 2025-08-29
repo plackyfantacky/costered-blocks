@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import path, { resolve } from 'path';
 import pathAlias from 'esbuild-plugin-path-alias';
 
+const isDev = process.env.NODE_ENV !== 'production';
 const isWatch = process.argv.includes('--watch');
 const justBuild = process.argv.includes('--build');
 const jsOutDir = './js';
@@ -68,7 +69,17 @@ const globalsMap = {
     "@wordpress/date": "wp.date",
     "@wordpress/data": "wp.data",
     "@wordpress/dom-ready": "wp.domReady",
+    "@wordpress/icons": "wp.icons",
     "@wordpress/i18n": "wp.i18n",
+    "@wordpress/preferences": "wp.preferences",
+    "@wordpress/keycodes": "wp.keycodes",
+    "@wordpress/html-entities": "wp.htmlEntities",
+    "@wordpress/url": "wp.url",
+    "@wordpress/media-utils": "wp.mediaUtils",
+    "@wordpress/media-upload": "wp.mediaUpload",
+    "@wordpress/blob": "wp.blob",
+    "@wordpress/customize-posts": "wp.customizePosts",
+    "@wordpress/viewport": "wp.viewport",
     "react": "React",
     "react-dom": "ReactDOM",
 };
@@ -100,20 +111,26 @@ const jsConfig = {
     jsx: 'transform',
     jsxFactory: 'React.createElement',
     jsxFragment: 'React.Fragment',
-    target: ['es2018'],
+    target: ['es2020'],
     format: 'iife',
+    platform: 'browser',
     plugins: [
         importAsGlobals(globalsMap),
         pathAlias({
-            '@registry': path.resolve(pluginRoot, 'src/editor/registry.js'),
-            '@panels': path.resolve(pluginRoot, 'src/editor/panels'),
+            '@editor': path.resolve(pluginRoot, 'src/editor'),
             '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
             '@components': path.resolve(pluginRoot, 'src/components'),
-            '@lib': path.resolve(pluginRoot, 'src/lib')
+            '@assets': path.resolve(pluginRoot, 'src/assets'),
+            '@hooks': path.resolve(pluginRoot, 'src/hooks'),
+            '@filters': path.resolve(pluginRoot, 'src/filters'),
+            '@config': path.resolve(pluginRoot, 'src/config.js'),
         })
     ],
     logLevel: 'info',
-    resolveExtensions: ['.js', '.jsx', '.ts', '.tsx']
+    resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
+    define: {
+        'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
+    }
 };
 
 const cssConfig = {

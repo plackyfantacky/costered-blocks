@@ -23,6 +23,15 @@ add_filter('render_block', function($block_content, $block) {
         'paddingRight' => 'padding-right',
         'paddingBottom' => 'padding-bottom',
         'paddingLeft' => 'padding-left',
+        'flexDirection' => 'flex-direction',
+        'flexWrap' => 'flex-wrap',
+        'justifyContent' => 'justify-content',
+        'alignItems' => 'align-items',
+        'alignContent' => 'align-content',
+        'flexGrow' => 'flex-grow',
+        'flexShrink' => 'flex-shrink',
+        'flexBasis' => 'flex-basis',
+        'order' => 'order'
         // add more as needed
     ];
 
@@ -49,4 +58,25 @@ add_filter('render_block', function($block_content, $block) {
     }
 
     return $block_content;
+}, 10, 2);
+
+add_filter('block_type_metadata_settings', function($settings, $metadata) {
+    $targets = [
+        'core/group',
+        'core/buttons',
+        'core/columns'
+    ];
+
+    if(!in_array($metadata['name'] ?? '', $targets, true)) {
+        return $settings;
+    }
+
+    // ensure support exists
+    if (!isset($settings['supports']) || !is_array($settings['supports'])) {
+        $settings['supports'] = [];
+    }
+
+    // nuke the attrs.layout object (which is used for the default block layout constols)
+    $settings['supports']['layout'] = false;
+    return $settings;
 }, 10, 2);

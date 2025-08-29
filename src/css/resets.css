@@ -59,3 +59,30 @@
         }
     }
 }
+
+.costered-custom-toggle-group {
+    padding: 2px;
+    border-radius:3px !important;
+    box-shadow: 0 0 0 1px #8c8f94 inset;
+
+    &.is-empty::before {
+        background-color:transparent !important;
+    }
+}
+
+.costered-blocks--grid-columns-simple-control,
+.costered-blocks--grid-rows-simple-control {
+    .components-range-control__wrapper {
+        min-width:158px;
+    }
+}
+
+.components-base-control {
+    width:100%;
+}
+
+.editor-styles-wrapper .is-layout-flex {
+    flex-wrap: unset;
+    align-items: unset;
+    justify-content: unset;
+}
