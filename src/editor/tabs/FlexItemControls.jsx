@@ -4,10 +4,14 @@ import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/componen
 import { useCallback } from '@wordpress/element';
 
 import {
-    AlignSelfBaseline, AlignSelfStretch, FlexChildItem, FlexJustifyStart, FlexJustifyEnd, FlexJustifyCenter,
-    FlexJustifySpaceAround, FlexJustifySpaceBetween, FlexAlignStart, FlexAlignEnd, FlexAlignCenter,
-    FlexAlignSpaceAround, FlexAlignSpaceBetween
-} from "@components/Icons";
+    AlignSelfBaseline,
+    AlignSelfStretch,
+    FluentRowChild16Regular as FlexChildItem,
+    HumbleiconsAlignObjectsCenter as FlexJustifyCenter, 
+    EntypoAlignTop as FlexAlignStart, 
+    EntypoAlignBottom as FlexAlignEnd
+
+} from "@assets/icons";
 import NumberControlInput from '@components/NumberControlInput';
 import UnitControlInput from '@components/UnitControlInput';
 import CustomToggleGroup from '@components/CustomToggleGroup';
@@ -34,7 +38,6 @@ const FlexItemControls = () => {
     const setFlexBasis = useCallback((v) => set('flexBasis', v), [set]);
     const setOrder = useCallback((v) => set('order', v), [set]);
     const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
-    const setJustifySelf = useCallback((v) => set('justifySelf', v), [set]);
 
     return (
         <Panel className="costered-blocks-flex-item-controls">

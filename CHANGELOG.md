@@ -1,5 +1,20 @@
 # Changelog
 
+## What's Changed in 1.1.0
+- feat: add Grid Controls panel to allow fine control over grid columns, rows, and gap
+- feat: add gap control to Flexbox Controls panel
+- refactor!: migrate all 'mode' type attributes to use a new user preference store
+- refactor: import attribute list from config into editor-style-mirror, avoids redundant
+attribute definitions
+- refactor: rewrite entire icon handling system to reduce work needed when adding more icons
+- refactor: separate hooks into individual files
+- refactor: clean up file paths for hooks and filter for simpler file structure
+
+BREAKING CHANGE: a lot of UI controls have alternate modes allowing more control over what
+values are saved. previously these were stored as attributes such as "marginMode". These
+are removed in favour of per-user preference store which is saved in the database and local
+storage. This reduces attribute pollution.
+
 ## What's Changed in 1.0.0a
 - feat!: Add a plugin sidebar and registry system for managing sidebar panels.
 - feat: add new tab panels for separating controls into categories "display-controls",

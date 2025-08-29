@@ -70,6 +70,13 @@
     }
 }
 
+.costered-blocks--grid-columns-simple-control,
+.costered-blocks--grid-rows-simple-control {
+    .components-range-control__wrapper {
+        min-width:158px;
+    }
+}
+
 .components-base-control {
     width:100%;
 }

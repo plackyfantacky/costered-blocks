@@ -5,9 +5,7 @@ import { Flex, FlexBlock, ToggleControl } from '@wordpress/components';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter } from "@hooks";
-
-const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, ' ').toUpperCase()) : '';
+import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
 
 /**
  * Renders a pair of input controls for dimension attributes. Will always contain exactly one width and height input,
@@ -21,8 +19,15 @@ const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, 
  * 
  * @returns {JSX.Element} A FlexBox containing the dimension input and toggle controls.
  */
-export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateAttributes }) {
+export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateAttributes, blockName = null }) {
     const {set, withPrefix } = useAttrSetter(updateAttributes, clientId);
+
+    const modeKey = groupKey ? `${groupKey}DimensionMode` : 'dimensionMode';
+    const safeBlockName = useSafeBlockName(blockName, clientId);
+
+    // Use a scoped preference key for the dimension mode
+    const prefKey = scopedKey(modeKey, { blockName: safeBlockName });
+    const [mode, setMode] = useUIPreferences(prefKey, 'unit');
 
     const ns = useMemo(
         () => (groupKey ? withPrefix(groupKey) : null),
@@ -46,10 +51,9 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
         height: attributes?.[keyFor('height')] || ''
     }), [attributes, groupKey]);
 
-    const modeKey = groupKey ? `${groupKey}DimensionMode` : 'dimensionMode';
-    const mode = attributes?.[modeKey] || 'unit';
-    
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
+
+    const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, ' ').toUpperCase()) : '';
 
     const labelText = 
         groupKey !== '' 
@@ -65,10 +69,6 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
         (next) => ns ? ns.set('Height', next) : set('height', next),
         [ns, set]
     );
-
-    const onToggleMode = useCallback(() => {
-        set(modeKey, mode === 'unit' ? 'text' : 'unit');
-    }, [set, modeKey, mode]);
 
     return (
         <Flex direction={'column'} gap={4} style={{ marginBottom: '1rem' }}>
@@ -91,7 +91,7 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
                 <ToggleControl
                     label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
                     checked={mode === 'text'}
-                    onChange={onToggleMode}
+                    onChange={(isUnit) => setMode(isUnit ? 'text' : 'unit')}
                     __nextHasNoMarginBottom
                     __next40pxDefaultSize
                 />

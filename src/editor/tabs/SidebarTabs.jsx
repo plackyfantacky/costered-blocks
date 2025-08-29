@@ -10,6 +10,7 @@ import DisplayControls from "@tabs/DisplayControls";
 import SpacingControls from "@tabs/SpacingControls";
 import FlexBoxControls from "@tabs/FlexBoxControls";
 import FlexItemControls from "@tabs/FlexItemControls";
+import GridControls from "@tabs/GridControls";
 
 const tabs = [
     DisplayControls,
@@ -17,6 +18,7 @@ const tabs = [
     SpacingControls,
     FlexBoxControls,
     FlexItemControls,
+    GridControls
 ];
 
 const EMPTY_ATTRS = Object.freeze({});

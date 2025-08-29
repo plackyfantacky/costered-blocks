@@ -6,7 +6,7 @@ import { __experimentalGrid as Grid } from "@wordpress/components";
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter } from "@hooks";
+import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
 
 const GRID_MAP = {
     Top: { col: '4 / span 4', row: '1' },
@@ -38,7 +38,7 @@ const FieldSlot = memo(function FieldSlot({ area, children }) {
     );
 });
 
-function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes }) {
+function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes, blockName = null }) {
     const { withPrefix } = useAttrSetter(updateAttributes, clientId);
     const ns = useMemo(() => withPrefix(prefix), [withPrefix, prefix]);
 
@@ -49,19 +49,18 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes 
         Bottom: attributes?.[`${prefix}Bottom`] || '',
     }), [attributes, prefix]);
 
-    const mode = attributes?.[`${prefix}Mode`] || 'unit';
+    const safeBlockName = useSafeBlockName(blockName, clientId);
+
+    const modeKey = `${prefix}Mode`;
+    const prefKey = scopedKey(modeKey, { blockName: safeBlockName });
+    const [mode, setMode] = useUIPreferences(prefKey, 'unit');
+
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
-
-
 
     const onChange = useCallback(
         (direction) => (next) => ns.set(direction, next),
         [ns]
     );
-
-    const onToggleMode = useCallback(() => {
-        ns.set(`Mode`, mode === 'unit' ? 'text' : 'unit');
-    }, [ns, mode]);
 
     return (
         <Grid
@@ -106,7 +105,7 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes 
                 <ToggleControl
                     label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
                     checked={mode === 'text'}
-                    onChange={onToggleMode}
+                    onChange={(isUnit) => setMode(isUnit ? 'text' : 'unit')}
                     __nextHasNoMarginBottom
                 />
             </div>

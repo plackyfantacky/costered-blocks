@@ -10,7 +10,10 @@ import { useSelectedBlockInfo } from "@hooks";
 import { BLOCKS_WITH_EDITOR_STYLES } from "@config";
 import SidebarTabs from "@tabs/SidebarTabs";
 
-import { UnknownIcon, HammerBreakIcon } from "@components/Icons";
+import {
+    MdiQuestionBoxMultiple as UnknownIcon,
+    GameIconsHammerBreak as HammerBreakIcon
+} from "@assets/icons";
 
 const TabIcon = ({ name, size = 24, style = {} }) => {
 
@@ -125,4 +128,3 @@ registerPlugin('costered-blocks-sidebar', {
     render: Sidebar,
     icon: <HammerBreakIcon width={24} height={24} />,
 });
-

@@ -5,14 +5,14 @@ import { Panel, PanelBody } from '@wordpress/components';
 import { useSelectedBlockInfo } from "@hooks";
 import { DimensionInputGroup } from "@components/composite/DimensionInputGroup";
 
-import { DimensionsIcon } from "@components/Icons";
+import { RadixIconsDimensions as DimensionsIcon } from "@assets/icons";
 
 const DimensionControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
     const { updateBlockAttributes } = useDispatch('core/block-editor');
 
     if (!selectedBlock) return null;
-    const { attributes } = selectedBlock;
+    const { attributes, name } = selectedBlock;
 
     return (
         <Panel>
@@ -21,6 +21,7 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
+                    blockName={name}
                 />
             </PanelBody>
             <PanelBody title={__('Minimum Dimensions', 'costered-blocks')} initialOpen={false}>
@@ -29,6 +30,7 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
+                    blockName={name}
                 />
             </PanelBody>
             <PanelBody title={__('Maximum Dimensions', 'costered-blocks')} initialOpen={false}>
@@ -37,6 +39,7 @@ const DimensionControls = () => {
                     attributes={attributes}
                     clientId={clientId}
                     updateAttributes={updateBlockAttributes}
+                    blockName={name}
                 />
             </PanelBody>
         </Panel>

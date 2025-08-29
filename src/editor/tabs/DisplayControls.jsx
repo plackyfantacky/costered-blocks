@@ -7,23 +7,40 @@ import { useSelectedBlockInfo, useAttrSetter } from "@hooks";
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 
 import {
-    BoxIcon,
-    BrickOulineRounded,
-    MatchWordRounded,
-    FlexNoWrapRounded,
-    GridViewRounded,
-    BorderNoneVariant,
-    EyeOutline,
-    EyeOffOutline,
-    Collapse
-} from "@components/Icons";
+    LucideBox as BoxIcon,
+    MaterialSymbolsRemoveSelectionRounded as DefaultIcon,
+    MaterialSymbolsBrickOutlineRounded as BrickOulineRounded,
+    MaterialSymbolsMatchWordRounded as MatchWordRounded,
+    MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded,
+    MaterialSymbolsGridViewRounded as GridViewRounded,
+    MdiBorderNoneVariant as BorderNoneVariant,
+    MdiEyeOutline as EyeOutline,
+    MdiEyeOffOutline as EyeOffOutline,
+    IconoirCollapse as Collapse
+} from "@assets/icons";
 
+/*
+    hopefully this is the only instance that needs this fix, but here is a weird one: prior to this change, if you 
+    set a block to `display:flex` or `display:grid`, then setting it to `display:block` and clicking anywhere outside
+    of the selected block...BOOM you get:
+    "Uncaught Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement."
+    the culprit is the return null statement below, but don't ask my why as I still don't know why going from flex/grid
+    to block causes it to happen.
+ */
 const DisplayControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
     if (!selectedBlock) return null;
 
-    const { attributes } = selectedBlock;
+    return (
+        <DisplayControlsInner
+            clientId={clientId}
+            attributes={selectedBlock.attributes}
+        />
+    );
+}
+
+const DisplayControlsInner = ({clientId, attributes }) => {
+    const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
     const setDisplay = useCallback((v) => set('display', v), [set]);
@@ -39,10 +56,11 @@ const DisplayControls = () => {
                             value={typeof attributes?.display === "string" ? attributes.display : ""}
                             onChange={setDisplay}
                         >
+                            <SelectControl.Option value=""><DefaultIcon />{__('unset / initial', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="block"><BrickOulineRounded />{__('Block', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="inline"><MatchWordRounded />{__('Inline', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="flex"><FlexNoWrapRounded />{__('Flex', 'costered-blocks')}</SelectControl.Option>
-                            {/* <SelectControl.Option value="grid"><GridViewRounded />{__('Grid', 'costered-blocks')}</SelectControl.Option> */} 
+                            <SelectControl.Option value="grid"><GridViewRounded />{__('Grid', 'costered-blocks')}</SelectControl.Option> 
                             <SelectControl.Option value="none"><BorderNoneVariant />{__('None', 'costered-blocks')}</SelectControl.Option>
                         </SelectControl>
                     </FlexItem>
@@ -52,6 +70,7 @@ const DisplayControls = () => {
                             value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
                             onChange={setVisibility}
                         >
+                            <SelectControl.Option value=""><DefaultIcon />{__('unset / initial', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="visible"><EyeOutline />{__('Visible', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="hidden"><EyeOffOutline />{__('Hidden', 'costered-blocks')}</SelectControl.Option>
                             <SelectControl.Option value="collapse"><Collapse />{__('Collapse', 'costered-blocks')}</SelectControl.Option>

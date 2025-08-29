@@ -5,7 +5,7 @@ import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/compon
 import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
 import { useSelectedBlockInfo } from "@hooks";
 
-import { BoxMargin } from "@components/Icons";
+import { TablerBoxMargin as BoxMargin } from "@assets/icons";
 
 const SpacingControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
@@ -13,7 +13,7 @@ const SpacingControls = () => {
 
     if (!selectedBlock) return null;
 
-    const { attributes } = selectedBlock;
+    const { attributes, name } = selectedBlock;
 
     return (
         <Panel>
@@ -26,6 +26,7 @@ const SpacingControls = () => {
                                 attributes={attributes}
                                 clientId={clientId}
                                 updateAttributes={updateBlockAttributes}
+                                blockName={name}
                             />
                         </BaseControl>
                     </FlexItem>
@@ -36,6 +37,7 @@ const SpacingControls = () => {
                                 attributes={attributes}
                                 clientId={clientId}
                                 updateAttributes={updateBlockAttributes}
+                                blockName={name}
                             />
                         </BaseControl>
                     </FlexItem>

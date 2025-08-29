@@ -1,11 +1,16 @@
 import { __, isRTL } from '@wordpress/i18n';
 import { useState, useEffect, useRef, createContext, useContext, useMemo, Children } from '@wordpress/element';
 import { Flex, FlexItem } from '@wordpress/components';
-import { DefaultIcon } from '@components/Icons';
 
 const Ctx = createContext();
 
-export function CustomSelectControl({ value, onChange, label = "", children }) {
+export function CustomSelectControl({
+    value,
+    onChange,
+    label = "",
+    className = "",
+    children
+}) {
     const [open, setOpen] = useState(false);
     const rootRef = useRef(null);
 
@@ -28,18 +33,26 @@ export function CustomSelectControl({ value, onChange, label = "", children }) {
 
     const ctxValue = useMemo(() => ({ value, onSelect: selectAndClose }), [value, selectAndClose]);
 
-    const DefaultText = __('default / unset', 'costered-blocks');
+    const DefaultText = __('choose...', 'costered-blocks');
 
     const getSelectedVisual = () => {
-        let icon = <DefaultIcon />;
+        let icon;
         let labelNode = DefaultText;
         const arr = Children.toArray(children);
         for (let i = 0; i < arr.length; i++) {
             const el = arr[i];
             if (el?.props?.value === value) {
+                //Child items of this component may or may not include an icon. e.g.
+                // <SelectControl.Option value=""><DefaultIcon />{__('unset / initial', 'costered-blocks')}</SelectControl.Option
+                // or
+                // <SelectControl.Option value="simple">{__('Simple', 'costered-blocks')}</SelectControl.Option>
                 const parts = Children.toArray(el.props.children);
-                icon = parts[0] ?? icon;
-                labelNode = parts.length > 1 ? parts.slice(1) : labelNode;
+                if (parts.length > 1) {
+                    icon = parts[0] ?? icon;
+                    labelNode = parts.slice(1)
+                } else {
+                    labelNode = parts[0] ?? DefaultText;
+                }
                 break;
             }
         }
@@ -61,6 +74,7 @@ export function CustomSelectControl({ value, onChange, label = "", children }) {
                         if (e.key === 'ArrowDown' && !open) setOpen(true);
                         if (e.key === 'Escape' && open) setOpen(false);
                     }}
+                    className="costered-custom-select__button"
                     style={buttonStyle}
                 >
                     <Flex direction={isRTL() ? "row-reverse" : "row"} align="center" gap={8}>
@@ -76,11 +90,9 @@ export function CustomSelectControl({ value, onChange, label = "", children }) {
                     <ul
                         role="listbox"
                         tabIndex={-1}
+                        className={`costered-custom-select__list ${className || ''}`}
                         style={listStyle}
                     >
-                        <Option value="">
-                            <DefaultIcon />{DefaultText}
-                        </Option>
                         {children}
                     </ul>
                 )}
@@ -89,7 +101,7 @@ export function CustomSelectControl({ value, onChange, label = "", children }) {
     );
 }
 
-const Option = React.memo(function Option({ value, children, ...rest }) {
+const Option = React.memo(function Option({ value, children, className = "", ...rest }) {
     const { value: current, onSelect} = useContext(Ctx) || {};
     const isSelected = value === current || (!value && !current);
 
@@ -100,6 +112,7 @@ const Option = React.memo(function Option({ value, children, ...rest }) {
             role="option"
             aria-selected={isSelected}
             tabIndex={0}
+            className={`costered-custom-select__list-item ${className}`}
             style={{ ...listItemStyle, ...(isSelected ? selectedOptionStyle : null) }}
             onClick={activate}
             onKeyDown={(e) => {
@@ -110,8 +123,8 @@ const Option = React.memo(function Option({ value, children, ...rest }) {
             }}
             {...rest}
         >
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexDirection: isRTL() ? 'row-reverse' : 'row' }}>
-                {children}
+            <div style={listItemInnerStyle}>
+                {children ?? String(value ?? '')}
             </div>
         </li>
     );
@@ -186,3 +199,10 @@ const listItemStyle = {
     padding: "8px 12px",
     cursor: "pointer"
 };
+
+const listItemInnerStyle = {
+    display: 'flex',
+    gap: 8,
+    alignItems: 'center',
+    flexDirection: isRTL() ? 'row-reverse' : 'row'
+}

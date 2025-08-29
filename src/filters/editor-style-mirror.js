@@ -25,10 +25,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
-
-const PADDING_KEYS = ['padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
-const SIZE_KEYS = ['width', 'minWidth', 'maxWidth', 'height', 'minHeight', 'maxHeight'];
-const MISC_KEYS = ['display', 'flexDirection', 'flexWrap', 'alignItems', 'justifyContent', 'alignSelf', 'flexGrow', 'flexShrink', 'flexBasis', 'order'];
+import { PADDING_KEYS, SIZE_KEYS, MISC_KEYS } from '@config';
 
 const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
 

@@ -1,6 +1,6 @@
 {
     "name": "costered-blocks",
-    "version": "1.0.0a",
+    "version": "1.1.0",
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
     "main": "costered-blocks.php",
     "scripts": {

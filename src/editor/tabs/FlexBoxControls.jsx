@@ -6,12 +6,30 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import CustomToggleGroup from "@components/CustomToggleGroup";
+import { GapControls } from '@components/composite/GapControls';
 
 import {
-    FlexNoWrapRounded, FlexDirectionColumn, FlexDirectionColumnReverse, FlexDirectionRow, FlexDirectionRowReverse, FlexWrapNone,
-    FlexWrapWrap, FlexWrapReverse, FlexJustifyStart, FlexJustifyEnd, FlexJustifyCenter, FlexJustifySpaceAround, FlexJustifySpaceBetween,
-    FlexJustifySpaceEven, FlexAlignStart, FlexAlignEnd, FlexAlignCenter, FlexAlignSpaceAround, FlexAlignSpaceBetween, FlexAlignSpaceEven
-} from "@components/Icons";
+    MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded, 
+    FlexDirectionColumn, 
+    FlexDirectionColumnReverse, 
+    FlexDirectionRow, 
+    FlexDirectionRowReverse, 
+    FlexWrapNone,
+    FlexWrapWrap, 
+    FlexWrapReverse, 
+    EntypoAlignLeft as FlexJustifyStart, 
+    EntypoAlignRight as FlexJustifyEnd, 
+    HumbleiconsAlignObjectsCenter as FlexJustifyCenter, 
+    MaterialSymbolsAlignJustifySpaceAround as FlexJustifySpaceAround, 
+    MaterialSymbolsAlignJustifySpaceBetween as FlexJustifySpaceBetween,
+    MaterialSymbolsAlignJustifySpaceEven as FlexJustifySpaceEven, 
+    EntypoAlignTop as FlexAlignStart, 
+    EntypoAlignBottom as FlexAlignEnd, 
+    MaterialSymbolsVerticalAlignCenterRounded as FlexAlignCenter, 
+    MaterialSymbolsAlignSpaceAround as FlexAlignSpaceAround, 
+    MaterialSymbolsAlignSpaceBetween as FlexAlignSpaceBetween, 
+    MaterialSymbolsAlignSpaceEven as FlexAlignSpaceEven
+} from "@assets/icons";
 
 const isFlexValue = (v) => /^(flex|inline-flex)$/i.test(v);
 
@@ -74,7 +92,7 @@ const FlexBoxControls = () => {
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     if (!selectedBlock) return null;
 
-    const { attributes } = selectedBlock;
+    const { attributes, name } = selectedBlock;
     const { set, setMany } = useAttrSetter(updateBlockAttributes, clientId);
 
     // Normaliser: react to 'display' and 'flexDirection' attribute changes
@@ -101,7 +119,6 @@ const FlexBoxControls = () => {
     const setFlexWrap = useCallback((v) => set('flexWrap', v), [set]);
     const setJustifyContent = useCallback((v) => set('justifyContent', v), [set]);
     const setAlignItems = useCallback((v) => set('alignItems', v), [set]);
-
     return (
         <Panel>
             <PanelBody title={__('Flexbox Controls', 'costered-blocks')} initialOpen={true}>
@@ -129,6 +146,10 @@ const FlexBoxControls = () => {
                             <CustomToggleGroup.CombinedOption value="wrap-reverse" icon={<FlexWrapReverse />} label={__('Reverse', 'costered-blocks')} />
                         </CustomToggleGroup>
                     </FlexItem>
+                </Flex>
+            </PanelBody>
+            <PanelBody title={__('Alignment', 'costered-blocks')} initialOpen={true}>
+                <Flex direction="column" className="flexbox-alignment-controls">
                     <FlexItem>
                         <JustifyControl
                             attributes={attributes}
@@ -139,6 +160,18 @@ const FlexBoxControls = () => {
                         <AlignControl
                             attributes={attributes}
                             setAlignItems={setAlignItems}
+                        />
+                    </FlexItem>
+                </Flex>
+            </PanelBody>
+            <PanelBody title={__('Gap', 'costered-blocks')} initialOpen={false}>
+                <Flex direction="column" className="flexbox-gap-controls">
+                    <FlexItem>
+                        <GapControls
+                            attributes={attributes}
+                            clientId={clientId}
+                            updateAttributes={updateBlockAttributes}
+                            blockName={name}
                         />
                     </FlexItem>
                 </Flex>

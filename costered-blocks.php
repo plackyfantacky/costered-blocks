@@ -22,7 +22,7 @@ require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 add_action('enqueue_block_editor_assets', function () {
 
     $files = [
-        'costered-blocks--hooks' => ['file' => 'js/lib/hooks/index.js', 'dependencies' => ['wp-hooks', 'wp-element']],
+        'costered-blocks--hooks' => ['file' => 'js/hooks/index.js', 'dependencies' => ['wp-hooks', 'wp-element']],
         'costered-blocks--editor--plugin-sidebar' => ['file' => 'js/editor/plugin-sidebar.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered-blocks--hooks']],
         'costered-blocks--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
         'costered-blocks--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],
