@@ -1,6 +1,6 @@
 {
     "name": "costered-blocks",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
     "main": "costered-blocks.php",
     "scripts": {
@@ -28,7 +28,7 @@
         "blocks"
     ],
     "author": "Adam Trickett",
-    "license": "MIT",
+    "license": "(MIT OR GPL-2.0-or-later)",
     "bugs": {
         "url": "https://github.com/plackyfantacky/costered-blocks/issues"
     },
