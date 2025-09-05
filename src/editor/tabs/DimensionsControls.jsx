@@ -20,7 +20,7 @@ const DimensionControls = () => {
                 <DimensionInputGroup
                     attributes={attributes}
                     clientId={clientId}
-                    updateAttributes={updateBlockAttributes}
+                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                 />
             </PanelBody>
@@ -29,7 +29,7 @@ const DimensionControls = () => {
                     groupKey="min"
                     attributes={attributes}
                     clientId={clientId}
-                    updateAttributes={updateBlockAttributes}
+                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                 />
             </PanelBody>
@@ -38,7 +38,7 @@ const DimensionControls = () => {
                     groupKey="max"
                     attributes={attributes}
                     clientId={clientId}
-                    updateAttributes={updateBlockAttributes}
+                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                 />
             </PanelBody>

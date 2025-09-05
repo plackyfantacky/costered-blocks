@@ -38,8 +38,8 @@ const FieldSlot = memo(function FieldSlot({ area, children }) {
     );
 });
 
-function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes, blockName = null }) {
-    const { withPrefix } = useAttrSetter(updateAttributes, clientId);
+function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttributes, blockName = null }) {
+    const { withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
     const ns = useMemo(() => withPrefix(prefix), [withPrefix, prefix]);
 
     const values = useMemo(() => ({
@@ -116,7 +116,7 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateAttributes,
 export default memo(DirectionalInputGroup, (prev, next) => {
     if (prev.clientId !== next.clientId) return false;
     if (prev.prefix !== next.prefix) return false;
-    if (prev.updateAttributes !== next.updateAttributes) return false;
+    if (prev.updateBlockAttributes !== next.updateBlockAttributes) return false;
 
     const p = prev.prefix;
     const keys = [`${p}Mode`, `${p}Top`, `${p}Left`, `${p}Right`, `${p}Bottom`];

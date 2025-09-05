@@ -1,6 +1,11 @@
 import { useCallback } from '@wordpress/element';
 
-export function useAttrSetter(updateAttributes, clientId, { trim = true, emptyUnsets = true } = {}) {
+/**
+ * Universal hook to handle setting/clearing attribute values. Supports block-props (inside a block edit) and store data ( sidebar / external UI )
+ */
+export function useAttrSetter(updateFn, target, { trim = true, emptyUnsets = true } = {}) {
+    const isStoreForm = target !== undefined && target !== null;
+
     const normalise = useCallback((value) => {
         let v = value;
         if (trim && typeof v === 'string') v = v.trim();
@@ -8,28 +13,49 @@ export function useAttrSetter(updateAttributes, clientId, { trim = true, emptyUn
         return v;
     }, [trim, emptyUnsets]);
 
+    const apply = useCallback((partial) => {
+        if(isStoreForm) {
+            return updateFn(target, partial)
+        }
+        return updateFn(partial)
+    }, [isStoreForm, updateFn, target])
+    
     const set = useCallback((key, value) => {
-        updateAttributes(clientId, { [key]: normalise(value) });
-    }, [updateAttributes, clientId, normalise]);
+        apply({ [key]: normalise(value) });
+    }, [apply, normalise]);
 
     const setMany = useCallback((entries) => {
         const payload = {};
-        for (const [k, v] of Object.entries(entries)) {
-            payload[k] = normalise(v);
+        for (const [key, value] of Object.entries(entries)) {
+            payload[key] = normalise(value);
         }
-        updateAttributes(clientId, payload);
-    }, [updateAttributes, clientId, normalise]);
+        apply(payload);
+    }, [apply, normalise]);
+
+    const unset = useCallback((key) => {
+        apply({ [key]: undefined });
+    })
+
+    const unsetMany = useCallback((keys) => {
+        const payload = {};
+        for (const key of keys) {
+            payload[key] = undefined;
+        }
+        apply(payload);
+    }, [apply]);
 
     const withPrefix = useCallback((prefix) => ({
-        set: (suffix, value) => set(`${prefix}${suffix}`, value),
+        set: (key, value) => set(`${prefix}${key}`, value),
         setMany: (obj) => {
             const namespaced = {};
-            for (const [suffix, v] of Object.entries(obj)) {
-                namespaced[`${prefix}${suffix}`] = v;
+            for (const [key, v] of Object.entries(obj)) {
+                namespaced[`${prefix}${key}`] = v;
             }
             setMany(namespaced);
         },
-    }), [set, setMany]);
+        unset: (key) => unset(`${prefix}${key}`),
+        unsetMany: (keys) => unsetMany(keys.map((s) => `${prefix}${s}`)),
+    }), [set, setMany, unset, unsetMany]);
 
-    return { set, setMany, withPrefix };
+    return { set, setMany, unset, unsetMany, withPrefix };
 }

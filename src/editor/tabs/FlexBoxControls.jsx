@@ -170,7 +170,7 @@ const FlexBoxControls = () => {
                         <GapControls
                             attributes={attributes}
                             clientId={clientId}
-                            updateAttributes={updateBlockAttributes}
+                            updateBlockAttributes={updateBlockAttributes}
                             blockName={name}
                         />
                     </FlexItem>

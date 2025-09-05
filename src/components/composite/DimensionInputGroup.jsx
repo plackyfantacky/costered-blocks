@@ -15,12 +15,12 @@ import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@h
  * @param {string} groupKey - The key for the group of attributes, defaults to "size".
  * @param {Object} attributes - The block attributes containing the values to edit.
  * @param {string} clientId - The client ID of the block being edited.
- * @param {Function} updateAttributes - Function to update block attributes.
+ * @param {Function} updateBlockAttributes - Function to update block attributes.
  * 
  * @returns {JSX.Element} A FlexBox containing the dimension input and toggle controls.
  */
-export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateAttributes, blockName = null }) {
-    const {set, withPrefix } = useAttrSetter(updateAttributes, clientId);
+export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateBlockAttributes, blockName = null }) {
+    const {set, withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
 
     const modeKey = groupKey ? `${groupKey}DimensionMode` : 'dimensionMode';
     const safeBlockName = useSafeBlockName(blockName, clientId);

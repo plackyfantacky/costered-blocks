@@ -24,12 +24,12 @@ const normalize = (v) => (v == null ? '' : String(v).trim());
  * 
  * @param {Object} attributes - The block attributes containing the values to edit.
  * @param {string} clientId - The client ID of the block being edited.
- * @param {Function} updateAttributes - Function to update block attributes.
+ * @param {Function} updateBlockAttributes - Function to update block attributes.
  * 
  * @returns {JSX.Element} A FlexBox containing the gap input and toggle controls.
  */
-export function GapControls({ attributes, clientId, updateAttributes, blockName = null }) {
-    const { set } = useAttrSetter(updateAttributes, clientId);
+export function GapControls({ attributes, clientId, updateBlockAttributes, blockName = null }) {
+    const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
     //user preferences for unit/text mode
     const safeBlockName = useSafeBlockName(blockName, clientId);
@@ -121,6 +121,7 @@ export function GapControls({ attributes, clientId, updateAttributes, blockName 
                     label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
                     checked={unitMode === 'text'}
                     onChange={onUnitToggleMode}
+                    __nextHasNoMarginBottom
                 />
             </FlexBlock>
         </Flex>

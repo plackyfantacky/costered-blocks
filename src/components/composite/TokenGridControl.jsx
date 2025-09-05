@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { Button, TextControl, Flex, FlexItem, Tooltip, Notice } from '@wordpress/components';
 import { plus, trash, arrowUp, arrowDown } from '@wordpress/icons';
@@ -23,7 +22,7 @@ function stringifyRows(rows) {
 function toRectangle(rows, filler) {
     const max = rows.reduce((m, r) => Math.max(m, r.length), 0);
     if (max === 0) return rows;
-    return rows.map((row) => (row.length === max ? row : [...row, ...Array(max - row.length).fill(filler)]));
+    return rows.map((r) => (r.length === max ? r : [...r, ...Array(max - r.length).fill(filler)]));
 }
 
 export default function TokenGridControl({
@@ -36,11 +35,11 @@ export default function TokenGridControl({
     tokenPattern = /^[A-Za-z_.-][A-Za-z0-9_.-]*$/,
     dedupeWithinRow = false,
     separator = /\s+/,
-    label = __('Tokens', 'costered-blocks'),
+    label = 'Tokens',
     help,
-    addRowLabel = __('Add row', 'costered-blocks'),
-    addTokenAria = __('Add token to this row', 'costered-blocks'),
-    inputLabel = __('Add token', 'costered-blocks'),
+    addRowLabel = 'Add Row',
+    addTokenAria = 'Add token to this row',
+    inputLabel = 'Add token',
 }) {
     const [input, setInput] = useState('');
     const inputRef = useRef(null);
@@ -51,72 +50,72 @@ export default function TokenGridControl({
             return Array.from({ length: minRows }, () => []);
         }
         return parsed;
-    }, [ value, separator, minRows ]);
+    }, [value, separator, minRows]);
 
-    const commit = useCallback(( rows2d ) => {
+    const commit = useCallback((rows2d) => {
         const next = normaliseToRectangle ? toRectangle(rows2d, placeholderToken) : rows2d;
         onChange?.(stringifyRows(next));
-    }, [ onChange, normaliseToRectangle, placeholderToken ]);
+    }, [onChange, normaliseToRectangle, placeholderToken]);
 
     const validate = useCallback((t) => {
         if (!t) return allowEmptyToken;
         return tokenPattern.test(t);
-    }, [ tokenPattern, allowEmptyToken ]);
+    }, [tokenPattern, allowEmptyToken]);
 
-    const addToken = useCallback(( rowIndex, raw ) => {
+    const addToken = useCallback((rowIndex, raw) => {
         const proposed = String(raw || '').trim();
         const token = proposed || (allowEmptyToken ? placeholderToken : '');
         if (!token) return;
         if (!validate(token)) return;
 
-        const next = rows.map((row, index) => {
-            if (index !== rowIndex) return row;
-            const candidate = dedupeWithinRow && token !== placeholderToken ? row.filter((t) => t !== token) : row;
+        const next = rows.map((r, i) => {
+            if (i !== rowIndex) return r;
+            const candidate = dedupeWithinRow && token !== placeholderToken ? r.filter((x) => x !== token) : r;
             return [...candidate, token];
         });
         commit(next);
         setInput('');
         inputRef.current?.focus();
-    }, [ rows, commit, allowEmptyToken, placeholderToken, validate, dedupeWithinRow ]);
+    }, [rows, commit, allowEmptyToken, placeholderToken, validate, dedupeWithinRow]);
 
-    const replaceToken = useCallback(( rowIndex, tokenIndex, raw ) => {
+    const replaceToken = useCallback((rowIndex, tokenIndex, raw) => {
         const proposed = String(raw || '').trim();
         const token = proposed || (allowEmptyToken ? placeholderToken : '');
         if (!token) return;
         if (!validate(token)) return;
 
-        const next = rows.map((row, index) => {
-            if (index !== rowIndex) return row;
-            const row2 = [...row];
-            row2[tokenIndex] = token;
-            return row2;
+        const next = rows.map((r, i) => {
+            if (i !== rowIndex) return r;
+            const r2 = [...r];
+            r2[tokenIndex] = token;
+            return r2;
         });
         commit(next);
-    }, [ rows, commit, allowEmptyToken, placeholderToken, validate ]);
+    }, [rows, commit, allowEmptyToken, placeholderToken, validate]);
 
-    const removeToken = useCallback(( rowIndex, tokenIndex ) => {
-        const next = rows.map((row, i) => {
-            if (i !== rowIndex) return row;
-            const row2 = [...row];
-            row2.splice(tokenIndex, 1);
-            return row2;
+    const removeToken = useCallback((rowIndex, tokenIndex) => {
+        const next = rows.map((r, i) => {
+            if (i !== rowIndex) return r;
+            const r2 = [...r];
+            r2.splice(tokenIndex, 1);
+            return r2;
         });
         commit(next);
     }, [rows, commit]);
 
     const addRow = useCallback(() => {
-        const width = rows.reduce((max, row) => Math.max(max, row.length), 0);
+        const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
         const newRow = normaliseToRectangle && width > 0 ? Array(width).fill(placeholderToken) : [];
         commit([...rows, newRow]);
-    }, [ rows, commit, normaliseToRectangle, placeholderToken ]);
+    }, [rows, commit, normaliseToRectangle, placeholderToken]);
 
-    const removeRow = useCallback(( rowIndex ) => {
+    const removeRow = useCallback((rowIndex) => {
         if (rows.length <= minRows) return;
-        const next = rows.filter((row, index) => index !== rowIndex);
+        const next = rows.filter((_, i) => i !== rowIndex);
         commit(next);
-    }, [ rows, commit, minRows ]);
+    }, [rows, commit, minRows]);
 
-    const moveRow = useCallback(( rowIndex, dir ) => {
+    const moveRow = useCallback((rowIndex, dir) => {
         const target = rowIndex + dir;
         if (target < 0 || target >= rows.length) return;
         const next = [...rows];
@@ -124,13 +123,13 @@ export default function TokenGridControl({
         next[rowIndex] = next[target];
         next[target] = tmp;
         commit(next);
-    }, [ rows, commit ]);
+    }, [rows, commit]);
 
     const onSubmitNew = useCallback((e) => {
         e.preventDefault();
         if (!rows.length) return;
         addToken(rows.length - 1, input);
-    }, [ rows.length, addToken, input ]);
+    }, [rows.length, addToken, input]);
 
     const onKeyDownInput = useCallback((e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -148,7 +147,7 @@ export default function TokenGridControl({
             const last = rows[lastRowIdx];
             if (last.length) removeToken(lastRowIdx, last.length - 1);
         }
-    }, [ input, onSubmitNew, addRow, rows, removeToken ]);
+    }, [input, onSubmitNew, addRow, rows, removeToken]);
 
     const invalidExample = input && !validate(input);
 
@@ -164,7 +163,7 @@ export default function TokenGridControl({
                             value={input}
                             onChange={setInput}
                             onKeyDown={onKeyDownInput}
-                            placeholder={__('Type a token and press Enter', 'costered-blocks')}
+                            placeholder="Type a token and press Enter"
                             ref={inputRef}
                             help={help}
                         />
@@ -173,7 +172,7 @@ export default function TokenGridControl({
                         icon={plus}
                         variant="primary"
                         onClick={onSubmitNew}
-                        aria-label={__('Add token to last row', 'costered-blocks')}
+                        aria-label="Add token to last row"
                     />
                     <Button
                         onClick={addRow}
@@ -185,7 +184,7 @@ export default function TokenGridControl({
 
                 {invalidExample && (
                     <Notice status="warning" isDismissible={false}>
-                        {`"${input}" ${__('is not a valid token.', 'costered-blocks')} ${tokenPattern.toString()}`}
+                        {`"${input}" doesn’t match the token pattern.`}
                     </Notice>
                 )}
 
@@ -205,12 +204,12 @@ export default function TokenGridControl({
                                                 onChange={(v) => replaceToken(rowIndex, tokenIndex, v)}
                                                 style={{ width: '12ch' }}
                                             />
-                                            <Tooltip text={__('Remove token', 'costered-blocks')}>
+                                            <Tooltip text="Remove token">
                                                 <Button
                                                     icon={trash}
                                                     variant="tertiary"
                                                     onClick={() => removeToken(rowIndex, tokenIndex)}
-                                                    aria-label={__('Remove token', 'costered-blocks')}
+                                                    aria-label="Remove token"
                                                 />
                                             </Tooltip>
                                         </div>
@@ -230,13 +229,13 @@ export default function TokenGridControl({
                             </Flex>
 
                             <div style={{ display: 'flex', gap: '4px' }}>
-                                <Tooltip text={__('Move row up', 'costered-blocks')}>
+                                <Tooltip text="Move row up">
                                     <Button icon={arrowUp} variant="tertiary" onClick={() => moveRow(rowIndex, -1)} />
                                 </Tooltip>
-                                <Tooltip text={__('Move row down', 'costered-blocks')}>
+                                <Tooltip text="Move row down">
                                     <Button icon={arrowDown} variant="tertiary" onClick={() => moveRow(rowIndex, 1)} />
                                 </Tooltip>
-                                <Tooltip text={rows.length <= minRows ? __('Minimum rows reached', 'costered-blocks') : __('Remove row', 'costered-blocks')}>
+                                <Tooltip text={rows.length <= minRows ? 'Minimum rows reached' : 'Remove row'}>
                                     <Button
                                         icon={trash}
                                         variant="secondary"

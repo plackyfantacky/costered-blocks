@@ -124,6 +124,7 @@ const jsConfig = {
             '@hooks': path.resolve(pluginRoot, 'src/hooks'),
             '@filters': path.resolve(pluginRoot, 'src/filters'),
             '@config': path.resolve(pluginRoot, 'src/config.js'),
+            '@utils': path.resolve(pluginRoot, 'src/utils')
         })
     ],
     logLevel: 'info',

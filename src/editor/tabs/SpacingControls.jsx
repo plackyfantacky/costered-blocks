@@ -25,7 +25,7 @@ const SpacingControls = () => {
                                 prefix="margin"
                                 attributes={attributes}
                                 clientId={clientId}
-                                updateAttributes={updateBlockAttributes}
+                                updateBlockAttributes={updateBlockAttributes}
                                 blockName={name}
                             />
                         </BaseControl>
@@ -36,7 +36,7 @@ const SpacingControls = () => {
                                 prefix="padding"
                                 attributes={attributes}
                                 clientId={clientId}
-                                updateAttributes={updateBlockAttributes}
+                                updateBlockAttributes={updateBlockAttributes}
                                 blockName={name}
                             />
                         </BaseControl>

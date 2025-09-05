@@ -25,11 +25,11 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
     );
 }
 
-function TextOption({ value, children, disabled }) {
+function TextOption({ value, label, disabled }) {
     return (
         <ToggleGroupControlOption
             value={value}
-            label={children}
+            label={label}
             disabled={disabled}
         />
     );

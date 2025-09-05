@@ -93,7 +93,9 @@ export const BLOCKS_WITH_EDITOR_STYLES = [
     'core/quote',
     'core/pullquote',
     'core/table'
-]
+];
+
+export const DEFAULT_GRID_UNIT = '1fr';
 
 /**
  * Editor Style Mirror keys.
