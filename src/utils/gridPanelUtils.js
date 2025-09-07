@@ -11,24 +11,26 @@ export function normaliseTemplate(s) {
 }
 
 // Split at top-level spaces only (ignores spaces inside parentheses).
-export function splitTopLevel(s) {
-    const str = String(s || '').trim();
-    if (!str) return [];
-
-    let depth = 0, buffer = '';
-    const out = [];
-    for (let i = 0; i < str.length; i++) {
-        const character = str[i];
-        if (character === '(') { depth++; buffer += character; continue; }
-        if (character === ')') { depth = Math.max(0, depth - 1); buffer += character; continue; }
-        if (character === ' ' && depth === 0) {
-            if (buffer) { out.push(buffer); buffer = ''; }
+export function splitTopLevel(input) {
+    const strings = String(input || '').trim();
+    if (!strings) return [];
+    let parentheses = 0, bracket = 0;
+    let buffer = '';
+    const output = [];
+    for (let i = 0; i < strings.length; i++) {
+        const character = strings[i];
+        if (character === '(') { parentheses++; buffer += character; continue; }
+        if (character === ')') { parentheses = Math.max(0, parentheses - 1); buffer += character; continue; }
+        if (character === '[') { bracket++; buffer += character; continue; }
+        if (character === ']') { bracket = Math.max(0, bracket - 1); buffer += character; continue; }
+        if (character === ' ' && parentheses === 0 && bracket === 0) {
+            if (buffer) { output.push(buffer); buffer = ''; }
             continue;
         }
         buffer += character;
     }
-    if (buffer) out.push(buffer);
-    return out;
+    if (buffer) output.push(buffer);
+    return output;   
 }
 
 export function parseRepeat(template) {

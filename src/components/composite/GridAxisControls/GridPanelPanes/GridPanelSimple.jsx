@@ -147,13 +147,13 @@ export function GridPanelSimple({ clientId }) {
                             <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
                                 <AxisAside
                                     axis="columns"
-                                    active={colsActive}
-                                    canClear={!!col.template}
+                                    canClear={!!col?.template}
                                     onClear={clearCols}
+                                    owner={model.activePane.columns}
+                                    here="simple"
                                 />
                             </FlexItem>
                         </Flex>
-
                     </FlexItem>
                     <FlexBlock>
                         <RangeControl
@@ -195,9 +195,10 @@ export function GridPanelSimple({ clientId }) {
                         <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
                             <AxisAside
                                 axis="rows"
-                                active={rowsActive}
                                 canClear={!!row.template}
                                 onClear={clearRows}
+                                owner={model.activePane.rows}
+                                here="tracks"
                             />
                         </FlexItem>
                     </Flex>

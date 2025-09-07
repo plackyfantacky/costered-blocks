@@ -16,7 +16,7 @@ export function HeaderToggle() {
             onChange={setActive}
         >
             <CustomToggleGroup.TextOption value="simple" label={__('Simple', 'costered-blocks')} />
-            <CustomToggleGroup.TextOption value="tracks" label={__('Tracks', 'costered-blocks')} disabled />
+            <CustomToggleGroup.TextOption value="tracks" label={__('Tracks', 'costered-blocks')} />
             <CustomToggleGroup.TextOption value="areas" label={__('Areas', 'costered-blocks')} disabled />
             <CustomToggleGroup.TextOption value="presets" label={__('Presets', 'costered-blocks')} disabled />
         </CustomToggleGroup>

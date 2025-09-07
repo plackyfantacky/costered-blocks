@@ -6,7 +6,7 @@ import { Flex, FlexItem,
     __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon
 } from '@wordpress/components';
 
-function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, children }) {
+function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, children, ...rest }) {
     const handleChange = useCallback((next) => onChange(next), [onChange]);
 
     return (
@@ -19,6 +19,7 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
                 __nextHasNoMarginBottom
                 __next40pxDefaultSize
                 isDeselectable
+                {...rest}
             >
                 {children}
             </ToggleGroupControl>
