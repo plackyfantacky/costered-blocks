@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 
+import { LABELS } from "@labels";
 import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
 import { useSelectedBlockInfo } from "@hooks";
 
@@ -17,10 +18,10 @@ const SpacingControls = () => {
 
     return (
         <Panel>
-            <PanelBody title={__('Spacing', 'costered-blocks')} initialOpen={true}>
+            <PanelBody title={LABELS.spacingControls.panelTitle} initialOpen={true}>
                 <Flex direction="column" gap={4}>
                     <FlexItem>
-                        <BaseControl label={__('Margin', 'costered-blocks')} __nextHasNoMarginBottom>
+                        <BaseControl label={LABELS.spacingControls.marginLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="margin"
                                 attributes={attributes}
@@ -31,7 +32,7 @@ const SpacingControls = () => {
                         </BaseControl>
                     </FlexItem>
                     <FlexItem>
-                        <BaseControl label={__('Padding', 'costered-blocks')} __nextHasNoMarginBottom>
+                        <BaseControl label={LABELS.spacingControls.paddingLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="padding"
                                 attributes={attributes}
@@ -49,7 +50,7 @@ const SpacingControls = () => {
 
 export default {
     name: "spacing-controls",
-    title: __('Spacing Controls', 'costered-blocks'),
+    title: LABELS.spacingControls.panelTitle,
     icon: <BoxMargin />,
     render: () => <SpacingControls />
 };

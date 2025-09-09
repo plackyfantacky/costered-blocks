@@ -68,7 +68,6 @@
     }
 }
 
-
 .costered-custom-toggle-group {
     padding: 2px;
     border-radius:3px !important;
@@ -80,7 +79,6 @@
 }
 
 /* grid control panel */
-
 .costered-blocks-grid-axis-aside {
     display: flex;
     flex-direction: column;
@@ -133,6 +131,63 @@
     }
 }
 
+/* token grid */
+.costered-blocks-tokengrid {
+    
+
+    .costered-blocks-gridarea {
+        border-top: 1px solid var(--wp--custom--token-border, #dcdcde);
+        border-left: 1px solid var(--wp--custom--token-border, #dcdcde);
+        display:grid;
+        grid-auto-rows: minmax(32px, auto);
+        inline-size: 100%; /* use container width */
+        max-inline-size: 100%;
+        overflow-x:scroll;
+        scrollbar-gutter: stable both-edges;
+        overscroll-behavior: contain;
+        width:248px;
+        background-color: var(--wp-components-color-accent-1, #f6f7f7);
+
+        .components-modal__content & {
+            width:auto;
+            max-width:unset;
+            overflow-x:unset;
+        }
+
+        .costered-blocks-gridarea__row {
+            display:grid;
+            grid-column: 1/-1;
+            grid-template-columns:subgrid;
+
+            .costered-blocks-gridarea__cell {
+                border-bottom: 1px solid var(--wp--custom--token-border, #dcdcde);
+                border-right: 1px solid var(--wp--custom--token-border, #dcdcde);
+                padding: 4px;
+            }
+
+            &.costered-blocks-gridarea__row--head {
+                .costered-blocks-gridarea__cell--corner {
+                    grid-column:1;   
+                }
+    
+                .costered-blocks-gridarea__cell--head {
+                    display:grid;
+                    grid-template-columns:subgrid;
+                }            
+            }
+
+            .costered-blocks-gridarea__headControls {
+                display:flex;
+                justify-content:center;
+            }
+
+            .costered-token {
+                width:100%;
+            }
+
+        }
+    }
+}
 
 /* tokens */
 .costered-token {
@@ -193,5 +248,16 @@
             gap: 0.25rem;
             align-items: center;
         }
+    }
+
+    .costered-blocks-token__popover .components-popover__content {
+        /* make it roomy but bounded */
+        width: var(--cb-popover-width, 520px);
+        max-width: min(calc(100vw - 40px), 640px);
+    }
+
+    .costered-blocks-token__popover .costered-blocks-token__panel {
+        /* ensure input expands nicely in the popover */
+        grid-template-columns: 1fr auto;
     }
 }

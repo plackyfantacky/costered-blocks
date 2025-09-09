@@ -1,19 +1,12 @@
 import { Button, Tooltip } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
+import { pretty } from "@utils/gridUtils";
+import { LABELS } from '@labels';
 
-const pretty = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-
-export function AxisAside({ 
-    axis,
-    canClear = false,
-    onClear,
-    active,
-    owner = null,
-    here = null
-}) {
+export function GridAxisAside({ axis, canClear = false, onClear, active, owner = null, here = null }) {
     const clearLabel = axis === 'columns'
-        ? __('Clear Columns', 'costered-blocks')
-        : __('Clear Rows', 'costered-blocks');
+        ? LABELS.gridAxisAside.clearColumns
+        : LABELS.gridAxisAside.clearRows;
 
     const isSet = !!canClear;
     // Resolve state
@@ -26,12 +19,12 @@ export function AxisAside({
 
     const pipTitle = 
         state === 'none'
-            ? __('No value set', 'costered-blocks')
+            ? LABELS.gridAxisAside.pipTitleNoValue
             : state === 'here'
-                ? __('Value matches this panel', 'costered-blocks')
+                ? LABELS.gridAxisAside.pipTitleValueHere
                 : (owner === 'raw'
-                    ? __('Value set (unrecognised format)', 'costered-blocks')
-                    : sprintf(__('Value set in %s panel', 'costered-blocks'), pretty(owner))
+                    ? LABELS.gridAxisAside.pipTitleValueRaw
+                    : sprintf(LABELS.gridAxisAside.pipTitleValueElsewhere, pretty(owner))
                 );
 
     return (

@@ -39,16 +39,56 @@ export const flexProps = {
 export const flexItemProps = {
     'flexGrow': { type: 'number' },
     'flexShrink': { type: 'number' },
-    'flexBasis': { type: 'string' },
-    'alignSelf': { type: 'string' },
-    'order': { type: 'number' }
+    'flexBasis': { type: 'string' }
 };
 
 export const gridProps = {
     'gridTemplateColumns': { type: 'string' },
-    'gridTemplateRows' : { type: 'string' }
+    'gridTemplateRows' : { type: 'string' },
+    'gridTemplateAreas': { type: 'string' }
 }
 
+export const gridItemsProps = {
+    'gridColumn': { type: 'string', default: '' },
+    'gridRow': { type: 'string', default: '' },
+    'gridArea': { type: 'string', default: '' }
+}
+
+const nonCSSGridItemProps = {
+    'gridColumnStart': { type: 'string' },
+    'gridColumnSpan': { type: 'string' },
+    'gridColumnEnd': { type: 'string' },
+    'gridRowStart': { type: 'string' },
+    'gridRowSpan': { type: 'string' },
+    'gridRowEnd': { type: 'string' }
+}
+
+export const  sharedProps = {
+    'gap': { type: 'string' },
+    'order': { type: 'number' },
+    'alignSelf': { type: 'string' },
+    'justifySelf': { type: 'string' },
+}
+
+export const COSTERED_LAYOUT_SCHEMA = {
+    ...displayProps,
+    ...dimensionProps,
+    ...marginProps,
+    ...paddingProps,
+    ...flexProps,
+    ...flexItemProps,
+    ...gridProps,
+    ...gridItemsProps,
+    ...nonCSSGridItemProps,
+    ...sharedProps
+}
+
+export const COSTERED_SCHEMA = Object.assign(
+    {},
+    ...Object.values(COSTERED_LAYOUT_SCHEMA)
+)
+
+/** user preferences  */
 export const modeProps = [
     'dimensionMode',
     'minDimensionMode',
@@ -61,31 +101,15 @@ export const modeProps = [
     'gridTemplateRowsMode'
 ];
 
-export const  sharedProps = {
-    'gap': { type: 'string' },
-}
-
-
-export const COSTERED_LAYOUT_SCHEMA = {
-    ...displayProps,
-    ...dimensionProps,
-    ...marginProps,
-    ...paddingProps,
-    ...flexProps,
-    ...flexItemProps,
-    ...gridProps,
-    ...sharedProps
-}
-
-export const COSTERED_SCHEMA = Object.assign(
-    {},
-    ...Object.values(COSTERED_LAYOUT_SCHEMA)
-)
-
 export const MUST_BE_SCOPED = new Set([
     ...modeProps,
 ])
 
+export const VERBATIM_STRING_KEYS = new Set([
+    ...Object.keys(gridItemsProps)
+]);
+
+/** misc */
 export const BLOCKS_WITH_EDITOR_STYLES = [
     'core/paragraph',
     'core/heading',
@@ -115,14 +139,17 @@ export const DEFAULT_GRID_UNIT = '1fr';
 
 /** Please don't touch this key. Controls padding styles in the Block Editor. Won't function without this. */
 export const PADDING_KEYS = new Set([
-    {},
     ...Object.keys(paddingProps)
 ]);
 
 /** Please don't touch this key. Controls width/height styles in the Block Editor. Won't function without this. */
 export const SIZE_KEYS = new Set([
-    {},
    ...Object.keys(dimensionProps)
+]);
+
+/** Please don't touch this key. Lists grid item track and span properties that must be transformed to CSS grid shorthand properties. */
+export const NON_CSS_GRID_ITEM_KEYS = new Set([
+   ...Object.keys(nonCSSGridItemProps)
 ]);
 
 /** If you want to extend this, create your own group and include it like the other groups below.  */
@@ -132,6 +159,8 @@ export const MISC_KEYS = new Set([
     ...Object.keys(flexProps),
     ...Object.keys(flexItemProps),
     ...Object.keys(gridProps),
+    ...Object.keys(gridItemsProps),
+    ...Object.keys(nonCSSGridItemProps),
     ...Object.keys(sharedProps),
     //...Object.keys(yourGroupGoesHere),
 ])

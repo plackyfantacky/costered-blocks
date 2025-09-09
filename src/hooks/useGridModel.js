@@ -1,7 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
-import { decodeAxis, decodeAreas } from "@utils/gridPanelUtils";
+import { decodeAxis, measureAreas } from "@utils/gridUtils";
 
 export function useGridModel(clientId) {
     const attrs = useSelect((select) => {
@@ -14,11 +14,17 @@ export function useGridModel(clientId) {
     const model = useMemo(() => {
         const cols = decodeAxis(attrs.gridTemplateColumns);
         const rows = decodeAxis(attrs.gridTemplateRows);
-        const areas = decodeAreas(attrs.gridTemplateAreas);
+        
+        const areasTemplate = attrs.gridTemplateAreas ?? null;
+        const areasMeta = measureAreas(areasTemplate);
+
         return {
             columns: cols,
             rows: rows,
-            areas: areas,
+            areas: {
+                template: areasTemplate,
+                ...areasMeta
+            },
             activePane: {
                 columns: cols.mode,
                 rows: rows.mode

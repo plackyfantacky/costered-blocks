@@ -25,9 +25,10 @@
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
-import { PADDING_KEYS, SIZE_KEYS, MISC_KEYS } from '@config';
+import { PADDING_KEYS, SIZE_KEYS, NON_CSS_GRID_ITEM_KEYS, MISC_KEYS } from '@config';
 
 const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
+const pick = (v) => (v == null ? '' : String(v).trim());
 
 /**
  * Build a style object from block attributes.
@@ -46,6 +47,7 @@ const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
 function buildMirror(attrs = {}) {
     const style = {};
     let any = false;
+
     let hasMt = false;
     let hasMb = false;
     let hasMl = false;
@@ -86,18 +88,32 @@ function buildMirror(attrs = {}) {
     if (hasValue(attrs.marginLeft)) { style.marginLeft = String(attrs.marginLeft); style.marginInlineStart = String(attrs.marginLeft); any = true; hasMl = true; }
     if (hasValue(attrs.marginRight)) { style.marginRight = String(attrs.marginRight); style.marginInlineEnd = String(attrs.marginRight); any = true; hasMr = true; }
 
-    // misc
-    for (const k of MISC_KEYS) {
-        const v = attrs[k];
-        if (hasValue(v)) {
-            style[k] = String(v);
-            any = true;
+    // grid item shenanigans
+    // 1) Prefer canonical shorthands (verbatim)
+    const area = String(attrs.gridArea || '').trim();
+    const col = (attrs.gridColumn || '').trim();
+    const row = (attrs.gridRow || '').trim();
+
+    if (area) {
+        // defend against shorthands leaking in (belt & braces UI-wise, but harmless here)
+        if (!area.includes('/') && !/\bspan\b/i.test(area)) {
+            style.gridArea = area; any = true;
         }
     }
+    if (col) { style.gridColumn = col; any = true; }
+    if (row) { style.gridRow = row; any = true; }
 
-    const haveFlexDir = hasValue(attrs.flexDirection);
+    // misc for most keys
+    // also 2) skip non-CSS grid item keys like gridColumnSpan
+    for (const k of MISC_KEYS) {
+        if (NON_CSS_GRID_ITEM_KEYS.has(k)) continue; // don’t emit meta keys like gridColumnSpan
+        const v = attrs[k];
+        if (hasValue(v)) { style[k] = String(v); any = true; }
+    }
 
+    // has flexDirection: ensure display:flex is set if it is
     // ensure flexDirection “sticks”
+    const haveFlexDir = hasValue(attrs.flexDirection);
     if (haveFlexDir && !style.display) {
         style.display = 'flex';
         any = true;

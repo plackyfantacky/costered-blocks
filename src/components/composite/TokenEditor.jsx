@@ -1,26 +1,24 @@
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { TextControl, Tooltip, Button, Flex, FlexItem } from '@wordpress/components';
+import { TextControl, Button, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { LABELS } from '@labels';
 import Token from '@components/composite/Token';
-import CustomToggleGroup from "@components/CustomToggleGroup";
-
-const isLineNames = (t) => /^\s*\[[^\[\]]+\]\s*$/.test(String(t || ''));
 
 export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, allowLineNames = true }) {
 
     const defaultLabels = useMemo(() => ({
-        add: __('Add', 'costered-blocks'),
-        addPlaceholder: __('Add token', 'costered-blocks'),
-        addLineNames: __('Add line names', 'costered-blocks'),
-        listAriaLabel: __('List of tokens', 'costered-blocks'),
-        moveLeft: __('Move left', 'costered-blocks'),
-        moveRight: __('Move right', 'costered-blocks'),
-        remove: __('Remove', 'costered-blocks'),
-        expand: __('Edit token', 'costered-blocks'),
-        collapse: __('Close editor', 'costered-blocks'),
+        add: LABELS.tokenEditor.add,
+        addPlaceholder: LABELS.tokenEditor.addPlaceholder,
+        addLineNames: LABELS.tokenEditor.addLineNames,
+        listAriaLabel: LABELS.tokenEditor.listAriaLabel,
+        moveLeft: LABELS.tokenEditor.moveLeft,
+        moveRight: LABELS.tokenEditor.moveRight,
+        remove: LABELS.tokenEditor.remove,
+        expand: LABELS.tokenEditor.expand,
+        collapse: LABELS.tokenEditor.collapse,
     }), []);
-    const l = useMemo(() => ({ ...defaultLabels, ...(labels || {}) }), [defaultLabels, labels]);
+    const labelData = useMemo(() => ({ ...defaultLabels, ...(labels || {}) }), [defaultLabels, labels]);
 
     const [draft, setDraft] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null); // number | null
@@ -60,26 +58,26 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
     }, [onMove]);
 
     return (
-        <div className="costered-token-editor" role="list" aria-label={l.listAriaLabel}>
+        <div className="costered-token-editor" role="list" aria-label={labelData.listAriaLabel}>
             <div className="costered-token-list">
-                {tokens.map((token, index) => (
+                {tokens.map((tokenValue, index) => (
                     <Token
-                        key={`${index}-${token}`}
+                        key={`token-${index}`}
                         index={index}
-                        value={token}
+                        value={tokenValue}
                         isExpanded={expandedIndex === index}
                         onToggle={toggleToken}
                         onRemove={handleRemove}
                         onChange={handleEdit}
                         onMoveLeft={(i) => handleMove(i, -1)}
                         onMoveRight={(i) => handleMove(i, +1)}
-                        labels={l}
+                        labels={labelData}
                     />
                 ))}
             </div>
             <div className="costered-token-add">
                 <TextControl
-                    placeholder={l.addPlaceholder}
+                    placeholder={labelData.addPlaceholder}
                     value={draft}
                     onChange={setDraft}
                     onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
@@ -89,12 +87,12 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
 
                 {allowLineNames ? (
                     <Flex className="costered-token-add-options" gap={0} align="center" style={{ width: 'fit-content' }}>
-                        <Button icon="editor-code" onClick={add} label={l.add} />
-                        <Button icon="tag" onClick={addNames} label={l.addLineNames} />
+                        <Button icon="editor-code" onClick={add} label={labelData.add} />
+                        <Button icon="tag" onClick={addNames} label={labelData.addLineNames} />
                     </Flex>
                 ) : 
                 (
-                    <Button variant="secondary" onClick={add}>{l.add}</Button>
+                    <Button variant="secondary" onClick={add}>{labelData.add}</Button>
                 )}
             </div>
         </div>

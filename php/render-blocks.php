@@ -31,7 +31,20 @@ add_filter('render_block', function($block_content, $block) {
         'flexGrow' => 'flex-grow',
         'flexShrink' => 'flex-shrink',
         'flexBasis' => 'flex-basis',
-        'order' => 'order'
+        'order' => 'order',
+        'gridTemplateColumns' => 'grid-template-columns',
+        'gridTemplateRows' => 'grid-template-rows',
+        'gridTemplateAreas' => 'grid-template-areas',
+        'gridColumnGap' => 'grid-column-gap',
+        'gridRowGap' => 'grid-row-gap',
+        'gridAutoFlow' => 'grid-auto-flow',
+        'gridAutoColumns' => 'grid-auto-columns',
+        'gridAutoRows' => 'grid-auto-rows',
+        'gridColumn' => 'grid-column',
+        'gridRow' => 'grid-row',
+        'gridArea' => 'grid-area',
+        'alignSelf' => 'align-self',
+        'justifySelf' => 'justify-self',
         // add more as needed
     ];
 

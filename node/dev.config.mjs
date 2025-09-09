@@ -117,14 +117,16 @@ const jsConfig = {
     plugins: [
         importAsGlobals(globalsMap),
         pathAlias({
-            '@editor': path.resolve(pluginRoot, 'src/editor'),
-            '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
-            '@components': path.resolve(pluginRoot, 'src/components'),
             '@assets': path.resolve(pluginRoot, 'src/assets'),
-            '@hooks': path.resolve(pluginRoot, 'src/hooks'),
-            '@filters': path.resolve(pluginRoot, 'src/filters'),
+            '@components': path.resolve(pluginRoot, 'src/components'),
             '@config': path.resolve(pluginRoot, 'src/config.js'),
-            '@utils': path.resolve(pluginRoot, 'src/utils')
+            '@editor': path.resolve(pluginRoot, 'src/editor'),
+            '@filters': path.resolve(pluginRoot, 'src/filters'),
+            '@hooks': path.resolve(pluginRoot, 'src/hooks'),
+            '@labels': path.resolve(pluginRoot, 'src/labels.js'),
+            '@panels': path.resolve(pluginRoot, 'src/components/panels'),
+            '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
+            '@utils': path.resolve(pluginRoot, 'src/utils'),
         })
     ],
     logLevel: 'info',

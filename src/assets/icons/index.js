@@ -4,6 +4,7 @@ export { default as EntypoAlignBottom } from './entypo--align-bottom.jsx';
 export { default as EntypoAlignLeft } from './entypo--align-left.jsx';
 export { default as EntypoAlignRight } from './entypo--align-right.jsx';
 export { default as EntypoAlignTop } from './entypo--align-top.jsx';
+export { default as F7Rectangle3OffgridFill } from './f7--rectangle-3-offgrid-fill.jsx';
 export { default as FlexDirectionColumn } from './FlexDirectionColumn.jsx';
 export { default as FlexDirectionColumnReverse } from './FlexDirectionColumnReverse.jsx';
 export { default as FlexDirectionRow } from './FlexDirectionRow.jsx';
@@ -16,6 +17,7 @@ export { default as GameIconsHammerBreak } from './game-icons--hammer-break.jsx'
 export { default as HumbleiconsAlignObjectsCenter } from './humbleicons--align-objects-center.jsx';
 export { default as IconoirCollapse } from './iconoir--collapse.jsx';
 export { default as JoinInput } from './JoinInput.jsx';
+export { default as JustifyGridStretch } from './JustifyGridStretch.jsx';
 export { default as LucideBox } from './lucide--box.jsx';
 export { default as MaterialSymbolsAlignJustifySpaceAround } from './material-symbols--align-justify-space-around.jsx';
 export { default as MaterialSymbolsAlignJustifySpaceBetween } from './material-symbols--align-justify-space-between.jsx';

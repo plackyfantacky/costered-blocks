@@ -3,9 +3,9 @@ import { useDispatch } from '@wordpress/data';
 import { Flex, FlexBlock, FlexItem, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { makeRepeat, normaliseTemplate } from '@utils/gridPanelUtils';
+import { makeRepeat, normaliseTemplate } from '@utils/gridUtils';
 import UnitControlInput from '@components/UnitControlInput';
-import { AxisAside } from "@components/composite/GridAxisControls/AxisAside";
+import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { useAttrSetter, useGridModel } from '@hooks';
 import { DEFAULT_GRID_UNIT } from '@config';
 
@@ -17,7 +17,7 @@ const EMPTY_AXIS = {
     tracks: null
 };
 
-export function GridPanelSimple({ clientId }) {
+export function GridAxisSimple({ clientId }) {
     if (!clientId) return null;
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
@@ -145,7 +145,7 @@ export function GridPanelSimple({ clientId }) {
                                 <span className="costered-blocks--grid-panel-simple-label">{__('Columns', 'costered-blocks')}</span>
                             </FlexBlock>
                             <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                                <AxisAside
+                                <GridAxisAside
                                     axis="columns"
                                     canClear={!!col?.template}
                                     onClear={clearCols}
@@ -193,12 +193,12 @@ export function GridPanelSimple({ clientId }) {
                             <span className="costered-blocks--grid-panel-simple-label">{__('Rows', 'costered-blocks')}</span>
                         </FlexBlock>
                         <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                            <AxisAside
+                            <GridAxisAside
                                 axis="rows"
                                 canClear={!!row.template}
                                 onClear={clearRows}
                                 owner={model.activePane.rows}
-                                here="tracks"
+                                here="simple"
                             />
                         </FlexItem>
                     </Flex>

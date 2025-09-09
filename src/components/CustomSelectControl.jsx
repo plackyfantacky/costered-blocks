@@ -1,6 +1,8 @@
-import { __, isRTL } from '@wordpress/i18n';
+import { isRTL } from '@wordpress/i18n';
 import { useState, useEffect, useRef, createContext, useContext, useMemo, Children } from '@wordpress/element';
 import { Flex, FlexItem } from '@wordpress/components';
+
+import { LABELS } from "@labels";
 
 const Ctx = createContext();
 
@@ -33,7 +35,7 @@ export function CustomSelectControl({
 
     const ctxValue = useMemo(() => ({ value, onSelect: selectAndClose }), [value, selectAndClose]);
 
-    const DefaultText = __('choose...', 'costered-blocks');
+    const DefaultText = LABELS.customSelectControl.defaultText;
 
     const getSelectedVisual = () => {
         let icon;

@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useCallback, memo } from '@wordpress/element';
 import { Flex, FlexItem,
     __experimentalToggleGroupControl as ToggleGroupControl,

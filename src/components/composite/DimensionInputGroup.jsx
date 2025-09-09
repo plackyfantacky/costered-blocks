@@ -1,7 +1,8 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { Flex, FlexBlock, ToggleControl } from '@wordpress/components';
 
+import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
@@ -55,10 +56,10 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
 
     const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, ' ').toUpperCase()) : '';
 
-    const labelText = 
-        groupKey !== '' 
-        ? `${startCase(groupKey)} ${__('Dimensions', 'costered-blocks')}`
-        : __('Dimensions', 'costered-blocks');
+    const labelText =
+        groupKey !== ''
+            ? sprintf(LABELS.dimensionInputGroup.labelPre, startCase(groupKey))
+            : LABELS.dimensionInputGroup.label;
 
     const setWidth = useCallback(
         (next) => ns? ns.set('Width', next) : set('width', next),
@@ -78,18 +79,18 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
                     <Input
                         value={values.width}
                         onChange={setWidth}
-                        label={__('Width', 'costered-blocks')}
+                        label={LABELS.dimensionInputGroup.width}
                     />
                     <Input
                         value={values.height}
                         onChange={setHeight}
-                        label={__('Height', 'costered-blocks')}
+                        label={LABELS.dimensionInputGroup.height}
                     />
                 </Flex>
             </FlexBlock>
             <FlexBlock>
                 <ToggleControl
-                    label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
+                    label={LABELS.dimensionInputGroup.useCustom}
                     checked={mode === 'text'}
                     onChange={(isUnit) => setMode(isUnit ? 'text' : 'unit')}
                     __nextHasNoMarginBottom
@@ -98,5 +99,4 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
             </FlexBlock>
         </Flex>
     );
-
 }

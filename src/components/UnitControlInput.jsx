@@ -1,40 +1,18 @@
-import { FlexItem, __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+
+import { maybeFormat } from "@utils/componentUtils";
 
 export default function UnitControlInput(props) {
     const { value, onChange, label } = props;
-    const formattedLabel = label.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    const formattedLabel = maybeFormat(label, { toCapitalFirst: true, trim: true, toSpaces: true });
 
     const allowedUnits = [
-        {
-            name: 'rem',
-            value: 'rem',
-            label: 'rem'
-        },
-        {
-            name: 'px',
-            value: 'px',
-            label: 'px'
-        },
-        {
-            name: 'em',
-            value: 'em',
-            label: 'em'
-        },
-        {
-            name: '%',
-            value: '%',
-            label: '%'
-        },
-        {
-            name: 'vw',
-            value: 'vw',
-            label: 'vw'
-        },
-        {
-            name: 'vh',
-            value: 'vh',
-            label: 'vh'
-        }
+        { name: 'rem', value: 'rem', label: 'rem' },
+        { name: 'px', value: 'px', label: 'px' },
+        { name: 'em', value: 'em', label: 'em' },
+        { name: '%', value: '%', label: '%' },
+        { name: 'vw', value: 'vw', label: 'vw' },
+        { name: 'vh', value: 'vh', label: 'vh' }
     ];
 
     return (

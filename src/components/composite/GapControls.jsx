@@ -2,20 +2,12 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, useEffect } from '@wordpress/element';
 import { Button, Flex, FlexBlock, FlexItem, ToggleControl } from '@wordpress/components';
 
+import { SplitInput, JoinInput } from "@assets/icons";
+import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
+import { splitGap, joinGap, normalize } from '@utils/gapUtils';
+import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
-
-import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
-
-import { SplitInput, JoinInput } from "@assets/icons";
-
-const splitGap = (s = '') =>
-    (s + '').trim().split(/\s+(?![^(]*\))/).filter(Boolean).slice(0, 2);
-
-const joinGap = (row = '', col = '') =>
-    [row, col].filter(Boolean).join(' ').trim();
-
-const normalize = (v) => (v == null ? '' : String(v).trim());
 
 /**
  * Renders a pair of input controls for gap attributes (rowGap and columnGap).
@@ -74,7 +66,9 @@ export function GapControls({ attributes, clientId, updateBlockAttributes, block
     }, [set, row]);
 
     const Input = unitMode === 'unit' ? UnitControlInput : TextControlInput;
-    const labelText = inputMode === 'single' ? __('Gap', 'costered-blocks') : __('Row Gap', 'costered-blocks');
+    const labelText = inputMode === 'single'
+        ? LABELS.gapControls.label
+        : LABELS.gapControls.rowLabel;
 
 
     //toggle between single and dual input modes
@@ -92,13 +86,13 @@ export function GapControls({ attributes, clientId, updateBlockAttributes, block
             <FlexBlock>
                 <Flex align="flex-end" gap={1}>                    
                     <FlexBlock>
-                        <Flex gap={0} direction="row">
+                        <Flex gap={0} direction="row" align="flex-end">
                             <FlexItem>
                                 <Input label={labelText} value={inputMode === 'single' ? initialValue : row} onChange={setRow} allowReset={true} />
                             </FlexItem>
                             {inputMode === 'dual' && (
                                 <FlexItem>
-                                    <Input label={__('Column Gap', 'costered-blocks')} value={col} onChange={setCol} allowReset={true} />
+                                    <Input label={LABELS.gapControls.column} value={col} onChange={setCol} allowReset={true} />
                                 </FlexItem>
                             )}
                         </Flex>
@@ -106,7 +100,9 @@ export function GapControls({ attributes, clientId, updateBlockAttributes, block
                     <FlexItem>
                         <Button
                             icon={inputMode === 'single' ? SplitInput : JoinInput}
-                            label={inputMode === 'single' ? __('Switch to Dual Gap', 'costered-blocks') : __('Switch to Single Gap', 'costered-blocks')}
+                            label={inputMode === 'single'
+                                ? LABELS.gapControls.switchToDual
+                                : LABELS.gapControls.switchToSingle}
                             onClick={onToggleInputMode}
                             style={{ marginBottom: '2px' }}
                             aria-pressed={inputMode === 'dual'}
@@ -118,7 +114,7 @@ export function GapControls({ attributes, clientId, updateBlockAttributes, block
             </FlexBlock>
             <FlexBlock>
                 <ToggleControl
-                    label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
+                    label={LABELS.gapControls.useCustom}
                     checked={unitMode === 'text'}
                     onChange={onUnitToggleMode}
                     __nextHasNoMarginBottom

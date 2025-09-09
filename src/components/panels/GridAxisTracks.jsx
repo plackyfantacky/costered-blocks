@@ -5,11 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { Flex, FlexBlock, FlexItem, TextControl, Button, Tooltip } from '@wordpress/components';
 
 import { useAttrSetter, useGridModel } from '@hooks';
-import { splitTopLevel, normaliseTemplate } from '@utils/gridPanelUtils';
-import { AxisAside } from "@components/composite/GridAxisControls/AxisAside";
+import { splitTopLevel, normaliseTemplate } from '@utils/gridUtils';
+import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { TokenEditor } from '@components/composite/TokenEditor';
 
-export function GridPanelTracks({ clientId }) {
+export function GridAxisTracks({ clientId }) {
     if (!clientId) return null;
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
@@ -127,7 +127,7 @@ export function GridPanelTracks({ clientId }) {
                                 <span className="costered-blocks--grid-panel-tracks-label">{__('Columns', 'costered-blocks')}</span>
                             </FlexBlock>
                             <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                                <AxisAside
+                                <GridAxisAside
                                     axis="columns"
                                     canClear={!!col?.template}
                                     onClear={clearCols}
@@ -163,7 +163,7 @@ export function GridPanelTracks({ clientId }) {
                                 <span className="costered-blocks--grid-panel-tracks-label">{__('Rows', 'costered-blocks')}</span>
                             </FlexBlock>
                             <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                                <AxisAside
+                                <GridAxisAside
                                     axis="rows"
                                     canClear={!!row?.template}
                                     onClear={clearRows}

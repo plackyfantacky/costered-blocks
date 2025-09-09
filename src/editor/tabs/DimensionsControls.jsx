@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
+import { LABELS } from "@labels";
 import { useSelectedBlockInfo } from "@hooks";
 import { DimensionInputGroup } from "@components/composite/DimensionInputGroup";
 
@@ -16,7 +17,7 @@ const DimensionControls = () => {
 
     return (
         <Panel>
-            <PanelBody title={__('Dimensions', 'costered-blocks')} initialOpen={true}>
+            <PanelBody title={LABELS.dimensionControls.panelTitle} initialOpen={true}>
                 <DimensionInputGroup
                     attributes={attributes}
                     clientId={clientId}
@@ -24,7 +25,7 @@ const DimensionControls = () => {
                     blockName={name}
                 />
             </PanelBody>
-            <PanelBody title={__('Minimum Dimensions', 'costered-blocks')} initialOpen={false}>
+            <PanelBody title={LABELS.dimensionControls.minPanel} initialOpen={false}>
                 <DimensionInputGroup
                     groupKey="min"
                     attributes={attributes}
@@ -33,7 +34,7 @@ const DimensionControls = () => {
                     blockName={name}
                 />
             </PanelBody>
-            <PanelBody title={__('Maximum Dimensions', 'costered-blocks')} initialOpen={false}>
+            <PanelBody title={LABELS.dimensionControls.maxPanel} initialOpen={false}>
                 <DimensionInputGroup
                     groupKey="max"
                     attributes={attributes}
@@ -48,7 +49,7 @@ const DimensionControls = () => {
 
 export default {
     name: "dimensions-controls",
-    title: __('Dimensions', 'costered-blocks'),
+    title: LABELS.dimensionControls.panelTitle,
     icon: <DimensionsIcon />,
     render: () => <DimensionControls />,
 };

@@ -1,7 +1,10 @@
-export { useSelectedBlockInfo } from "@hooks/useSelectedBlockInfo";
-export { useParentAttrs } from "@hooks/useParentAttrs";
 export { useAttrSetter } from "@hooks/useAttrSetter";
-export { useUIPreferences, scopedKey } from "@hooks/useUIPreferences";
-export { useSafeBlockName } from "@hooks/useSafeBlockName";
-export { useGridTemplateValue } from "@hooks/useGridTemplateValue";
+export { useGridAreasMatrix } from "@hooks/useGridAreasMatrix";
+export { useGridItemBounds } from "@hooks/useGridItemBounds";
 export { useGridModel } from "@hooks/useGridModel";
+export { useGridStoreAreasIO } from "@hooks/useGridStoreAreasIO";
+export { useParentAttrs } from "@hooks/useParentAttrs";
+export { useParentGridMeta } from "@hooks/useParentGridMeta";
+export { useSafeBlockName } from "@hooks/useSafeBlockName";
+export { useSelectedBlockInfo } from "@hooks/useSelectedBlockInfo";
+export { useUIPreferences, scopedKey } from "@hooks/useUIPreferences";

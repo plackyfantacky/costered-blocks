@@ -1,8 +1,8 @@
 import { useMemo, useCallback, memo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
 import { __experimentalGrid as Grid } from "@wordpress/components";
 
+import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
@@ -76,34 +76,34 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttrib
                 <Input
                     value={values.Top}
                     onChange={onChange('Top')}
-                    label={__('Top', 'costered-blocks')}
+                    label={LABELS.directionalInputGroup.top}
                 />
             </FieldSlot>
             <FieldSlot area="Left">
                 <Input
                     value={values.Left}
                     onChange={onChange('Left')}
-                    label={__('Left', 'costered-blocks')}
+                    label={LABELS.directionalInputGroup.left}
                 />
             </FieldSlot>
             <FieldSlot area="Right">
                 <Input
                     value={values.Right}
                     onChange={onChange('Right')}
-                    label={__('Right', 'costered-blocks')}
+                    label={LABELS.directionalInputGroup.right}
                 />
             </FieldSlot>
             <FieldSlot area="Bottom">
                 <Input
                     value={values.Bottom}
                     onChange={onChange('Bottom')}
-                    label={__('Bottom', 'costered-blocks')}
+                    label={LABELS.directionalInputGroup.bottom}
                 />
             </FieldSlot>
             
             <div style={{ gridColumn: '1 / span 10', gridRow: '4' }}>
                 <ToggleControl
-                    label={__('Use custom values (e.g auto, calc)', 'costered-blocks')}
+                    label={LABELS.directionalInputGroup.useCustom}
                     checked={mode === 'text'}
                     onChange={(isUnit) => setMode(isUnit ? 'text' : 'unit')}
                     __nextHasNoMarginBottom
