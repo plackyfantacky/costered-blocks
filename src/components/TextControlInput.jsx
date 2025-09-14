@@ -1,7 +1,10 @@
 import { TextControl } from '@wordpress/components';
 
+import { maybeFormat } from "@utils/componentUtils";
+
 export default function TextControlInput({ value, onChange, label, placeholder = "", help = "" }) {
-    const formattedLabel = label.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    const formattedLabel = maybeFormat(label, { toDashes: true, toSpaces: false });
+    
     return (
         <div style={{ padding: '0 2px' }}>
             <TextControl

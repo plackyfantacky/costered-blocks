@@ -1,4 +1,4 @@
-export function maybeFormat(input = '', { formatting = {} }) {
+export function maybeFormat(input = '', formatting = {} ) {
     const {
         trim = true,
         toLower = false,

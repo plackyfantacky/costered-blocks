@@ -7,8 +7,7 @@ import NumberControlInput from '@components/NumberControlInput';
 import { LABELS } from "@labels";
 
 import { useAttrSetter, useParentGridMeta } from '@hooks';
-import { whereGridItemDefined } from "@utils/gridUtils";
-import { clamp, toInt, parsePlacementSimple, composePlacementSimple } from '@utils/gridPlacement';
+import { clamp, toInt, parsePlacementSimple, composePlacementSimple, isGridPlacement } from '@utils/gridPlacement';
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 
@@ -18,9 +17,8 @@ export function GridItemSimple({ clientId, attributes}) {
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
     
-    const { columns, rows } = useParentGridMeta();
-    const definedIn = whereGridItemDefined(attributes);
-    const isAdvancedOwned = definedIn === 'Advanced';
+    const { columns, rows  } = useParentGridMeta();
+    const hasArea = isGridPlacement(attributes.gridArea);
 
     // 1) Parse the CURRENT canonical shorthands each render (source of truth)
     const colNow = parsePlacementSimple(attributes.gridColumn);
@@ -78,37 +76,35 @@ export function GridItemSimple({ clientId, attributes}) {
         saveRow(displayStartRow, span);
     }
 
+    // disable if using grid-area
+    const disabledSimple = hasArea;
+
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-simple--panel">
-            {isAdvancedOwned && (
-                <Notice status="info" isDismissible={false}>
-                    {LABELS.gridItemsControls.settingsIsAdvancedOwned}
-                </Notice>
-            )}
             <FlexBlock className={'costered-blocks-grid-item-simple-controls--columns'}>
                 {hasCols ? (
                     <Flex direction="column" gap={2}>
                         <RangeControl
-                            label={LABELS.gridItemsControls.columnStart}
+                            label={LABELS.gridItemsControls.simplePanel.columnStart}
                             value={displayStartCol}
                             onChange={handleColumnStartChange}
                             min={1}
                             max={columns}
                             step={1}
-                            disabled={isAdvancedOwned}
-                            help={sprintf(LABELS.gridItemsControls.columnStartHelp, columns)}
+                            disabled={disabledSimple}
+                            help={sprintf(LABELS.gridItemsControls.simplePanel.columnStartHelp, columns)}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
                         <RangeControl
-                            label={LABELS.gridItemsControls.columnSpan}
+                            label={LABELS.gridItemsControls.simplePanel.columnSpan}
                             value={displaySpanCol}
                             onChange={handleColumnSpanChange}
                             min={1}
                             max={colSpanCap}
                             step={1}
-                            disabled={isAdvancedOwned}
-                            help={LABELS.gridItemsControls.columnSpanHelp}
+                            disabled={disabledSimple}
+                            help={LABELS.gridItemsControls.simplePanel.columnSpanHelp}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
@@ -116,22 +112,22 @@ export function GridItemSimple({ clientId, attributes}) {
                 ) : (
                     <Flex direction="column" gap={2}>
                         <NumberControlInput
-                            label={LABELS.gridItemsControls.columnStart}
+                            label={LABELS.gridItemsControls.simplePanel.columnStart}
                             value={displayStartCol}
                             onChange={(value) => handleColumnStartChange(value)}
                             min={1}
                             isDragEnabled
-                            disabled={isAdvancedOwned}
+                            disabled={disabledSimple}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
                         <NumberControlInput
-                            label={LABELS.gridItemsControls.columnSpan}
+                            label={LABELS.gridItemsControls.simplePanel.columnSpan}
                             value={displaySpanCol}
                             onChange={(value) => handleColumnSpanChange(value)}
                             min={1}
                             isDragEnabled
-                            disabled={isAdvancedOwned}
+                            disabled={disabledSimple}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
@@ -142,26 +138,26 @@ export function GridItemSimple({ clientId, attributes}) {
                 {hasRows ? (
                     <Flex direction="column" gap={2}>
                         <RangeControl
-                            label={LABELS.gridItemsControls.rowStart}
+                            label={LABELS.gridItemsControls.simplePanel.rowStart}
                             value={displayStartRow}
                             onChange={handleRowStartChange}
                             min={1}
                             max={rows}
                             step={1}
-                            disabled={isAdvancedOwned}
-                            help={sprintf(LABELS.gridItemsControls.rowStartHelp, rows)}
+                            disabled={disabledSimple}
+                            help={sprintf(LABELS.gridItemsControls.simplePanel.rowStartHelp, rows)}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
                         <RangeControl
-                            label={LABELS.gridItemsControls.rowSpan}
+                            label={LABELS.gridItemsControls.simplePanel.rowSpan}
                             value={displaySpanRow}
                             onChange={handleRowSpanChange}
                             min={1}
                             max={rowSpanCap}
                             step={1}
-                            disabled={isAdvancedOwned}
-                            help={LABELS.gridItemsControls.rowSpanHelp}
+                            disabled={disabledSimple}
+                            help={LABELS.gridItemsControls.simplePanel.rowSpanHelp}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
@@ -169,22 +165,22 @@ export function GridItemSimple({ clientId, attributes}) {
                 ) : (
                     <Flex direction="column" gap={2}>
                         <NumberControlInput
-                            label={LABELS.gridItemsControls.rowStart}
+                            label={LABELS.gridItemsControls.simplePanel.rowStart}
                             value={displayStartRow}
                             onChange={(value) => handleRowStartChange(value)}
                             min={1}
                             isDragEnabled
-                            disabled={isAdvancedOwned}
+                            disabled={disabledSimple}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />
                         <NumberControlInput
-                            label={LABELS.gridItemsControls.rowSpan}
+                            label={LABELS.gridItemsControls.simplePanel.rowSpan}
                             value={displaySpanRow}
                             onChange={(value) => handleRowSpanChange(value)}
                             min={1}
                             isDragEnabled
-                            disabled={isAdvancedOwned}
+                            disabled={disabledSimple}
                             __next40pxDefaultSize
                             __nextHasNoMarginBottom
                         />

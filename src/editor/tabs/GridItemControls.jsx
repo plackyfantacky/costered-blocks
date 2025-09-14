@@ -53,14 +53,14 @@ const GridItemControls = () => {
                             }}
                             panelProps={{ clientId, attributes, parentAttrs }}
                         >
-                            <PanelToggle.TextOption value="simple" label={LABELS.gridItemsControls.simplePanel} />
-                            <PanelToggle.TextOption value="tracks" label={LABELS.gridItemsControls.tracksPanel} />
-                            <PanelToggle.TextOption value="areas" label={LABELS.gridItemsControls.areasPanel} />
+                            <PanelToggle.TextOption value="simple" label={LABELS.gridItemsControls.simplePanel.title} />
+                            <PanelToggle.TextOption value="tracks" label={LABELS.gridItemsControls.tracksPanel.title} />
+                            <PanelToggle.TextOption value="areas" label={LABELS.gridItemsControls.areasPanel.title} />
                         </PanelToggle>
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.panelAlignment} initialOpen={true}>
+            <PanelBody title={LABELS.gridItemsControls.alignmentPanel.title} initialOpen={true}>
                 <Flex expanded={true} gap={4} direction="column" className="costered-blocks-grid-item-controls--alignment-panel">
                     <FlexBlock className={'costered-blocks-grid-item-simple-controls--justifyself'}>
                         { /* RTL aware */ }
@@ -78,11 +78,11 @@ const GridItemControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.panelOrder} initialOpen={true}>
+            <PanelBody title={LABELS.gridItemsControls.orderPanel.title} initialOpen={true}>
                 <Flex expanded={true} gap={4} direction="column" className="costered-blocks-grid-item-controls--order-panel">   
                     <FlexBlock className={'costered-blocks-grid-item-simple-controls--order'}>
                         <NumberControlInput
-                            label={LABELS.gridItemsControls.order}
+                            label={LABELS.gridItemsControls.orderPanel.label}
                             value={attributes?.order || 0}
                             onChange={setOrder}
                             step={1} min={minInteger} max={maxInteger}

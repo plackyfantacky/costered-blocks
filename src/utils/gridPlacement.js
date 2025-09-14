@@ -1,9 +1,33 @@
-export const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
-export const isIntToken = (t) => /^-?\d+$/.test(String(t || '').trim());
-export const toInt  = (v, f = 1) => {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : f;
+export function clamp (n, min, max) {
+    return Math.min(Math.max(n, min), max);
+}
+
+export function toInt  (value, fallback = 1) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
 };
+
+export function isIntToken (token) {
+    if(typeof token === 'number') return Number.isInteger(token);
+    const tokenString = String(token);
+    return /^-?\d+$/.test(tokenString);
+}
+
+export function toSignedLine(value, fallback = 1) {
+    const num = parseInt(value, 10);
+    return Number.isFinite(num) && num !== 0 ? num : fallback; //0 is invalid in CSS Grid
+}
+
+export function parseSigned(value) {
+    const num = parseInt(value, 10);
+    return Number.isFinite(num) ? num : '';
+}
+
+export function isZeroToken(value) {
+    if (typeof value === 'number') return value === 0;
+    if (typeof value === 'string') return /^\s*0\s*$/.test(value);
+    return false;
+}
 
 export const parsePlacementSimple = (input) => {
     // returns { start, span } from shorthand

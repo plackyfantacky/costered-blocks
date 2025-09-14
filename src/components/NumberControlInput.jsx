@@ -1,8 +1,11 @@
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { useCallback } from "@wordpress/element";
 
+import { maybeFormat } from "@utils/componentUtils";
+
 export default function NumberControlInput({ value, onChange, label, placeholder, min = 2, max = 100, step = 1, asInteger = false, clamp = true, ...rest }) {
-    const formattedLabel = label.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+
+    const formattedLabel = maybeFormat(label, { toDashes: true, toSpaces: false });
     const displayValue = value === '' || value === undefined ? '' : String(value);
 
     const handleChange = useCallback(

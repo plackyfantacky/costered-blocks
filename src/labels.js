@@ -90,66 +90,90 @@ export const LABELS = {
 
     // Grid Item Controls    
     gridItemsControls: {
+        panelTitle                      : __('Grid Item Controls', 'costered-blocks'),
+        
         //Simple Panel
-        simplePanel                : __('Simple', 'costered-blocks'),
+        simplePanel: {
+            title                       : __('Simple', 'costered-blocks'),
+            //Controls
+            columnStart                 : __('Column Start', 'costered-blocks'),
+            columnStartHelp             : __('%1$d columns', 'costered-blocks'),
+            columnSpan                  : __('Column Span', 'costered-blocks'),
+            columnSpanHelp              : __('Max updates with start', 'costered-blocks'),
+            rowStart                    : __('Row Start', 'costered-blocks'),
+            rowStartHelp                : __('%1$d rows', 'costered-blocks'),
+            rowSpan                     : __('Row Span', 'costered-blocks'),
+            rowSpanHelp                 : __('Max updates with start', 'costered-blocks'),
+        },
         
         //Tracks Panel
-        tracksPanel                : __('Tracks', 'costered-blocks'),
+        tracksPanel: {
+            title                       : __('Tracks', 'costered-blocks'),
+            hasAreasNotice              : __('This item uses a named grid area. Line-based placement is disabled.', 'costered-blocks'),    
+            namedLineMismatch           : __('No named lines are defined in the parent grid.', 'costered-blocks'),
+            columns: {
+                trackStartMode          : __('Start uses', 'costered-blocks'),
+                trackStartModeNamed     : __('Named Line', 'costered-blocks'),
+                trackStartModeNumber    : __('Line Number', 'costered-blocks'),
+                trackEndMode            : __('End uses', 'costered-blocks'),
+                trackEndModeSpan        : __('Span', 'costered-blocks'),
+                trackEndModeEnd         : __('End', 'costered-blocks'),
+                startNumber             : __('Line Number', 'costered-blocks'),
+                startNumberHelp         : __('Positive or negative line number', 'costered-blocks'),
+                startNamed              : __('Named Line', 'costered-blocks'),
+                startNamedHelp          : __('Named lines from parent grid template', 'costered-blocks'),
+                spanNumber              : __('Span', 'costered-blocks'),
+                spanNumberHelp          : __('Max updates with start', 'costered-blocks'),
+                endAuto                 : __('Auto', 'costered-blocks'),
+                endAutoHelp             : __('Automatically size based on start/span', 'costered-blocks'),
+                endNamed                : __('Named Line', 'costered-blocks'),
+                endNamedHelp            : __('Named lines from parent grid template', 'costered-blocks'),
+                endNumber               : __('Line Number', 'costered-blocks'),
+                endNumberHelp           : __('Positive or negative line number', 'costered-blocks'),
+            },
+            rows: {
+                trackStartMode          : __('Start uses', 'costered-blocks'),
+                trackStartModeNamed     : __('Named Line', 'costered-blocks'),
+                trackStartModeNumber    : __('Line Number', 'costered-blocks'),
+                trackEndMode            : __('End uses', 'costered-blocks'),
+                trackEndModeSpan        : __('Span', 'costered-blocks'),
+                trackEndModeEnd         : __('End', 'costered-blocks'),
+                startNumber             : __('Line Number', 'costered-blocks'),
+                startNumberHelp         : __('Positive or negative line number', 'costered-blocks'),
+                startNamed              : __('Named Line', 'costered-blocks'),
+                startNamedHelp          : __('Named lines from parent grid template', 'costered-blocks'),
+                spanNumber              : __('Span', 'costered-blocks'),
+                spanNumberHelp          : __('Max updates with start', 'costered-blocks'),
+                endNumber               : __('Line Number', 'costered-blocks'),
+                endNumberHelp           : __('Positive or negative line number', 'costered-blocks'),
+                endNumberZeroHelp       : __('0 isn’t a valid grid line. Use 1..N or negative indices like -1', 'costered-blocks'),
+                endNamed                : __('Named Line', 'costered-blocks'),
+                endNamedHelp            : __('Named lines from parent grid template', 'costered-blocks'),
+                endNamesMismatch        : __('No named lines are defined in the parent grid.', 'costered-blocks'),
+                endAuto                 : __('Auto', 'costered-blocks'),
+                endAutoHelp             : __('Automatically size based on start/span', 'costered-blocks'),
+            },
+        },
 
         //Areas Panel
-        areasPanel                 : __('Areas', 'costered-blocks'),
-        gridAreaLabel              : __('Named area (grid-area)', 'costered-blocks'),
-        gridAreaNone               : __('— None —', 'costered-blocks'),
-        gridAreaHelp               : __('Setting a named area overrides row/column placement.', 'costered-blocks'),
+        areasPanel: {  
+            title                      : __('Areas', 'costered-blocks'),  
+            gridAreaLabel              : __('Named area (grid-area)', 'costered-blocks'),
+            gridAreaNone               : __('— None —', 'costered-blocks'),
+            gridAreaHelp               : __('Setting a named area overrides row/column placement.', 'costered-blocks'),
+        },
 
+        //Alignment Panel
+        alignmentPanel: {
+            title                 : __('Alignment', 'costered-blocks'),
+        },
 
-        // Panel    
-        panelTitle                 : __('Grid Item Controls', 'costered-blocks'),
-        settingsIsAdvancedOwned    : __('Settings use Advanced features (read-only here). Switch to the Advanced panel to edit.', 'costered-blocks'),
-        settingsIsSimpleOwned      : __('Settings use Simple features (read-only here). Switch to the Simple panel to edit.', 'costered-blocks'),
-        settingsHasArea            : __('This item uses a named grid area. Line-based placement is disabled.', 'costered-blocks'),
-        panelAlignment             : __('Alignment', 'costered-blocks'),
-        panelOrder                 : __('Order', 'costered-blocks'),
-        // sub-panels
-        simple                     : __('Simple', 'costered-blocks'),
-        advanced                   : __('Advanced', 'costered-blocks'),
-        // Controls
-        
-        
-        columnsLabel               : __('Columns', 'costered-blocks'),
-        rowsLabel                  : __('Rows', 'costered-blocks'),
-        columnPlacementMode        : __('Placement uses', 'costered-blocks'),
-        columnPlacementSpan        : __('Span', 'costered-blocks'),
-        columnPlacementEnd         : __('End', 'costered-blocks'),
-        columnStartMode            : __('Start uses', 'costered-blocks'),
-        columnStartModeNumber      : __('Line number', 'costered-blocks'),
-        columnStartModeNamed       : __('Named line', 'costered-blocks'),
-        columnStart                : __('Column Start', 'costered-blocks'),
-        columnStartHelp            : __('%1$d columns', 'costered-blocks'),
-        columnStartNamed           : __('Column Start (named line)', 'costered-blocks'),
-        columnStartNamedHelp       : __('Free text allowed; suggestions from parent column template.', 'costered-blocks'),
-        columnStartNameMismatch    : __('Parent grid has no named column lines; this item currently uses a named start token.', 'costered-blocks'),
-        columnSpan                 : __('Column Span', 'costered-blocks'),
-        columnSpanHelp             : __('Max updates with start', 'costered-blocks'),
-        columnSpanParentHelp       : __('Max updates with start & parent columns.', 'costered-blocks'),
-        columnEndMode              : __('End uses', 'costered-blocks'),
-        columnEndModeNumber        : __('Line number', 'costered-blocks'),
-        columnEndModeNamed         : __('Named line', 'costered-blocks'),
-        columnEndModeAuto          : __('Auto', 'costered-blocks'),
-        columnEnd                  : __('Column End', 'costered-blocks'),
-        columnEndHelp              : __('Max updates with start', 'costered-blocks'),
-        columnEndNumber            : __('Column End (line number)', 'costered-blocks'),
-        columnEndNumberHelp        : __('Supports negative indices (e.g. -1 = last line).', 'costered-blocks'),
-        columnEndNamed             : __('Column End (named line)', 'costered-blocks'),
-        columnEndNamedHelp         : __('Free text allowed; suggestions from parent column template.', 'costered-blocks'),
-        columnEndNameMismatch      : __('Parent grid has no named column lines; this item currently uses a named end token.', 'costered-blocks'),
-        rowStart                   : __('Row Start', 'costered-blocks'),
-        rowStartHelp               : __('%1$d rows', 'costered-blocks'),
-        rowSpan                    : __('Row Span', 'costered-blocks'),
-        rowSpanHelp                : __('Max updates with start', 'costered-blocks'),
-        order                      : __('Order', 'costered-blocks'),
+        //Order Panel
+        orderPanel: {
+            title                 : __('Order', 'costered-blocks'),
+            label                  : __('Order', 'costered-blocks'),
+        }
     },
-
     //RTL Aware Components
     // Flex Direction
     flexDirection: {

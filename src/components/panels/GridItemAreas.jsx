@@ -25,14 +25,14 @@ export function GridItemAreas({ clientId, attributes }) {
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-area--panel">
             <FlexBlock className={'costered-blocks-grid-item-advanced-controls--grid-area-selector'}>
                 <ComboboxControl
-                    label={LABELS.gridItemsControls.gridAreaLabel}
+                    label={LABELS.gridItemsControls.areasPanel.gridAreaLabel}
                     value={attributes.gridArea || ''}
                     options={[
-                        { label: LABELS.gridItemsControls.gridAreaNone, value: '' },
+                        { label: LABELS.gridItemsControls.areasPanel.gridAreaNone, value: '' },
                         ...areaNames.map((area) => ({ label: area, value: area }))
                     ]}
                     onChange={(value) => writeGridArea(value)}
-                    help={LABELS.gridItemsControls.gridAreaHelp}
+                    help={LABELS.gridItemsControls.areasPanel.gridAreaHelp}
                     __nextHasNoMarginBottom
                     __next40pxDefaultSize
                 />
