@@ -7,4 +7,4 @@ export { useParentAttrs } from "@hooks/useParentAttrs";
 export { useParentGridMeta } from "@hooks/useParentGridMeta";
 export { useSafeBlockName } from "@hooks/useSafeBlockName";
 export { useSelectedBlockInfo } from "@hooks/useSelectedBlockInfo";
-export { useUIPreferences, scopedKey } from "@hooks/useUIPreferences";
+export { useUIPreferences, useScopedKey } from "@hooks/useUIPreferences";

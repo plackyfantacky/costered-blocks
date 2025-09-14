@@ -22,7 +22,6 @@ const FlexItemControls = () => {
     const { attributes } = selectedBlock;
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
-
     const isRow = parentAttrs?.flexDirection ? parentAttrs.flexDirection.includes('row') : true;
 
     const setFlexGrow = useCallback((v) => set('flexGrow', v), [set]);

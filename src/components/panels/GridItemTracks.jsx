@@ -23,7 +23,6 @@ export function GridItemTracks({ clientId, attributes }) {
 
     const { columns, rows, areaNames, columnTemplate, rowTemplate } = useParentGridMeta();
     const definedIn = whereGridItemDefined(attributes);
-    const isSimpleOwned = definedIn === 'Simple';
     const hasArea = isGridPlacement(attributes.gridArea);
     const col = useMemo(() => parsePlacementAdvanced(attributes.gridColumn), [attributes.gridColumn]);
     const row = useMemo(() => parsePlacementAdvanced(attributes.gridRow), [attributes.gridRow]);

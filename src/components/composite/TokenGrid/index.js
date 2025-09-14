@@ -7,7 +7,7 @@ import { GridBoard } from './GridBoard';
 import { NoticePanel } from './NoticePanel';
 import { LABELS } from '@labels';
 
-export function TokenGrid({ clientId }) {
+export default function TokenGrid({ clientId }) {
     const {
         applyMatrixToStore,
         seedFromStore,

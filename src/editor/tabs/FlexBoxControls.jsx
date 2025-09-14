@@ -1,8 +1,8 @@
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
-import { useSelectedBlockInfo, useAttrSetter } from "@hooks";
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
+import { useSelectedBlockInfo, useAttrSetter, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import {
     MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded, 
     FlexWrapNone,
@@ -10,12 +10,12 @@ import {
     FlexWrapReverse
 } from "@assets/icons";
 import { LABELS } from "@labels";
+
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import FlexDirectionControl from '@components/RtlAware/FlexDirectionControl';
 import JustifyControl from '@components/RtlAware/JustifyContentControl';
 import AlignControl from '@components/RtlAware/AlignItemsControl';
-import { GapControls } from '@components/composite/GapControls';
-
+import GapControls from '@components/composite/GapControls';
 
 const isFlexValue = (v) => /^(flex|inline-flex)$/i.test(v);
 
@@ -26,6 +26,17 @@ const FlexBoxControls = () => {
 
     const { attributes, name } = selectedBlock;
     const { set, setMany } = useAttrSetter(updateBlockAttributes, clientId);
+
+    // user preferences (panel open/close state)
+    const safeBlockName = useSafeBlockName(name, clientId);
+    const flexBoxKey = useScopedKey('flexBoxPanelOpen', { blockName: safeBlockName });
+    const [flexBoxPanelOpen, setFlexBoxPanelOpen] = useUIPreferences(flexBoxKey, true);
+
+    const alignmentKey = useScopedKey('flexBoxAlignmentPanelOpen', { blockName: safeBlockName });
+    const [alignmentPanelOpen, setAlignmentPanelOpen] = useUIPreferences(alignmentKey, false);
+
+    const gapKey = useScopedKey('flexBoxGapPanelOpen', { blockName: safeBlockName });
+    const [gapPanelOpen, setGapPanelOpen] = useUIPreferences(gapKey, false);
 
     // Normaliser: respond to 'display' and 'flexDirection' attribute changes
     const prevDisplayRef = useRef(attributes?.display ?? '');
@@ -53,7 +64,7 @@ const FlexBoxControls = () => {
     const setAlignItems = useCallback((v) => set('alignItems', v), [set]);
     return (
         <Panel>
-            <PanelBody title={LABELS.flexBoxControls.panelTitle} initialOpen={true}>
+            <PanelBody title={LABELS.flexBoxControls.panelTitle} initialOpen={flexBoxPanelOpen} onToggle={setFlexBoxPanelOpen}>
                 <Flex direction="column" className="flexbox-controls">
                     <FlexItem>
                         { /* RTL aware */}
@@ -75,7 +86,7 @@ const FlexBoxControls = () => {
                     </FlexItem>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.alignmentLabel} initialOpen={true}>
+            <PanelBody title={LABELS.flexBoxControls.alignmentPanel} initialOpen={alignmentPanelOpen} onToggle={setAlignmentPanelOpen}>
                 <Flex direction="column" className="flexbox-alignment-controls">
                     <FlexItem>
                         { /* RTL aware */ }
@@ -93,7 +104,7 @@ const FlexBoxControls = () => {
                     </FlexItem>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.gapLabel} initialOpen={false}>
+            <PanelBody title={LABELS.flexBoxControls.gapPanel} initialOpen={gapPanelOpen} onToggle={setGapPanelOpen}>
                 <Flex direction="column" className="flexbox-gap-controls">
                     <FlexItem>
                         <GapControls

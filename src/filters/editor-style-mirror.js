@@ -25,7 +25,15 @@
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
-import { PADDING_KEYS, SIZE_KEYS, NON_CSS_GRID_ITEM_KEYS, MISC_KEYS } from '@config';
+import { MIRRORED_STYLE_KEYS, ATTRS_TO_CSS } from '@config';
+
+const LOGICAL_CSS_PROPS = {
+    marginInlineStart: 'margin-inline-start',
+    marginInlineEnd: 'margin-inline-end',
+    marginBlockStart: 'margin-block-start',
+    marginBlockEnd: 'margin-block-end',
+};
+
 
 const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
 const pick = (v) => (v == null ? '' : String(v).trim());
@@ -48,67 +56,74 @@ function buildMirror(attrs = {}) {
     const style = {};
     let any = false;
 
-    let hasMt = false;
-    let hasMb = false;
-    let hasMl = false;
-    let hasMr = false;
 
-    //dimensions
-    for (const k of SIZE_KEYS) {
-        const v = attrs[k];
-        if (hasValue(v)) {
-            style[k] = String(v);
-            any = true;
-        }
-    }
+    // Track which margin sides are set for class flags
+    let hasMt = false, hasMb = false, hasMl = false, hasMr = false;
 
-    // padding
-    for (const k of PADDING_KEYS) {
-        const v = attrs[k];
-        if (hasValue(v)) { style[k] = String(v); any = true; }
-    }
-
-    // margin
-    // top: also set the logical property so we override blockGap cleanly
+    // margin top
     if (hasValue(attrs.marginTop)) {
-        const v = String(attrs.marginTop);
-        style.marginTop = v;
-        style.marginBlockStart = v; // <- beats parent’s blockGap rule
+        const value = String(attrs.marginTop);
+        style.marginTop = value;
+        style.marginBlockStart = value; // <- beats parent’s blockGap rule
         any = true;
         hasMt = true;
     }
 
+    // margin bottom
     if (hasValue(attrs.marginBottom)) {
-        style.marginBottom = String(attrs.marginBottom);
+        const value = String(attrs.marginBottom);
+        style.marginBottom = value;
+        style.marginBlockEnd = value; // <- beats parent’s blockGap rule
         any = true;
         hasMb = true;
     }
 
-    // left/right: also set the logical property so we override blockGap cleanly. we also need to add !important to override parent styles
-    if (hasValue(attrs.marginLeft)) { style.marginLeft = String(attrs.marginLeft); style.marginInlineStart = String(attrs.marginLeft); any = true; hasMl = true; }
-    if (hasValue(attrs.marginRight)) { style.marginRight = String(attrs.marginRight); style.marginInlineEnd = String(attrs.marginRight); any = true; hasMr = true; }
-
-    // grid item shenanigans
-    // 1) Prefer canonical shorthands (verbatim)
-    const area = String(attrs.gridArea || '').trim();
-    const col = (attrs.gridColumn || '').trim();
-    const row = (attrs.gridRow || '').trim();
-
-    if (area) {
-        // defend against shorthands leaking in (belt & braces UI-wise, but harmless here)
-        if (!area.includes('/') && !/\bspan\b/i.test(area)) {
-            style.gridArea = area; any = true;
-        }
+    // margin left
+    if (hasValue(attrs.marginLeft)) {
+        const value = String(attrs.marginLeft);
+        style.marginLeft = value;
+        style.marginInlineStart = value; // <- beats parent’s blockGap rule
+        any = true;
+        hasMl = true;
     }
+
+    // margin right
+    if (hasValue(attrs.marginRight)) {
+        const value = String(attrs.marginRight);
+        style.marginRight = value;
+        style.marginInlineEnd = value; // <- beats parent’s blockGap rule
+        any = true;
+        hasMr = true;
+    }
+
+    // grid shorthands
+    // grid area
+    const area = String(attrs.gridArea || '').trim();
+    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) {
+        style.gridArea = area;
+        any = true;
+    }
+
+    //grid column
+    const col = (attrs.gridColumn || '').trim();
     if (col) { style.gridColumn = col; any = true; }
+
+    //grid row
+    const row = (attrs.gridRow || '').trim();
     if (row) { style.gridRow = row; any = true; }
 
-    // misc for most keys
-    // also 2) skip non-CSS grid item keys like gridColumnSpan
-    for (const k of MISC_KEYS) {
-        if (NON_CSS_GRID_ITEM_KEYS.has(k)) continue; // don’t emit meta keys like gridColumnSpan
-        const v = attrs[k];
-        if (hasValue(v)) { style[k] = String(v); any = true; }
+    // All other mirrored style keys (skip margins and grid shorthands already handled)
+    for (const key of MIRRORED_STYLE_KEYS) {
+        if (
+            key === 'marginTop' || key === 'marginBottom' ||
+            key === 'marginLeft' || key === 'marginRight' ||
+            key === 'gridArea' || key === 'gridColumn' || key === 'gridRow'
+        ) continue;
+        const value = attrs[key];
+        if (hasValue(value)) {
+            style[key] = String(value);
+            any = true;
+        }
     }
 
     // has flexDirection: ensure display:flex is set if it is
@@ -121,14 +136,6 @@ function buildMirror(attrs = {}) {
 
     return { style, any, hasMt, hasMb, hasMl, hasMr, haveFlexDir };
 }
-
-const cssName = {
-    marginLeft: 'margin-left',
-    marginRight: 'margin-right',
-    marginInlineStart: 'margin-inline-start',
-    marginInlineEnd: 'margin-inline-end',
-    flexDirection: 'flex-direction',
-};
 
 /**
  * Wrap BlockListBlock with live style mirroring.
@@ -157,15 +164,6 @@ function withCosteredMirror(BlockListBlock) {
         useLayoutEffect(() => {
             if (!props.clientId) return;
 
-            // a little helper to set styles with !important
-            function setImportantStyle(el, name, value) {
-                if (value != null && value !== '') {
-                    el.style.setProperty(name, value, 'important');
-                } else {
-                    el.style.removeProperty(name);
-                }
-            }
-
             const root = document.querySelector(`[data-block="${props.clientId}"]`);
             if (!root) return;
 
@@ -175,24 +173,49 @@ function withCosteredMirror(BlockListBlock) {
                 el = root.querySelector(':scope > .block-editor-inner-blocks > .block-editor-block-list__layout') || el;
             }
 
-            setImportantStyle(el, cssName.marginLeft, mirrorStyle.marginLeft);
-            setImportantStyle(el, cssName.marginRight, mirrorStyle.marginRight);
-            setImportantStyle(el, cssName.marginInlineStart, mirrorStyle.marginInlineStart);
-            setImportantStyle(el, cssName.marginInlineEnd, mirrorStyle.marginInlineEnd);
-
-            if (mirrorStyle.flexDirection) {
-                setImportantStyle(el, cssName.flexDirection, mirrorStyle.flexDirection);
-                if (!el.style.display) el.style.setProperty('display', 'flex', 'important');
-            } else {
-                el.style.removeProperty(cssName.flexDirection);
+            // a little helper to set styles with !important
+            function setImportantStyle(el, attrKey, value) {
+                const cssProp = ATTRS_TO_CSS[attrKey] || LOGICAL_CSS_PROPS[attrKey] || attrKey;
+                if (value != null && value !== '') {
+                    el.style.setProperty(cssProp, value, 'important');
+                } else {
+                    el.style.removeProperty(cssProp);
+                }
             }
+
+            // Set all mirrored styles with !important
+            for (const [key, value] of Object.entries(mirrorStyle)) {
+                //Only set known mirrored keys
+                if (typeof value !== 'undefined') {
+                    const cssProp = ATTRS_TO_CSS[key] || LOGICAL_CSS_PROPS[key] || key;
+                    if(value != null && value !== '') {
+                        el.style.setProperty(cssProp, value, 'important');
+                    } else {
+                        el.style.removeProperty(cssProp);
+                    }
+                }
+            }
+
+                    
+            // setImportantStyle(el, 'marginInlineStart', mirrorStyle.marginInlineStart);
+            // setImportantStyle(el, 'marginInlineEnd', mirrorStyle.marginInlineEnd);
+            // setImportantStyle(el, 'marginBlockStart', mirrorStyle.marginBlockStart);
+            // setImportantStyle(el, 'marginBlockEnd', mirrorStyle.marginBlockEnd);
+
+            // if (mirrorStyle.flexDirection) {
+            //     setImportantStyle(el, 'flexDirection', mirrorStyle.flexDirection);
+            //     if (!el.style.display) el.style.setProperty('display', 'flex', 'important');
+            // } else {
+            //     el.style.removeProperty(ATTRS_TO_CSS['flexDirection'] || 'flex-direction');
+            // }
         }, [
             props.clientId,
-            mirrorStyle.marginLeft,
-            mirrorStyle.marginRight,
-            mirrorStyle.marginInlineStart,
-            mirrorStyle.marginInlineEnd,
-            mirrorStyle.flexDirection,
+            // mirrorStyle.marginInlineStart,
+            // mirrorStyle.marginInlineEnd,
+            // mirrorStyle.marginBlockStart,
+            // mirrorStyle.marginBlockEnd,
+            // mirrorStyle.flexDirection,
+            mirrorStyle,
             hasMl, hasMr, haveFlexDir
         ]);
 

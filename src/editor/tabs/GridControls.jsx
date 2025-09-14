@@ -2,10 +2,11 @@ import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock, Button, Modal } from '@wordpress/components';
 
-import { useSelectedBlockInfo } from "@hooks";
+import { useSelectedBlockInfo, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { LABELS } from "@labels";
-import { GapControls } from '@components/composite/GapControls';
-import { TokenGrid } from '@components/composite/TokenGrid';
+
+import GapControls from '@components/composite/GapControls';
+import TokenGrid from '@components/composite/TokenGrid';
 import PanelToggle from '@components/composite/PanelToggle';
 
 import { GridAxisSimple } from '@panels/GridAxisSimple';
@@ -36,10 +37,20 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
     const openModal = useCallback(() => setModalOpen(true), []);
     const closeModal = useCallback(() => setModalOpen(false), []);
 
+    const safeBlockName = useSafeBlockName(name, clientId);
+    const gridTemplateKey = useScopedKey('gridTemplatePanelOpen', { blockName: safeBlockName });
+    const [gridTemplatePanelOpen, setGridTemplatePanelOpen] = useUIPreferences(gridTemplateKey, true);
+
+    const gridGapKey = useScopedKey('gridGapPanelOpen', { blockName: safeBlockName });
+    const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
+
+    const gridTemplateAreasKey = useScopedKey('gridTemplateAreasPanelOpen', { blockName: safeBlockName });
+    const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences(gridTemplateAreasKey, false);
+
     return (
         <>
             <Panel>
-                <PanelBody title={LABELS.gridControls.gridTemplatePanel} initialOpen={true}>
+                <PanelBody title={LABELS.gridControls.gridTemplatePanel} initialOpen={gridTemplatePanelOpen} onToggle={setGridTemplatePanelOpen}>
                     <PanelToggle
                         value={activeKey}
                         onChange={setActiveKey}
@@ -55,7 +66,7 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
                         <PanelToggle.TextOption value="tracks" label={LABELS.gridControls.gridTemplatePanelTracks} />
                     </PanelToggle>
                 </PanelBody>
-                <PanelBody title={LABELS.gridControls.gapPanel} initialOpen={true}>
+                <PanelBody title={LABELS.gridControls.gapPanel} initialOpen={gridGapPanelOpen} onToggle={setGridGapPanelOpen}>
                     <Flex direction="column" expanded={true}>
                         <FlexBlock>
                             <GapControls
@@ -67,7 +78,7 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
                         </FlexBlock>
                     </Flex>
                 </PanelBody>
-                <PanelBody title={LABELS.gridControls.gridTemplateAreasPanel} initialOpen={true}>
+                <PanelBody title={LABELS.gridControls.gridTemplateAreasPanel} initialOpen={gridTemplateAreasPanelOpen} onToggle={setGridTemplateAreasPanelOpen}>
                     <Flex direction="column" gap={4}>
                         <TokenGrid clientId={clientId} />
                         <Flex justify="flex-end">

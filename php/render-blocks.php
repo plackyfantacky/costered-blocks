@@ -1,52 +1,39 @@
 <?php
 
+function costered_blocks_get_allowed_attributes_map() {
+    static $map = null;
+    if (null !== $map) return $map;
+
+    $file = rtrim(COSTERED_BLOCKS_PATH, '/\\') . '/config/attributes.json';
+    if ( ! file_exists( $file ) || ! is_readable( $file ) ) {
+        $map = [];
+        return $map;
+    }
+
+    $json = file_get_contents( $file );
+    $data = json_decode( $json, true );
+    if ( ! is_array( $data ) ) {
+        $map = [];
+        return $map;
+    }
+    $map = [];
+    foreach ( $data as $attr => $meta ) {
+        if ( isset( $meta['css'] ) && $meta['css'] ) {
+            $map[ $attr ] = $meta['css'];
+        }
+    }
+    return $map;
+}
+
 add_filter('render_block', function($block_content, $block) {
     if (empty($block['attrs']) || !is_array($block['attrs'])) {
         return $block_content;
     }
 
-    // Map of allowed attribute keys to CSS property names (handles camelCase or dash-case if needed)
-    $allowed = [
-        'display' => 'display',
-        'visibility' => 'visibility',
-        'width' => 'width',
-        'height' => 'height',
-        'maxWidth' => 'max-width',
-        'maxHeight' => 'max-height',
-        'minWidth' => 'min-width',
-        'minHeight' => 'min-height',
-        'marginTop' => 'margin-top',
-        'marginRight' => 'margin-right',
-        'marginBottom' => 'margin-bottom',
-        'marginLeft' => 'margin-left',
-        'paddingTop' => 'padding-top',
-        'paddingRight' => 'padding-right',
-        'paddingBottom' => 'padding-bottom',
-        'paddingLeft' => 'padding-left',
-        'flexDirection' => 'flex-direction',
-        'flexWrap' => 'flex-wrap',
-        'justifyContent' => 'justify-content',
-        'alignItems' => 'align-items',
-        'alignContent' => 'align-content',
-        'flexGrow' => 'flex-grow',
-        'flexShrink' => 'flex-shrink',
-        'flexBasis' => 'flex-basis',
-        'order' => 'order',
-        'gridTemplateColumns' => 'grid-template-columns',
-        'gridTemplateRows' => 'grid-template-rows',
-        'gridTemplateAreas' => 'grid-template-areas',
-        'gridColumnGap' => 'grid-column-gap',
-        'gridRowGap' => 'grid-row-gap',
-        'gridAutoFlow' => 'grid-auto-flow',
-        'gridAutoColumns' => 'grid-auto-columns',
-        'gridAutoRows' => 'grid-auto-rows',
-        'gridColumn' => 'grid-column',
-        'gridRow' => 'grid-row',
-        'gridArea' => 'grid-area',
-        'alignSelf' => 'align-self',
-        'justifySelf' => 'justify-self',
-        // add more as needed
-    ];
+    $allowed = costered_blocks_get_allowed_attributes_map();
+    if (empty($allowed)) {
+        return $block_content;
+    }    
 
     $style_string = '';
     foreach ($allowed as $attr_key => $css_key) {

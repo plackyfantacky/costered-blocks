@@ -3,7 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter, useParentAttrs, scopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
+import { useSelectedBlockInfo, useAttrSetter, useParentAttrs, useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
 import { LABELS } from "@labels";
 import { F7Rectangle3OffgridFill as GridItem } from "@assets/icons";
 
@@ -29,8 +29,8 @@ const GridItemControls = () => {
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
     const safeBlockName = useSafeBlockName(blockName, clientId);
-    const unitModePrefKey = scopedKey('activeGridItemPanel', { blockName: safeBlockName });
-    const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences(unitModePrefKey, 'simple');
+    const preferenceKey = useScopedKey('activeGridItemPanel', { blockName: safeBlockName });
+    const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences(preferenceKey, 'simple');
 
     const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
     const setJustifySelf = useCallback((v) => set('justifySelf', v), [set]);

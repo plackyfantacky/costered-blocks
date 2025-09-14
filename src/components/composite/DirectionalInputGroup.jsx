@@ -6,7 +6,7 @@ import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
+import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
 
 const GRID_MAP = {
     Top: { col: '4 / span 4', row: '1' },
@@ -52,7 +52,7 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttrib
     const safeBlockName = useSafeBlockName(blockName, clientId);
 
     const modeKey = `${prefix}Mode`;
-    const prefKey = scopedKey(modeKey, { blockName: safeBlockName });
+    const prefKey = useScopedKey(modeKey, { blockName: safeBlockName });
     const [mode, setMode] = useUIPreferences(prefKey, 'unit');
 
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;

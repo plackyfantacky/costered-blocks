@@ -1,6 +1,13 @@
 import { __ } from '@wordpress/i18n';
 
 export const LABELS = {
+    pluginSidebar: {
+        noBlockSelected            : __('Please select a block to edit its settings.', 'costered-blocks'),
+        title                      : __('Costered Blocks', 'costered-blocks'),
+        selectedBlock              : __('Selected block', 'costered-blocks'),
+        blockWarningSummary        : __('Style changes may not appear in the editor', 'costered-blocks'),
+        blockWarningDetails        : __('There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here.', 'costered-blocks'),
+    },
     // Main Tabs
     // Display Controls
     displayControls: {
@@ -23,8 +30,20 @@ export const LABELS = {
     dimensionControls: {
         panelTitle                 : __('Dimension Controls', 'costered-blocks'),
         dimensionPanel             : __('Dimensions', 'costered-blocks'),
+        dimensions: {
+            width                  : __('Width', 'costered-blocks'),
+            height                 : __('Height', 'costered-blocks'),
+        },
         minPanel                   : __('Minimum Dimensions', 'costered-blocks'),
+        minDimensions: {
+            width                  : __('Min Width', 'costered-blocks'),
+            height                 : __('Min Height', 'costered-blocks'),
+        },
         maxPanel                   : __('Maximum Dimensions', 'costered-blocks'),
+        maxDimensions: {
+            width                  : __('Max Width', 'costered-blocks'),
+            height                 : __('Max Height', 'costered-blocks'),
+        },
     },
 
     // Spacing Controls
@@ -187,9 +206,7 @@ export const LABELS = {
         right                      : __('Right', 'costered-blocks'),
         bottom                     : __('Bottom', 'costered-blocks'),
         left                       : __('Left', 'costered-blocks'),
-        all                        : __('All', 'costered-blocks'),
-        horizontal                 : __('Horizontal', 'costered-blocks'),
-        vertical                   : __('Vertical', 'costered-blocks'),
+        useCustom                  : __('Use custom values (e.g auto, calc)', 'costered-blocks'),
     },
 
     // GapControls

@@ -6,7 +6,7 @@ import { Flex, FlexBlock,RangeControl, Notice } from '@wordpress/components';
 import NumberControlInput from '@components/NumberControlInput';
 import { LABELS } from "@labels";
 
-import { useAttrSetter, useParentGridMeta, useGridItemBounds } from '@hooks';
+import { useAttrSetter, useParentGridMeta } from '@hooks';
 import { whereGridItemDefined } from "@utils/gridUtils";
 import { clamp, toInt, parsePlacementSimple, composePlacementSimple } from '@utils/gridPlacement';
 

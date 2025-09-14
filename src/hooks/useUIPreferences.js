@@ -1,6 +1,5 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferenceStore } from '@wordpress/preferences';
-import { MUST_BE_SCOPED } from '@config';
 
 /**
  * A hook to get and set UI preferences for the current user.
@@ -39,17 +38,7 @@ export function useUIPreferences(key, defaultValue, ns = 'costered-blocks') {
  * @param {string} [options.variant] An additional variant to namespace by.
  * @returns {string} The namespaced key.
  */
-export const scopedKey = (base, { blockName, variant } = {}) => {
-    // Examples: 'dimensionMode', 'dimensionMode:core/image', 'dimensionMode:core/image#min'
-    const needsScope = MUST_BE_SCOPED.has(base);
-    const hasScope = !!blockName || !!variant;
-    /* TODO: sometimes the blockName is not available, so we're stuck with the bare key without suffix.
-    not harmful, but not ideal. We quarantine these now to avoid accidental overwrites.
-    but we should revisit this. */
-    if (needsScope && !hasScope) {
-        // Redirect to a quarantined bucket so we NEVER touch the bare base key again.
-        return `${base}:__unscoped__`;
-    }
+export const useScopedKey = (base, { blockName, variant } = {}) => {
     if (!blockName && !variant) return base;
     if (blockName && !variant) return `${base}:${blockName}`;
     if (!blockName && variant) return `${base}#${variant}`;

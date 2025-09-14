@@ -2,10 +2,11 @@ import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
 import { isValidElement, cloneElement } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 
+
+import { LABELS } from '@labels';
 import { useSelectedBlockInfo } from "@hooks";
 import { BLOCKS_WITH_EDITOR_STYLES } from "@config";
 import SidebarTabs from "@tabs/SidebarTabs";
@@ -80,22 +81,22 @@ const Sidebar = () => {
     const { selectedBlock } = useSelectedBlockInfo();
 
     if (!selectedBlock) {
-        return <PluginSidebar name="costered-blocks-sidebar" title={__('Costered Blocks', 'costered-blocks')}>
+        return <PluginSidebar name="costered-blocks-sidebar" title={LABELS.pluginSidebar.title} className="costered-blocks-sidebar">
             <Panel>
                 <PanelBody>
-                    <p>{__('Please select a block to edit its settings.', 'costered-blocks')}</p>
+                    <p>{LABELS.pluginSidebar.noBlockSelected}</p>
                 </PanelBody>
             </Panel>
         </PluginSidebar>;
     }
 
     return (
-        <PluginSidebar name="costered-blocks-sidebar" title={__('Costered Blocks', 'costered-blocks')} className="costered-blocks-sidebar">
+        <PluginSidebar name="costered-blocks-sidebar" title={LABELS.pluginSidebar.title} className="costered-blocks-sidebar">
             <Panel className="costered-blocks-sidebar">
                 <PanelBody>
                     <Flex justify="space-between" align="center">
                         <FlexItem>
-                            {__('Selected block:', 'costered-blocks')}
+                            {LABELS.pluginSidebar.selectedBlock}:
                         </FlexItem>
                         <FlexItem>
                             <Flex align="center" gap={0.5}>
@@ -108,10 +109,9 @@ const Sidebar = () => {
                         <div style={{ marginTop: '1em' }}>
                             <Notice status="warning" isDismissible={false}>
                                 <details key={".0"}>
-                                    <summary style={{ cursor: 'pointer', fontWeight: 500 }}>{__('Style changes may not appear in the editor', 'costered-blocks')}</summary>
+                                    <summary style={{ cursor: 'pointer', fontWeight: 500 }}>{LABELS.pluginSidebar.blockWarningSummary}</summary>
                                     <Flex direction="column" gap={2} style={{ marginTop: '1em' }}>
-                                        {__("Changing the style properties of this block may not appear to have much effect in the editor. This is due to limitations in the block editor, which does not always allow custom inline styles to be displayed here.", 'costered-blocks')}
-                                        <strong>{__('Your styles will still appear correctly on the frontend of your site.', 'costered-blocks')}</strong>
+                                        {LABELS.pluginSidebar.blockWarningDetails}
                                     </Flex>
                                 </details>
                             </Notice>

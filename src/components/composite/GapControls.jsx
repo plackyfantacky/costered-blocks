@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState, useEffect } from '@wordpress/element';
 import { Button, Flex, FlexBlock, FlexItem, ToggleControl } from '@wordpress/components';
 
 import { SplitInput, JoinInput } from "@assets/icons";
-import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
+import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
 import { splitGap, joinGap, normalize } from '@utils/gapUtils';
 import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
@@ -20,15 +20,15 @@ import TextControlInput from "@components/TextControlInput";
  * 
  * @returns {JSX.Element} A FlexBox containing the gap input and toggle controls.
  */
-export function GapControls({ attributes, clientId, updateBlockAttributes, blockName = null }) {
+export default function GapControls({ attributes, clientId, updateBlockAttributes, blockName = null }) {
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
     //user preferences for unit/text mode
     const safeBlockName = useSafeBlockName(blockName, clientId);
-    const unitModePrefKey = scopedKey('gapMode', { blockName: safeBlockName });
+    const unitModePrefKey = useScopedKey('gapMode', { blockName: safeBlockName });
     const [unitMode, setUnitMode] = useUIPreferences(unitModePrefKey, 'unit');
 
-    const inputModePrefKey = scopedKey('gapInputMode', { blockName: safeBlockName });
+    const inputModePrefKey = useScopedKey('gapInputMode', { blockName: safeBlockName });
     const [inputMode, setInputMode] = useUIPreferences(inputModePrefKey, 'single');
 
     //initial values

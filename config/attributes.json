@@ -1,0 +1,45 @@
+{
+    "display":             { "css": "display",               "type": "string", "group": "display" },
+    "visibility":          { "css": "visibility",            "type": "string", "group": "display" },
+    "overflow":            { "css": "overflow",              "type": "string", "group": "display" },
+
+    "width":               { "css": "width",                 "type": "string", "group": "dimension" },
+    "height":              { "css": "height",                "type": "string", "group": "dimension" },
+    "maxWidth":            { "css": "max-width",             "type": "string", "group": "dimension" },
+    "maxHeight":           { "css": "max-height",            "type": "string", "group": "dimension" },
+    "minWidth":            { "css": "min-width",             "type": "string", "group": "dimension" },
+    "minHeight":           { "css": "min-height",            "type": "string", "group": "dimension" },
+
+    "marginTop":           { "css": "margin-top",            "type": "string", "group": "margin" },
+    "marginRight":         { "css": "margin-right",          "type": "string", "group": "margin" },
+    "marginBottom":        { "css": "margin-bottom",         "type": "string", "group": "margin" },
+    "marginLeft":          { "css": "margin-left",           "type": "string", "group": "margin" },
+
+    "paddingTop":          { "css": "padding-top",           "type": "string", "group": "padding" },
+    "paddingRight":        { "css": "padding-right",         "type": "string", "group": "padding" },
+    "paddingBottom":       { "css": "padding-bottom",        "type": "string", "group": "padding" },
+    "paddingLeft":         { "css": "padding-left",          "type": "string", "group": "padding" },
+
+    "flexDirection":       { "css": "flex-direction",        "type": "string", "group": "flex" },
+    "flexWrap":            { "css": "flex-wrap",             "type": "string", "group": "flex" },
+    "justifyContent":      { "css": "justify-content",       "type": "string", "group": "flex" },
+    "alignItems":          { "css": "align-items",           "type": "string", "group": "flex" },
+    "alignContent":        { "css": "align-content",         "type": "string", "group": "flex" },
+
+    "flexGrow":            { "css": "flex-grow",             "type": "number", "group": "flex-item" },
+    "flexShrink":          { "css": "flex-shrink",           "type": "number", "group": "flex-item" },
+    "flexBasis":           { "css": "flex-basis",            "type": "string", "group": "flex-item" },
+
+    "gridTemplateColumns": { "css": "grid-template-columns", "type": "string", "group": "grid" },
+    "gridTemplateRows":    { "css": "grid-template-rows",    "type": "string", "group": "grid" },
+    "gridTemplateAreas":   { "css": "grid-template-areas",   "type": "string", "group": "grid" },
+
+    "gridColumn":          { "css": "grid-column",           "type": "string", "group": "grid-item", "default": "" },
+    "gridRow":             { "css": "grid-row",              "type": "string", "group": "grid-item", "default": "" },
+    "gridArea":            { "css": "grid-area",             "type": "string", "group": "grid-item", "default": "" },
+
+    "gap":                 { "css": "gap",                   "type": "string", "group": "shared" },
+    "order":               { "css": "order",                 "type": "number", "group": "shared" },
+    "alignSelf":           { "css": "align-self",            "type": "string", "group": "shared" },
+    "justifySelf":         { "css": "justify-self",          "type": "string", "group": "shared" }
+}

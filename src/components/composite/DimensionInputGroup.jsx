@@ -6,7 +6,7 @@ import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@hooks";
+import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
 
 /**
  * Renders a pair of input controls for dimension attributes. Will always contain exactly one width and height input,
@@ -20,14 +20,14 @@ import { useAttrSetter, useUIPreferences, scopedKey, useSafeBlockName } from "@h
  * 
  * @returns {JSX.Element} A FlexBox containing the dimension input and toggle controls.
  */
-export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateBlockAttributes, blockName = null }) {
+export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateBlockAttributes, blockName = null, labels = {} }) {
     const {set, withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
 
     const modeKey = groupKey ? `${groupKey}DimensionMode` : 'dimensionMode';
     const safeBlockName = useSafeBlockName(blockName, clientId);
 
     // Use a scoped preference key for the dimension mode
-    const prefKey = scopedKey(modeKey, { blockName: safeBlockName });
+    const prefKey = useScopedKey(modeKey, { blockName: safeBlockName });
     const [mode, setMode] = useUIPreferences(prefKey, 'unit');
 
     const ns = useMemo(
@@ -54,13 +54,9 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
 
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
 
-    const startCase = (s) => s ? s.replace(/(^.|[-_]\w)/g, (m) => m.replace(/[-_]/, ' ').toUpperCase()) : '';
-
-    const labelText =
-        groupKey !== ''
-            ? sprintf(LABELS.dimensionInputGroup.labelPre, startCase(groupKey))
-            : LABELS.dimensionInputGroup.label;
-
+    const widthLabel = labels.width || LABELS.dimensionInputGroup.width;
+    const heightLabel = labels.height || LABELS.dimensionInputGroup.height;
+    
     const setWidth = useCallback(
         (next) => ns? ns.set('Width', next) : set('width', next),
         [ns, set]
@@ -74,17 +70,16 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
     return (
         <Flex direction={'column'} gap={4} style={{ marginBottom: '1rem' }}>
             <FlexBlock>
-                <label style={{ marginBottom: '0.5rem' }}>{labelText}</label>
                 <Flex gap={2} wrap={false} align="stretch" justify="space-between">
                     <Input
                         value={values.width}
                         onChange={setWidth}
-                        label={LABELS.dimensionInputGroup.width}
+                        label={widthLabel}
                     />
                     <Input
                         value={values.height}
                         onChange={setHeight}
-                        label={LABELS.dimensionInputGroup.height}
+                        label={heightLabel}
                     />
                 </Flex>
             </FlexBlock>
