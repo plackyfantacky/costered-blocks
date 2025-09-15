@@ -1,0 +1,259 @@
+{
+    "pluginSidebar": {
+        "noBlockSelected": "Please select a block to edit its settings.",
+        "title": "Costered Blocks",
+        "selectedBlock": "Selected block",
+        "blockWarningSummary": "Style changes may not appear in the editor",
+        "blockWarningDetails": "There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here."
+    },
+    "displayControls": {
+        "panelTitle": "Display Controls",
+        "displayLabel": "Display",
+        "unset": "unset / initial",
+        "displayBlock": "Block",
+        "displayInline": "Inline",
+        "displayFlex": "Flex",
+        "displayGrid": "Grid",
+        "displayNone": "None",
+        "visibilityLabel": "Visibility",
+        "visibilityUnset": "unset / initial",
+        "visibilityVisible": "Visible",
+        "visibilityHidden": "Hidden",
+        "visibilityCollapse": "Collapse"
+    },
+    "dimensionControls": {
+        "panelTitle": "Dimension Controls",
+        "dimensionPanel": "Dimensions",
+        "dimensions": {
+            "width": "Width",
+            "height": "Height"
+        },
+        "minPanel": "Minimum Dimensions",
+        "minDimensions": {
+            "width": "Min Width",
+            "height": "Min Height"
+        },
+        "maxPanel": "Maximum Dimensions",
+        "maxDimensions": {
+            "width": "Max Width",
+            "height": "Max Height"
+        }
+    },
+    "spacingControls": {
+        "panelTitle": "Spacing Controls",
+        "panelLabel": "Spacing",
+        "marginLabel": "Margin",
+        "paddingLabel": "Padding"
+    },
+    "flexBoxControls": {
+        "panelTitle": "Flexbox Controls",
+        "flexWrapLabel": "Flex Wrap",
+        "flexWrapNone": "No Wrap",
+        "flexWrapWrap": "Wrap",
+        "flexWrapReverse": "Reverse",
+        "alignmentPanel": "Alignment",
+        "gapPanel": "Gap"
+    },
+    "flexItemControls": {
+        "panelTitle": "Flex Item Controls",
+        "flexGrow": "Grow",
+        "flexShrink": "Shrink",
+        "flexBasis": "Basis",
+        "flexBasisPlaceholder": "Enter value",
+        "order": "Order"
+    },
+    "gridControls": {
+        "panelTitle": "Grid Controls",
+        "gridTemplatePanel": "Grid Template",
+        "gridTemplatePanelSimple": "Simple",
+        "gridTemplatePanelTracks": "Tracks",
+        "gapPanel": "Gap",
+        "gridTemplateAreasPanel": "Grid Template Areas",
+        "gridTemplateAreasEditLarge": "Edit in larger view",
+        "gridTemplateAreasModal": "Edit Grid Template Areas"
+    },
+    "gridItemsControls": {
+        "panelTitle": "Grid Item Controls",
+        "simplePanel": {
+            "title": "Simple",
+            "columnStart": "Column Start",
+            "columnStartHelp": "%1$d columns",
+            "columnSpan": "Column Span",
+            "columnSpanHelp": "Max updates with start",
+            "rowStart": "Row Start",
+            "rowStartHelp": "%1$d rows",
+            "rowSpan": "Row Span",
+            "rowSpanHelp": "Max updates with start"
+        },
+        "tracksPanel": {
+            "title": "Tracks",
+            "hasAreasNotice": "This item uses a named grid area. Line-based placement is disabled.",
+            "namedLineMismatch": "No named lines are defined in the parent grid.",
+            "zeroInvalid": "0 isn’t a valid grid line. Use 1..N or negative indices like -1",
+            "columns": {
+                "legend": "Columns",
+                "trackStartMode": "Start uses",
+                "trackStartModeNamed": "Named Line",
+                "trackStartModeNumber": "Line Number",
+                "trackEndMode": "End uses",
+                "trackEndModeSpan": "Span",
+                "trackEndModeEnd": "End",
+                "startNumber": "Line Number",
+                "startNumberHelp": "Positive or negative line number",
+                "startNamed": "Named Line",
+                "startNamedHelp": "Named lines from parent grid template",
+                "spanNumber": "Span",
+                "spanNumberHelp": "Max updates with start",
+                "endAuto": "Auto",
+                "endAutoHelp": "Automatically size based on start/span",
+                "endNamed": "Named Line",
+                "endNamedHelp": "Named lines from parent grid template",
+                "endNumber": "Line Number",
+                "endNumberHelp": "Positive or negative line number"
+            },
+            "rows": {
+                "legend": "Rows",
+                "trackStartMode": "Start uses",
+                "trackStartModeNamed": "Named Line",
+                "trackStartModeNumber": "Line Number",
+                "trackEndMode": "End uses",
+                "trackEndModeSpan": "Span",
+                "trackEndModeEnd": "End",
+                "startNumber": "Line Number",
+                "startNumberHelp": "Positive or negative line number",
+                "startNamed": "Named Line",
+                "startNamedHelp": "Named lines from parent grid template",
+                "spanNumber": "Span",
+                "spanNumberHelp": "Max updates with start",
+                "endAuto": "Auto",
+                "endAutoHelp": "Automatically size based on start/span",
+                "endNamed": "Named Line",
+                "endNamedHelp": "Named lines from parent grid template",
+                "endNumber": "Line Number",
+                "endNumberHelp": "Positive or negative line number"
+            }
+        },
+        "areasPanel": {
+            "title": "Areas",
+            "gridAreaLabel": "Named area (grid-area)",
+            "gridAreaNone": "— None —",
+            "gridAreaHelp": "Setting a named area overrides row/column placement."
+        },
+        "alignmentPanel": {
+            "title": "Alignment"
+        },
+        "orderPanel": {
+            "title": "Order",
+            "label": "Order"
+        }
+    },
+    "flexDirection": {
+        "label": "Flex Direction",
+        "row": "Row",
+        "rowReverse": "Row Reverse",
+        "column": "Column",
+        "columnReverse": "Column Reverse"
+    },
+    "justifyControls": {
+        "label": "Justify Content",
+        "start": "Start",
+        "end": "End",
+        "center": "Center",
+        "spaceAround": "Space Around",
+        "spaceBetween": "Space Between",
+        "spaceEvenly": "Space Evenly"
+    },
+    "alignControls": {
+        "label": "Align Items",
+        "start": "Start",
+        "end": "End",
+        "center": "Center",
+        "stretch": "Stretch",
+        "baseline": "Baseline",
+        "spaceAround": "Space Around",
+        "spaceBetween": "Space Between",
+        "spaceEvenly": "Space Evenly"
+    },
+    "customSelectControl": {
+        "defaultText": "choose..."
+    },
+    "dimensionInputGroup": {
+        "label": "Dimensions",
+        "labelPre": "%1$s Dimensions",
+        "width": "Width",
+        "height": "Height",
+        "useCustom": "Use custom values (e.g auto, calc)"
+    },
+    "directionalInputGroup": {
+        "label": "Directions",
+        "top": "Top",
+        "right": "Right",
+        "bottom": "Bottom",
+        "left": "Left",
+        "useCustom": "Use custom values (e.g auto, calc)"
+    },
+    "gapControls": {
+        "label": "Gaps",
+        "rowLabel": "Row Gap",
+        "switchToSingle": "Switch to Single Gap",
+        "switchToDual": "Switch to Dual Gap",
+        "columnLabel": "Column Gap",
+        "useCustom": "Use custom values (e.g auto, calc)"
+    },
+    "gridAxisAside": {
+        "label": "Grid Axis",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "pipTitleNoValue": "No value set",
+        "pipTitleValueHere": "Value matches this panel",
+        "pipTitleValueElsewhere": "Value set in %s panel",
+        "pipTitleValueRaw": "Value set (unrecognised format)",
+        "clearRows": "Clear Rows",
+        "clearColumns": "Clear Columns"
+    },
+    "panelToggle": {
+        "label": "Panel"
+    },
+    "token": {
+        "expand": "Edit token",
+        "collapse": "Close editor",
+        "remove": "Remove",
+        "moveLeft": "Move left",
+        "moveRight": "Move right"
+    },
+    "tokenGrid": {
+        "title": "Areas",
+        "clear": "Clear",
+        "sizeHint": "%1$d columns x %2$d rows",
+        "mismatchText": "Templates areas (%1$dx%2$d) do not match current tracks (%3$dx%4$d)",
+        "resizeToTracks": "Resize areas to match tracks",
+        "growTracksToAreas": "Grow tracks to match areas",
+        "shrinkTracks": "Shrink tracks to areas",
+        "shrinkTracksWarning": "Shrinking may remove named lines. Continue?",
+        "shrinkTracksNote": "Shrinking tracks may remove named lines; please review afterwards.",
+        "shrinkTracksConfirm": "Shrink tracks",
+        "shrinkTracksCancel": "Cancel",
+        "shrinkTracksHeading": "Remove named lines?",
+        "shrinkTracksDescription": "Shrinking tracks will drop line names (e.g. [sidebar-start]). This can change template references. Continue?",
+        "tokenExpand": "Edit cell",
+        "tokenCollapse": "Close editor",
+        "tokenRemove": "Clear cell",
+        "tokenMoveLeft": "Previous cell",
+        "tokenMoveRight": "Next cell",
+        "addColumn": "Add column",
+        "removeColumn": "Remove column",
+        "addRow": "Add row",
+        "removeRow": "Remove row"
+    },
+    "tokenEditor": {
+        "add": "Add",
+        "addPlaceholder": "Add token",
+        "addLineNames": "Add line names",
+        "listAriaLabel": "List of tokens",
+        "moveLeft": "Move left",
+        "moveRight": "Move right",
+        "remove": "Remove",
+        "expand": "Edit token",
+        "collapse": "Close editor"
+    }
+}

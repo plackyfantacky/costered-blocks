@@ -5,7 +5,7 @@
  * automatically reflect in the block editor’s inline styles, so the editor layout
  * stays visually consistent with the saved frontend output.
  *
- * - buildMirror(attrs):
+ * - buildMirror(attrs):    
  *     Examines a block’s attributes and builds an inline `style` object
  *     (plus some helper flags) for supported properties:
  *       • dimensions (width/height/min/max)
@@ -14,19 +14,32 @@
  *     It also handles quirks like overriding blockGap with logical properties
  *     and ensuring null/empty values don’t bleed through.
  *
- * - withCosteredMirror(BlockListBlock):
+ * - withEditorStyleMirror(BlockListBlock):
  *     A Higher-Order Component (HOC) that wraps Gutenberg’s BlockListBlock.
  *     It uses `useSelect` to grab the current block’s attributes, runs them
  *     through `buildMirror`, and merges the result into the block’s wrapperProps.
  *     This ensures the editor preview updates live as attributes change,
  *     without extra re-renders or manual MutationObservers.
  */
-
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
-import { MIRRORED_STYLE_KEYS, ATTRS_TO_CSS } from '@config';
 
+import {
+    MIRRORED_STYLE_KEYS,
+    ATTRS_TO_CSS,
+    gridItemsProps,
+} from '@config';
+
+// helpers
+const kebabToCamel = (value) => value.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+const hasNonEmptyString = (input) => {
+    if (input === undefined || input === null) return false;
+    const output = String(input).trim();
+    return output !== '' && output !== 'undefined' && output !== 'null';
+};
+
+// Logical CSS properties for margin overrides (to beat blockGap)
 const LOGICAL_CSS_PROPS = {
     marginInlineStart: 'margin-inline-start',
     marginInlineEnd: 'margin-inline-end',
@@ -34,9 +47,19 @@ const LOGICAL_CSS_PROPS = {
     marginBlockEnd: 'margin-block-end',
 };
 
-
-const hasValue = (v) => v != null && (typeof v !== 'string' || v.trim() !== '');
-const pick = (v) => (v == null ? '' : String(v).trim());
+/**
+ * #notafunction
+ * Mapping of grid placement attribute keys to CSS properties and camelCase versions.
+ * Used to ensure exclusivity of grid-area over grid-column/row and to append !important if configured.
+ */
+const keys = Object.keys(gridItemsProps || {});
+const PLACEMENT = {};
+for (const key of keys) {
+    PLACEMENT[key] = {
+        css: gridItemsProps[key]?.css || key,
+        attr: kebabToCamel(gridItemsProps[key]?.css || key)
+    };
+}
 
 /**
  * Build a style object from block attributes.
@@ -45,14 +68,14 @@ const pick = (v) => (v == null ? '' : String(v).trim());
  * inline styles. Also sets logical margin properties to override blockGap and returns flags 
  * for which sides are set.
  * 
- * @param {Object} attrs - Block attributes to process.
+ * @param {Object} attributes - Block attributes to process.
  * @returns {Object} An object containing:
  *   - style: The constructed style object.
  *   - any: Boolean indicating if any styles were set.
  *   - hasMt, hasMb, hasMl, hasMr: Booleans indicating if specific margins are set.
  *   - haveFlexDir: Boolean indicating if flexDirection is set
  */
-function buildMirror(attrs = {}) {
+function buildMirror(attributes = {}) {
     const style = {};
     let any = false;
 
@@ -61,8 +84,8 @@ function buildMirror(attrs = {}) {
     let hasMt = false, hasMb = false, hasMl = false, hasMr = false;
 
     // margin top
-    if (hasValue(attrs.marginTop)) {
-        const value = String(attrs.marginTop);
+    if (hasNonEmptyString(attributes.marginTop)) {
+        const value = String(attributes.marginTop);
         style.marginTop = value;
         style.marginBlockStart = value; // <- beats parent’s blockGap rule
         any = true;
@@ -70,8 +93,8 @@ function buildMirror(attrs = {}) {
     }
 
     // margin bottom
-    if (hasValue(attrs.marginBottom)) {
-        const value = String(attrs.marginBottom);
+    if (hasNonEmptyString(attributes.marginBottom)) {
+        const value = String(attributes.marginBottom);
         style.marginBottom = value;
         style.marginBlockEnd = value; // <- beats parent’s blockGap rule
         any = true;
@@ -79,8 +102,8 @@ function buildMirror(attrs = {}) {
     }
 
     // margin left
-    if (hasValue(attrs.marginLeft)) {
-        const value = String(attrs.marginLeft);
+    if (hasNonEmptyString(attributes.marginLeft)) {
+        const value = String(attributes.marginLeft);
         style.marginLeft = value;
         style.marginInlineStart = value; // <- beats parent’s blockGap rule
         any = true;
@@ -88,8 +111,8 @@ function buildMirror(attrs = {}) {
     }
 
     // margin right
-    if (hasValue(attrs.marginRight)) {
-        const value = String(attrs.marginRight);
+    if (hasNonEmptyString(attributes.marginRight)) {
+        const value = String(attributes.marginRight);
         style.marginRight = value;
         style.marginInlineEnd = value; // <- beats parent’s blockGap rule
         any = true;
@@ -97,30 +120,26 @@ function buildMirror(attrs = {}) {
     }
 
     // grid shorthands
-    // grid area
-    const area = String(attrs.gridArea || '').trim();
-    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) {
-        style.gridArea = area;
-        any = true;
-    }
+    const area = String(attributes[PLACEMENT.gridArea.attr] || '').trim();
+    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[PLACEMENT.gridArea.attr] = area; any = true; }
 
     //grid column
-    const col = (attrs.gridColumn || '').trim();
-    if (col) { style.gridColumn = col; any = true; }
+    const col = (attributes[PLACEMENT.gridColumn.attr] || '').trim();
+    if (col) { style[PLACEMENT.gridColumn.attr] = col; any = true; }
 
     //grid row
-    const row = (attrs.gridRow || '').trim();
-    if (row) { style.gridRow = row; any = true; }
+    const row = (attributes[PLACEMENT.gridRow.attr] || '').trim();
+    if (row) { style[PLACEMENT.gridRow.attr] = row; any = true; }
 
     // All other mirrored style keys (skip margins and grid shorthands already handled)
     for (const key of MIRRORED_STYLE_KEYS) {
         if (
             key === 'marginTop' || key === 'marginBottom' ||
             key === 'marginLeft' || key === 'marginRight' ||
-            key === 'gridArea' || key === 'gridColumn' || key === 'gridRow'
+            key === PLACEMENT.gridArea.attr || key === PLACEMENT.gridColumn.attr || key === PLACEMENT.gridRow.attr
         ) continue;
-        const value = attrs[key];
-        if (hasValue(value)) {
+        const value = attributes[key];
+        if (hasNonEmptyString(value)) {
             style[key] = String(value);
             any = true;
         }
@@ -128,11 +147,21 @@ function buildMirror(attrs = {}) {
 
     // has flexDirection: ensure display:flex is set if it is
     // ensure flexDirection “sticks”
-    const haveFlexDir = hasValue(attrs.flexDirection);
+    const haveFlexDir = hasNonEmptyString(attributes.flexDirection);
     if (haveFlexDir && !style.display) {
         style.display = 'flex';
         any = true;
     }
+
+    // drop any empty/"undefined"/"null" strings from style
+    Object.keys(style).forEach((key) => {
+        if(!hasNonEmptyString(style[key])) {
+            delete style[key];
+        } else {
+            // normalise strings in-place (trim)
+            style[key] = String(style[key]).trim();
+        }
+    });
 
     return { style, any, hasMt, hasMb, hasMl, hasMr, haveFlexDir };
 }
@@ -147,7 +176,7 @@ function buildMirror(attrs = {}) {
  * @param {Function} BlockListBlock - The original BlockListBlock component.
  * @returns {Function} A memoized component that applies the style mirror.
  */
-function withCosteredMirror(BlockListBlock) {
+function withEditorStyleMirror(BlockListBlock) {
     const Wrapped = memo((props) => {
         const block = useSelect(
             (sel) => (props.clientId ? sel('core/block-editor').getBlock(props.clientId) : null),
@@ -173,52 +202,23 @@ function withCosteredMirror(BlockListBlock) {
                 el = root.querySelector(':scope > .block-editor-inner-blocks > .block-editor-block-list__layout') || el;
             }
 
-            // a little helper to set styles with !important
-            function setImportantStyle(el, attrKey, value) {
-                const cssProp = ATTRS_TO_CSS[attrKey] || LOGICAL_CSS_PROPS[attrKey] || attrKey;
-                if (value != null && value !== '') {
-                    el.style.setProperty(cssProp, value, 'important');
-                } else {
-                    el.style.removeProperty(cssProp);
-                }
-            }
-
             // Set all mirrored styles with !important
             for (const [key, value] of Object.entries(mirrorStyle)) {
                 //Only set known mirrored keys
                 if (typeof value !== 'undefined') {
                     const cssProp = ATTRS_TO_CSS[key] || LOGICAL_CSS_PROPS[key] || key;
-                    if(value != null && value !== '') {
+                    if (value != null && value !== '') {
                         el.style.setProperty(cssProp, value, 'important');
                     } else {
                         el.style.removeProperty(cssProp);
                     }
                 }
             }
-
-                    
-            // setImportantStyle(el, 'marginInlineStart', mirrorStyle.marginInlineStart);
-            // setImportantStyle(el, 'marginInlineEnd', mirrorStyle.marginInlineEnd);
-            // setImportantStyle(el, 'marginBlockStart', mirrorStyle.marginBlockStart);
-            // setImportantStyle(el, 'marginBlockEnd', mirrorStyle.marginBlockEnd);
-
-            // if (mirrorStyle.flexDirection) {
-            //     setImportantStyle(el, 'flexDirection', mirrorStyle.flexDirection);
-            //     if (!el.style.display) el.style.setProperty('display', 'flex', 'important');
-            // } else {
-            //     el.style.removeProperty(ATTRS_TO_CSS['flexDirection'] || 'flex-direction');
-            // }
         }, [
             props.clientId,
-            // mirrorStyle.marginInlineStart,
-            // mirrorStyle.marginInlineEnd,
-            // mirrorStyle.marginBlockStart,
-            // mirrorStyle.marginBlockEnd,
-            // mirrorStyle.flexDirection,
             mirrorStyle,
             hasMl, hasMr, haveFlexDir
         ]);
-
 
         const className = [
             props?.wrapperProps?.className || '',
@@ -243,4 +243,4 @@ function withCosteredMirror(BlockListBlock) {
     return Wrapped;
 }
 
-addFilter('editor.BlockListBlock', 'costered-blocks/editor-size-mirror', withCosteredMirror, 100);
+addFilter('editor.BlockListBlock', 'costered-blocks/editor-size-mirror', withEditorStyleMirror, 100);

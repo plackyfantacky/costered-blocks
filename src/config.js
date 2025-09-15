@@ -44,6 +44,8 @@ export const BLOCKS_WITH_EDITOR_STYLES = [
 
 export const DEFAULT_GRID_UNIT = '1fr';
 
+export const MIRROR_APPEND_IMPORTANT_FOR_GRID = true;
+
 /**
  * Editor Style Mirror keys.
  * The WP Block Editor can be tough to work with as the editor state is always being updated by 

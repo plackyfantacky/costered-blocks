@@ -1,23 +1,29 @@
-import { useCallback } from '@wordpress/element';
-
-import { VERBATIM_STRING_KEYS } from "@config";
 /**
  * Universal hook to handle setting/clearing attribute values. Supports block-props (inside a block edit) and store data ( sidebar / external UI )
  */
+import { useCallback } from '@wordpress/element';
+
+import { VERBATIM_STRING_KEYS } from "@config";
+
 export function useAttrSetter(updateFn, target, { trim = true, emptyUnsets = true } = {}) {
     const isStoreForm = target !== undefined && target !== null;
 
-    const normalise = useCallback((value, key) => {
+    const normalise = useCallback((rawValue, key) => {
+        if (rawValue === undefined || rawValue === null) return undefined; //exit early
         if (VERBATIM_STRING_KEYS.has(key)) {
             //verbatim strings; only trim and allow empty to truly unset
-            const v = typeof value === 'string' && trim ? value.trim() : String(value);
+            const v = typeof rawValue === 'string' && trim ? rawValue.trim() : String(rawValue);
             return (emptyUnsets && v === '') ? undefined : v;
         }
         //existing behaviour for all other keys
-        let v = value;
-        if (trim && typeof v === 'string') v = v.trim();
-        if (emptyUnsets && (v === '' || v == null)) return undefined;
-        return v;
+        let value = rawValue;
+        if (trim && typeof value === 'string') value = value.trim();
+        if (emptyUnsets && (value === '' || value == null)) return undefined;
+
+        //guard against 'undefined' and 'null' strings
+        const outputValue = String(value).trim();
+        if (!outputValue || outputValue === 'undefined' || outputValue === 'null') return undefined;
+        return outputValue;
     }, [trim, emptyUnsets]);
 
     const apply = useCallback((partial) => {
@@ -32,7 +38,7 @@ export function useAttrSetter(updateFn, target, { trim = true, emptyUnsets = tru
             }
             if (Object.keys(next).length) updateFn(target, next);
         }
-    }, [isStoreForm, updateFn, target, normalise])
+    }, [isStoreForm, updateFn, target, normalise]);
     
     const set = useCallback((key, value) => {
         apply({ [key]: normalise(value, key) });
@@ -48,7 +54,7 @@ export function useAttrSetter(updateFn, target, { trim = true, emptyUnsets = tru
 
     const unset = useCallback((key) => {
         apply({ [key]: undefined });
-    })
+    });
 
     const unsetMany = useCallback((keys) => {
         const payload = {};

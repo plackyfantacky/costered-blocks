@@ -10,7 +10,7 @@ export function GridItemAreas({ clientId, attributes }) {
     if (!clientId) return null;
 
     const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+    const { setMany } = useAttrSetter(updateBlockAttributes, clientId);
 
     const { areaNames } = useParentGridMeta();
 
@@ -18,8 +18,13 @@ export function GridItemAreas({ clientId, attributes }) {
     const writeGridArea = useCallback((raw) => {
         const name = normaliseGridAreaName(raw);
         // Only set if it's a valid name; otherwise do nothing (or clear if you prefer)
-        set('gridArea', name);
-    }, [set]);
+        setMany({
+            'gridArea': name,
+            //TODO: don't use undefined here -> it gets saved as a string and that breaks everything
+            'gridColumn': '',
+            'gridRow': ''
+        });
+    }, [setMany]);
 
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-area--panel">
@@ -39,5 +44,4 @@ export function GridItemAreas({ clientId, attributes }) {
             </FlexBlock>
         </Flex>
     );
-
 }

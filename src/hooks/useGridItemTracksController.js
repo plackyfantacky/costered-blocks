@@ -9,7 +9,7 @@ import {
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 
-export function useGridItemTracksController({ attributes, set, parentMeta }) {
+export function useGridItemTracksController({ attributes, setMany, parentMeta }) {
     const hasArea = isGridPlacement(attributes.gridArea);
     const { columns, rows, columnTemplate, rowTemplate } = parentMeta;
 
@@ -27,8 +27,8 @@ export function useGridItemTracksController({ attributes, set, parentMeta }) {
     useEffect(() => { setRowMode(inferRowMode); }, [inferRowMode]);
 
     // Writers (generic)
-    const writeColumn = useGridItemWriter(set, 'gridColumn', colMode);
-    const writeRow = useGridItemWriter(set, 'gridRow', rowMode);
+    const writeColumn = useGridItemWriter(setMany, 'gridColumn', colMode);
+    const writeRow = useGridItemWriter(setMany, 'gridRow', rowMode);
 
     // Named line suggestions from parent
     const namedColLines = useMemo(() => extractNamedLines(columnTemplate), [columnTemplate]);

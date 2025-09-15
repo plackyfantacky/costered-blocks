@@ -51,7 +51,7 @@ const GridItemControls = () => {
                                 tracks: GridItemTracks,
                                 areas: GridItemAreas,
                             }}
-                            panelProps={{ clientId, attributes, parentAttrs }}
+                            panelProps={{ clientId, attributes, parentAttrs, safeBlockName }}
                         >
                             <PanelToggle.TextOption value="simple" label={LABELS.gridItemsControls.simplePanel.title} />
                             <PanelToggle.TextOption value="tracks" label={LABELS.gridItemsControls.tracksPanel.title} />

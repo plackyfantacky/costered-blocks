@@ -44,10 +44,6 @@ export function CustomSelectControl({
         for (let i = 0; i < arr.length; i++) {
             const el = arr[i];
             if (el?.props?.value === value) {
-                //Child items of this component may or may not include an icon. e.g.
-                // <SelectControl.Option value=""><DefaultIcon />{__('unset / initial', 'costered-blocks')}</SelectControl.Option
-                // or
-                // <SelectControl.Option value="simple">{__('Simple', 'costered-blocks')}</SelectControl.Option>
                 const parts = Children.toArray(el.props.children);
                 if (parts.length > 1) {
                     icon = parts[0] ?? icon;

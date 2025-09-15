@@ -35,24 +35,40 @@ add_filter('render_block', function($block_content, $block) {
         return $block_content;
     }    
 
-    $style_string = '';
+    $stylesParts = [];
     foreach ($allowed as $attr_key => $css_key) {
         if (!empty($block['attrs'][$attr_key])) {
             $value = trim($block['attrs'][$attr_key]);
             if ($value !== '') {
-                $style_string .= "{$css_key}:{$value};";
+                $stylesParts[] = "{$css_key}: {$value};";
             }
         }
     }
-    if (!$style_string) return $block_content;
+
+    $grid_area = $attributes['gridArea'] ?? null;
+    $grid_column = $attributes['gridColumn'] ?? null;
+    $grid_row = $attributes['gridRow'] ?? null;
+
+    if(is_string($grid_area) && trim($grid_area) !== '') {
+        $stylesParts[] = "grid-area: {$grid_area} !important";
+    } else {
+        if(is_string($grid_column) && trim($grid_column) !== '') {
+            $stylesParts[] = "grid-column: {$grid_column} !important";
+        }
+        if(is_string($grid_row) && trim($grid_row) !== '') {
+            $stylesParts[] = "grid-row: {$grid_row} !important";
+        }
+    }   
+
+    if (!count($stylesParts)) return $block_content;
 
     if (preg_match('/<[^>]+>/', $block_content, $m, PREG_OFFSET_CAPTURE)) {
         $tag = $m[0][0];
         if (strpos($tag, 'style=') === false) {
-            $new_tag = rtrim($tag, '>') . ' style="' . esc_attr($style_string) . '">';
+            $new_tag = rtrim($tag, '>') . ' style="' . esc_attr(implode(' ', $stylesParts)) . '">';
             $block_content = substr_replace($block_content, $new_tag, $m[0][1], strlen($tag));
         } else {
-            $new_tag = preg_replace('/style="([^"]*)"/', 'style="$1 ' . esc_attr($style_string) . '"', $tag);
+            $new_tag = preg_replace('/style="([^"]*)"/', 'style="$1 ' . esc_attr(implode(' ', $stylesParts)) . '"', $tag);
             $block_content = substr_replace($block_content, $new_tag, $m[0][1], strlen($tag));
         }
     }
