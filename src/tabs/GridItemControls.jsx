@@ -37,9 +37,9 @@ const GridItemControls = () => {
     const setOrder = useCallback((v) => set('order', v), [set]);
 
     return (
-        <Panel className="costered-blocks-grid-item-controls--panel">
-            <PanelBody title={LABELS.gridItemsControls.panelTitle}>
-                <Flex expanded={true} gap={4} direction="column" className="costered-blocks-grid-item-controls--mode-panel">
+        <Panel className="costered-blocks--tab--griditem-controls">
+            <PanelBody title={LABELS.gridItemsControls.panelTitle} className="costered-blocks--griditem-controls--inner" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column">
                     <FlexBlock>
                         <PanelToggle
                             value={activeGridItemPanel}
@@ -60,16 +60,16 @@ const GridItemControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.alignmentPanel.title} initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column" className="costered-blocks-grid-item-controls--alignment-panel">
-                    <FlexBlock className={'costered-blocks-grid-item-simple-controls--justifyself'}>
+            <PanelBody title={LABELS.gridItemsControls.alignmentPanel.title} className="costered-blocks--griditem-controls-alignment" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls-alignment-flex">
+                    <FlexBlock className={'costered-blocks--griditem-controls--justifyself'}>
                         { /* RTL aware */ }
                         <JustifySelfControl
                             attributes={attributes}
                             setJustifySelf={setJustifySelf}
                         />
                     </FlexBlock>
-                    <FlexBlock className={'costered-blocks-grid-item-simple-controls--alignself'}>
+                    <FlexBlock className={'costered-blocks--griditem-controls--alignself'}>
                         { /* RTL aware */ }
                         <AlignSelfControl
                             attributes={attributes}
@@ -78,9 +78,9 @@ const GridItemControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.orderPanel.title} initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column" className="costered-blocks-grid-item-controls--order-panel">   
-                    <FlexBlock className={'costered-blocks-grid-item-simple-controls--order'}>
+            <PanelBody title={LABELS.gridItemsControls.orderPanel.title} className="costered-blocks--griditem-controls-order" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column">   
+                    <FlexBlock>
                         <NumberControlInput
                             label={LABELS.gridItemsControls.orderPanel.label}
                             value={attributes?.order || 0}

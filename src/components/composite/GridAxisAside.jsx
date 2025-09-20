@@ -3,10 +3,12 @@ import { sprintf } from '@wordpress/i18n';
 import { pretty } from "@utils/gridUtils";
 import { LABELS } from '@labels';
 
-export function GridAxisAside({ axis, canClear = false, onClear, active, owner = null, here = null }) {
-    const clearLabel = axis === 'columns'
-        ? LABELS.gridAxisAside.clearColumns
-        : LABELS.gridAxisAside.clearRows;
+export function GridAxisAside({ axis, canClear = false, onClear, active, owner = null, here = null, label }) {
+    const clearLabel = label || (
+        axis === 'columns'
+            ? LABELS.gridAxisAside.clearColumns
+            : LABELS.gridAxisAside.clearRows
+        );
 
     const isSet = !!canClear;
     // Resolve state
@@ -19,24 +21,24 @@ export function GridAxisAside({ axis, canClear = false, onClear, active, owner =
 
     const pipTitle = 
         state === 'none'
-            ? LABELS.gridAxisAside.pipTitleNoValue
+            ? LABELS.gridAxisAside.pip.noValue
             : state === 'here'
-                ? LABELS.gridAxisAside.pipTitleValueHere
+                ? LABELS.gridAxisAside.pip.valueHere
                 : (owner === 'raw'
-                    ? LABELS.gridAxisAside.pipTitleValueRaw
-                    : sprintf(LABELS.gridAxisAside.pipTitleValueElsewhere, pretty(owner))
+                    ? LABELS.gridAxisAside.pip.valueRaw
+                    : sprintf(LABELS.gridAxisAside.pip.valueElsewhere, pretty(owner))
                 );
 
     return (
         <div
-            className={`costered-blocks-grid-axis-aside${state === 'here' ? ' is-owned-here' : ''}${state === 'elsewhere' ? ' is-elsewhere' : ''}`}
+            className={`costered-blocks--grid-axis-aside ${state === 'here' ? 'is-owned-here' : ''} ${state === 'elsewhere' ? 'is-elsewhere' : ''}`}
             data-state={state}
             data-owner={owner || 'none'}
             data-here={here || 'none'}
             aria-label={axis}
         >
             <Tooltip text={pipTitle}>
-                <span className="costered-blocks-grid-axis__pip"/>
+                <span className="costered-blocks--grid-axis-aside--pip"/>
             </Tooltip>
             <Tooltip text={clearLabel}>
                 <Button
@@ -45,7 +47,7 @@ export function GridAxisAside({ axis, canClear = false, onClear, active, owner =
                     onClick={onClear}
                     disabled={!isSet}
                     variant="tertiary"
-                    className="costered-blocks-grid-axis-aside__clear"
+                    className="costered-blocks--grid-axis-aside__clear"
                 />
             </Tooltip>
         </div>

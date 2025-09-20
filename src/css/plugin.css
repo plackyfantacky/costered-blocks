@@ -1,0 +1,296 @@
+.costered-blocks--sidebar {
+    /* Override default notice width */
+    .components-notice__content {
+        margin-right: 0 !important;
+    }
+
+    .costered-blocks--sidebar-header {
+        /* .costered-blocks--header-selected-block {  } */
+
+        .costered-blocks--sidebar-tabs {
+            .costered-blocks--tab-icon-object {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .costered-blocks--notice-style-differences {
+            margin-top: 1rem;
+
+            details {
+                summary {
+                    cursor: pointer;
+                    font-weight: 500;
+                }
+
+                .costered-blocks--notice-style-differences-body {
+                    margin-top: 1rem;
+                }
+            }
+        }
+    }
+
+    .costered-blocks--sidebar-body {
+
+        .costered-blocks--tab-panel-outer {
+            
+            .costered-blocks--tab--display-controls {
+
+                .costered-blocks--display-controls--inner {
+                    margin-bottom: 1rem;
+                }
+            }
+    
+            /* .costered-blocks--tab--flexbox-controls {
+                .costered-blocks--flexbox-controls--inner {}
+                .costered-blocks--flexbox-controls--alignment {}
+                .costered-blocks--flexbox-controls--gap {}
+            } */
+            
+            /* .costered-blocks--tab--dimensions-controls {} */
+            
+            /* .costered-blocks--tab--flexitem-controls {
+                .costered-blocks--flexitem-controls--inner {}
+                .costered-blocks--flexitem-controls--order {}
+                .costered-blocks--flexitem-controls--alignself {}
+            } */
+    
+            /* .costered-blocks--tab--grid-controls {
+                .costered-blocks--grid-controls--template-axis {}
+                .costered-blocks--grid-controls--gap {}
+                .costered-blocks--grid-controls--template-areas {}
+                .costered-blocks--grid-control--modal {}
+            } */
+    
+            /* .costered-blocks--griditem-controls-tab {
+                .costered-blocks--griditem-controls--inner {}
+                .costered-blocks--griditem-controls-alignment {
+                    .costered-blocks--griditem-controls-alignment-flex {
+                        .costered-blocks--griditem-controls--justifyself {}
+                        .costered-blocks--griditem-controls--alignself {}  
+                    }
+                .costered-blocks--griditem-controls-order {}  
+            } */
+
+            /* .costered-blocks--spacing-controls-tab {
+                .costered-blocks--spacing-controls-inner {
+                    .costered-blocks--spacing-controls-margin {}
+                    .costered-blocks--spacing-controls-padding {}
+                }
+            } */
+        }
+    }
+}
+
+/* CustomToggleGroup */
+.costered-blocks--custom-toggle-group {
+    padding: 2px;
+    border-radius: 3px !important;
+    box-shadow: 0 0 0 1px #8c8f94 inset;
+
+    &.is-empty::before {
+        background-color: transparent !important;
+    }
+}
+
+/* DimensionInputGroup */
+.costered-blocks--dimension-input-group {
+    margin-bottom: 1rem;
+}
+
+/* GridAxisAside */
+.costered-blocks--grid-axis-aside {
+    display: flex;
+    flex: 0 0 32px;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    width: 32px;
+
+    .costered-blocks--grid-axis-aside--pip {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #000; /* uses admin theme color by default */
+        opacity: 0.2; /* no value */
+        transition:
+            opacity 0.15s ease,
+            box-shadow 0.15s ease;
+        position: absolute;
+        top: 2px;
+        right: 2px;
+
+        .costered-blocks--grid-axis-aside.is-owned-here & {
+            opacity: 1; /* value set here */
+            background: var(--wp-admin-theme-color, #3858e9);
+        }
+
+        .costered-blocks--grid-axis-aside.is-elsewhere & {
+            opacity: 0.6; /* value set elsewhere */
+            box-shadow: 0 0 0 2px currentColor inset;
+        }
+    }
+}
+
+/* TokenEditor */
+.costered-blocks--token-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .costered-blocks--token-editor--list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .costered-blocks--token-editor--add {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: center;
+
+        .costered-blocks--token-editor--add-options {
+            width: fit-content;
+        }
+    }
+}
+
+/* TokenGrid */
+.costered-blocks--token-grid-component {
+
+    .costered-blocks--token-grid--area {
+        grid-template-columns: 80px;
+        grid-auto-columns: minmax(132px, max-content);
+        grid-auto-flow:column;
+        border-top: 1px solid var(--wp--custom--token-border, #dcdcde);
+        border-left: 1px solid var(--wp--custom--token-border, #dcdcde);
+        display: grid;
+        grid-auto-rows: minmax(32px, auto);
+        inline-size: 100%; /* use container width */
+        max-inline-size: 100%;
+        overflow-x: scroll;
+        scrollbar-gutter: stable both-edges;
+        overscroll-behavior: contain;
+        width: 248px;
+        background-color: var(--wp-components-color-accent-1, #f6f7f7);
+
+        /* wp style reset */
+        .components-modal__content & {
+            width: auto;
+            max-width: unset;
+            overflow-x: unset;
+        }
+
+        .costered-blocks--token-grid--row {
+            display: grid;
+            grid-template-columns: subgrid;
+            grid-auto-rows: minmax(48px, auto);
+
+            .costered-blocks--token-grid--cell {
+                border-bottom: 1px solid var(--wp--custom--token-border, #dcdcde);
+                border-right: 1px solid var(--wp--custom--token-border, #dcdcde);
+                padding: 4px;
+            }
+
+            &.costered-blocks--token-grid--row-head {
+                .costered-blocks--token-grid--cell-corner {
+                    grid-column: 1;
+                }
+
+                .costered-blocks--token-grid--cell-head {
+                    display: grid;
+                    grid-template-columns: subgrid;
+                }
+            }
+
+            .costered-blocks--token-grid--controls {
+                display: flex;
+                justify-content: center;
+            }
+
+            .costered-blocks--token {
+                width: 100%;
+            }
+        }
+    }
+}
+
+/* Token */
+.costered-blocks--token {
+    border: 1px solid var(--wp--custom--token-border, #dcdcde);
+    border-radius: 6px;
+    padding: 0.25rem;
+    background: #fff;
+    width: fit-content;
+
+    .costered-blocks--token--chip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.25rem;
+
+        button.costered-blocks--token--chipButton {
+            all: unset;
+            cursor: pointer;
+            padding: 0 0 0 0.25rem;
+            border-radius: 4px;
+            height: 24px;
+            line-height: 24px;
+
+            &:focus-visible {
+                outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+                outline-offset: 2px;
+            }
+        }
+
+        span.costered-blocks--token--chipText {
+            display: block;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 24px;
+
+            .is-expanded & {
+                max-width: unset;
+            }
+        }
+
+        button.costered-blocks--token--remove.components-button {
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            min-width: unset;
+        }
+    }
+
+    .costered-blocks--token--panel {
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+
+        .costered-blocks--token--actions {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+    }
+
+    /* wp style reset */
+    .costered-blocks--token--popover .components-popover__content {
+        /* make it roomy but bounded */
+        width: var(--cb-popover-width, 520px);
+        max-width: min(calc(100vw - 40px), 640px);
+    }
+
+    .costered-blocks--token--popover .costered-blocks--token--panel {
+        /* ensure input expands nicely in the popover */
+        grid-template-columns: 1fr auto;
+    }
+}

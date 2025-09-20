@@ -1,13 +1,15 @@
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Flex, FlexBlock, FlexItem, RangeControl, ToggleControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
 
-import { makeRepeat, normaliseTemplate } from '@utils/gridUtils';
-import UnitControlInput from '@components/UnitControlInput';
-import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { useAttrSetter, useGridModel } from '@hooks';
 import { DEFAULT_GRID_UNIT } from '@config';
+import { LABELS } from '@labels';
+import { makeRepeat } from '@utils/gridUtils';
+
+import UnitControlInput from '@components/UnitControlInput';
+import { GridAxisAside } from "@components/composite/GridAxisAside";
 
 const EMPTY_AXIS = {
     mode: 'raw',
@@ -67,8 +69,8 @@ export function GridAxisSimple({ clientId }) {
     const colsNow = makeRepeat(colCount, effectiveColUnit);
     const rowsNow = makeRepeat(rowCount, effectiveRowUnit);
 
-    const colsActive = !!col.template && normaliseTemplate(colsNow) === colKey;
-    const rowsActive = !!row.template && normaliseTemplate(rowsNow) === rowKey;
+    //const colsActive = !!col.template && normaliseTemplate(colsNow) === colKey;
+    //const rowsActive = !!row.template && normaliseTemplate(rowsNow) === rowKey;
 
     const writeCols = useCallback((nextCount, nextUnit) => {
         const template = makeRepeat(nextCount, nextUnit);
@@ -133,106 +135,82 @@ export function GridAxisSimple({ clientId }) {
     }, [unset]);
 
     return (
-        <Flex direction="column" gap={4}>
-            <FlexBlock>
-                {__('In Simple mode, you can define the number of columns. All columns equally divide the total available width.', 'costered-blocks')}
+        <Flex direction="column" gap={6}>
+            <FlexBlock className="costered-blocks--grid-panel-simple--description">
+                {LABELS.gridControls.simplePanel.description}
             </FlexBlock>
-            <FlexBlock>
-                <Flex direction="column" gap={1}>
-                    <FlexItem>
-                        <Flex direction="row" gap={2} justify="space-between" align="center">
-                            <FlexBlock>
-                                <span className="costered-blocks--grid-panel-simple-label">{__('Columns', 'costered-blocks')}</span>
-                            </FlexBlock>
-                            <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                                <GridAxisAside
-                                    axis="columns"
-                                    canClear={!!col?.template}
-                                    onClear={clearCols}
-                                    owner={model.activePane.columns}
-                                    here="simple"
-                                />
-                            </FlexItem>
-                        </Flex>
-                    </FlexItem>
-                    <FlexBlock>
-                        <RangeControl
-                            min={0}
-                            max={12}
-                            step={1}
-                            value={colCount}
-                            onChange={handleColCount}
-                            className="costered-blocks--grid-columns-simple-control"
-                            __next40pxDefaultSize
-                            __nextHasNoMarginBottom
-                        />
-                    </FlexBlock>
-                    <FlexBlock>
-                        <ToggleControl
-                            label={__(`Use ${DEFAULT_GRID_UNIT}`, 'costered-blocks')}
-                            checked={colUseDGU}
-                            onChange={handleColUseDGU}
-                            __nextHasNoMarginBottom
-                        />
-                    </FlexBlock>
-                    {!colUseDGU && (
-                        <FlexBlock>
-                            <UnitControlInput
-                                label={__('Unit', 'costered-blocks')}
-                                value={colUnit}
-                                onChange={handleColUnit}
-                            />
-                        </FlexBlock>
-                    )}
+            <Flex direction="column" gap={3} className={"costered-blocks--grid-panel-simple--axis-controls"}>
+                <Flex direction="row" justify="space-between" align="center">
+                    <span className="costered-blocks--grid-panel-simple--axis-label">{LABELS.gridControls.simplePanel.columns}</span>
+                    <GridAxisAside
+                        axis="columns"
+                        canClear={!!col?.template}
+                        onClear={clearCols}
+                        owner={model.activePane.columns}
+                        here="simple"
+                        label={LABELS.gridControls.simplePanel.columnsClear}
+                    />
                 </Flex>
-            </FlexBlock>
-            <FlexBlock>
-                <Flex direction="column" gap={1}>
-                    <Flex direction="row" gap={2} justify="space-between" align="center">
-                        <FlexBlock>
-                            <span className="costered-blocks--grid-panel-simple-label">{__('Rows', 'costered-blocks')}</span>
-                        </FlexBlock>
-                        <FlexItem style={{ width: 32, flex: '0 0 32px' }}>
-                            <GridAxisAside
-                                axis="rows"
-                                canClear={!!row.template}
-                                onClear={clearRows}
-                                owner={model.activePane.rows}
-                                here="simple"
-                            />
-                        </FlexItem>
-                    </Flex>
-                    <FlexBlock>
-                        <RangeControl
-                            min={0}
-                            max={12}
-                            step={1}
-                            value={rowCount}
-                            onChange={handleRowCount}
-                            className="costered-blocks--grid-rows-simple-control"
-                            __next40pxDefaultSize
-                            __nextHasNoMarginBottom
-                        />
-                    </FlexBlock>
-                    <FlexBlock>
-                        <ToggleControl
-                            label={__(`Use ${DEFAULT_GRID_UNIT}`, 'costered-blocks')}
-                            checked={rowUseDGU}
-                            onChange={handleRowUseDGU}
-                            __nextHasNoMarginBottom
-                        />
-                    </FlexBlock>
-                    {!rowUseDGU && (
-                        <FlexBlock>
-                            <UnitControlInput
-                                label={__('Unit', 'costered-blocks')}
-                                value={rowUnit}
-                                onChange={handleRowUnit}
-                            />
-                        </FlexBlock>
-                    )}
+                <RangeControl
+                    min={0}
+                    max={12}
+                    step={1}
+                    value={colCount}
+                    onChange={handleColCount}
+                    className="costered-blocks--grid-columns-simple--axis-control"
+                    __next40pxDefaultSize
+                    __nextHasNoMarginBottom
+                />
+                <ToggleControl
+                    label={sprintf(LABELS.gridControls.simplePanel.columnSpan, DEFAULT_GRID_UNIT)}
+                    checked={colUseDGU}
+                    onChange={handleColUseDGU}
+                    __nextHasNoMarginBottom
+                />
+                {!colUseDGU && (
+                    <UnitControlInput
+                        label={LABELS.gridControls.simplePanel.columnUnit}
+                        value={colUnit}
+                        onChange={handleColUnit}
+                    />
+                )}
+            </Flex>
+            <Flex direction="column" gap={2} className={"costered-blocks--grid-panel-simple--axis-controls"}>
+                <Flex direction="row" justify="space-between" align="center">
+                    <span className="costered-blocks--grid-panel-simple--axis-label">{LABELS.gridControls.simplePanel.rows}</span>
+                    <GridAxisAside
+                        axis="rows"
+                        canClear={!!row.template}
+                        onClear={clearRows}
+                        owner={model.activePane.rows}
+                        here="simple"
+                        label={LABELS.gridControls.simplePanel.rowsClear}
+                    />
                 </Flex>
-            </FlexBlock>
+                <RangeControl
+                    min={0}
+                    max={12}
+                    step={1}
+                    value={rowCount}
+                    onChange={handleRowCount}
+                    className="costered-blocks--grid-rows-simple--axis-control"
+                    __next40pxDefaultSize
+                    __nextHasNoMarginBottom
+                />
+                <ToggleControl
+                    label={sprintf(LABELS.gridControls.simplePanel.rowSpan, DEFAULT_GRID_UNIT)}
+                    checked={rowUseDGU}
+                    onChange={handleRowUseDGU}
+                    __nextHasNoMarginBottom
+                />
+                {!rowUseDGU && (
+                    <UnitControlInput
+                        label={LABELS.gridControls.simplePanel.rowUnit}
+                        value={rowUnit}
+                        onChange={handleRowUnit}
+                    />
+                )}
+            </Flex>
         </Flex>
     );
 } 

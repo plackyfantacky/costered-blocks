@@ -88,7 +88,7 @@ export default function Token({
     }, [openFromKeyboard, index, isExpanded, onToggle]);
 
     const EditorPanel = (
-        <div id={`costered-token-panel-${index}`} className="costered-token__panel">
+        <div id={`costered-blocks--token--panel-${index}`} className="costered-blocks--token--panel">
             <TextControl
                 ref={setInputRef}
                 value={value ?? ''}
@@ -98,7 +98,7 @@ export default function Token({
                 __nextHasNoMarginBottom
                 __next40pxDefaultSize
             />
-            <div className="costered-token__actions">
+            <div className="costered-blocks--token--actions">
                 <Tooltip text={labelData.moveLeft}>
                     <Button
                         icon="arrow-left-alt2"
@@ -122,19 +122,19 @@ export default function Token({
 
 
     return (
-        <div className={`costered-token${isExpanded ? ' is-expanded' : ''}`}>
+        <div className={`costered-blocks--token ${isExpanded ? 'is-expanded' : ''}`}>
             {/* collapsed “chip” header */}
-            <div className="costered-token__chip" ref={chipRef}>
+            <div className="costered-blocks--token--chip" ref={chipRef}>
                 <button
                     type="button"
-                    className="costered-token__chipButton"
+                    className="costered-blocks--token--chipButton"
                     aria-expanded={isExpanded}
                     aria-controls={`costered-token-panel-${index}`}
                     onClick={openFromPointer}
                     onKeyDown={handleChipKeyDown}
                     title={isExpanded ? labelData.collapse : labelData.expand}
                 >
-                    <span className="costered-token__chipText">{chipText}</span>
+                    <span className="costered-blocks--token--chipText">{chipText}</span>
                 </button>
 
                 <Tooltip text={labelData.remove}>
@@ -143,7 +143,7 @@ export default function Token({
                         label={labelData.remove}
                         onClick={handleRemove}
                         variant="tertiary"
-                        className="costered-token__remove"
+                        className="costered-blocks--token--remove"
                     />
                 </Tooltip>
             </div>
@@ -153,7 +153,7 @@ export default function Token({
             {/* Floating panel (opt-in) */}
             {floatingEditor && isExpanded && (
                 <Popover
-                    className="costered-blocks-token__popover"
+                    className="costered-blocks--token--popover"
                     anchor={chipRef.current}
                     placement={popoverPlacement} // e.g. 'bottom-start', 'right-start'
                     onClose={() => onToggle(index, false)}
@@ -161,7 +161,7 @@ export default function Token({
                     expandOnMobile
                 >
                     <div
-                        className="costered-blocks-token__popoverInner"
+                        className="costered-blocks--token--popoverInner"
                         style={popoverWidth ? { width: popoverWidth } : undefined}
                     >
                         {EditorPanel}

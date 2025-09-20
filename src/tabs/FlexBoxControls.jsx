@@ -63,9 +63,9 @@ const FlexBoxControls = () => {
     const setJustifyContent = useCallback((v) => set('justifyContent', v), [set]);
     const setAlignItems = useCallback((v) => set('alignItems', v), [set]);
     return (
-        <Panel>
-            <PanelBody title={LABELS.flexBoxControls.panelTitle} initialOpen={flexBoxPanelOpen} onToggle={setFlexBoxPanelOpen}>
-                <Flex direction="column" className="flexbox-controls">
+        <Panel className="costered-blocks--tab--flexbox-controls">
+            <PanelBody title={LABELS.flexBoxControls.panelTitle} className="costered-blocks--flexbox-controls--inner" initialOpen={flexBoxPanelOpen} onToggle={setFlexBoxPanelOpen}>
+                <Flex direction="column">
                     <FlexItem>
                         { /* RTL aware */}
                         <FlexDirectionControl
@@ -86,8 +86,8 @@ const FlexBoxControls = () => {
                     </FlexItem>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.alignmentPanel} initialOpen={alignmentPanelOpen} onToggle={setAlignmentPanelOpen}>
-                <Flex direction="column" className="flexbox-alignment-controls">
+            <PanelBody title={LABELS.flexBoxControls.alignmentPanel} className="costered-blocks--flexbox-controls--alignment" initialOpen={alignmentPanelOpen} onToggle={setAlignmentPanelOpen}>
+                <Flex direction="column">
                     <FlexItem>
                         { /* RTL aware */ }
                         <JustifyControl
@@ -104,8 +104,8 @@ const FlexBoxControls = () => {
                     </FlexItem>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.gapPanel} initialOpen={gapPanelOpen} onToggle={setGapPanelOpen}>
-                <Flex direction="column" className="flexbox-gap-controls">
+            <PanelBody title={LABELS.flexBoxControls.gapPanel} className="costered-blocks--flexbox-controls--gap" initialOpen={gapPanelOpen} onToggle={setGapPanelOpen}>
+                <Flex direction="column">
                     <FlexItem>
                         <GapControls
                             attributes={attributes}

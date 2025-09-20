@@ -31,10 +31,10 @@ const FlexItemControls = () => {
     const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
 
     return (
-        <Panel className="costered-blocks-flex-item-controls">
+        <Panel className="costered-blocks--tab--flexitem-controls">
             <PanelBody title={LABELS.flexItemControls.panelTitle} initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column" className="flex-item-controls">
-                    <FlexBlock>
+                <Flex expanded={true} gap={4} direction="column">
+                    <FlexBlock className="costered-blocks--flexitem-controls-inner">
                         <Flex expanded={true} gap={0} direction="row">
                             <FlexItem>
                                 <NumberControlInput
@@ -62,7 +62,7 @@ const FlexItemControls = () => {
                             </FlexBlock>
                         </Flex>
                     </FlexBlock>
-                    <FlexBlock>
+                    <FlexBlock className="costered-blocks--flexitem-controls--order">
                         <NumberControlInput
                             label={LABELS.flexItemControls.order}
                             value={attributes?.order || 0}
@@ -71,7 +71,7 @@ const FlexItemControls = () => {
                         />
                     </FlexBlock>
                     {isRow && (
-                        <FlexBlock>
+                        <FlexBlock className="costered-blocks--flexitem-controls--alignself">
                             <AlignSelfControl
                                 attributes={attributes}
                                 setAlignSelf={setAlignSelf}

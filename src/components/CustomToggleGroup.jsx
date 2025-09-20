@@ -10,7 +10,7 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
 
     return (
             <ToggleGroupControl
-                className={`costered-custom-toggle-group ${value ? 'has-selection' : 'is-empty'}`}
+                className={`costered-blocks--custom-toggle-group ${value ? 'has-selection' : 'is-empty'}`}
                 label={label}
                 value={value}
                 onChange={handleChange}

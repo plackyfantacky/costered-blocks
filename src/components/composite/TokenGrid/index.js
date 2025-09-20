@@ -5,9 +5,13 @@ import { sprintf } from '@wordpress/i18n';
 import { useGridAreasMatrix, useGridStoreAreasIO } from '@hooks';
 import { GridBoard } from './GridBoard';
 import { NoticePanel } from './NoticePanel';
-import { LABELS } from '@labels';
+import { LABELS as DEFAULT_LABELS } from '@labels';
 
-export default function TokenGrid({ clientId }) {
+export default function TokenGrid({ clientId, labels = {} }) {
+
+    const tokenGridLabels = useMemo(() => ({ ...DEFAULT_LABELS.tokenGrid, ...labels.tokenGrid }), [labels]);
+    const tokenGridNoticeLabels = useMemo(() => ({ ...DEFAULT_LABELS.tokenGridNotice, ...labels.tokenGridNotice }), [labels]);
+
     const {
         applyMatrixToStore,
         seedFromStore,
@@ -43,39 +47,43 @@ export default function TokenGrid({ clientId }) {
     );
 
     return (
-        <div className="costered-blocks-tokengrid">
+        <Flex direction="column" gap={2} className="costered-blocks--token-grid-component">
             {mismatch && (
-                <>
-                    <NoticePanel clientId={clientId} columnData={columnData} rowData={rowData} gridMatrix={gridMatrix} /> {/* passthrough resize function */ }
-                </>
+                <NoticePanel
+                    clientId={clientId}
+                    columnData={columnData}
+                    rowData={rowData}
+                    gridMatrix={gridMatrix}
+                    labels={tokenGridNoticeLabels}
+                />
             )}
-            <Flex direction="row" gap={2} align="center" justify="space-between" style={{ marginBottom: 8 }} className={"costered-blocks-tokengrid__header"}>
+            <Flex direction="row" gap={2} align="center" justify="space-between" className={"costered-blocks--token-grid-header"}>
                 <FlexItem>
-                    <strong>{LABELS.tokenGrid.title}</strong>{' '}
-                    <span className="components-help-text">
-                        {sprintf(LABELS.tokenGrid.sizeHint, columnData, rowData)}
+                    <span className="costered-blocks--token-grid-help">
+                        {sprintf(tokenGridLabels.sizeHint, columnData, rowData)}
                     </span>
                 </FlexItem>
-                <FlexItem>
+                {/* disabling this for now, as this action is destructive and I should at least confirm with the user */}
+                {/* <FlexItem>
                     <Button
                         icon="trash"
                         variant="tertiary"
                         onClick={() => clear(trackColumnCount, trackRowCount)}
                     >
-                        {LABELS.tokenGrid.clear}
+                        {tokenGridLabels.clear}
                     </Button>
-                </FlexItem>
+                </FlexItem> */}
             </Flex>
             <GridBoard
                 matrix={matrix}
                 columnData={columnData}
                 rowData={rowData}
                 emptyToken={'.'}
-                labels={LABELS.tokenGrid}
+                labels={tokenGridLabels}
                 setCell={setCell}
                 resize={resize}
                 onEditingChange={handleEditingChange}
             />
-        </div>
+        </Flex>
     );
 }

@@ -10,10 +10,11 @@ import {
 
 import { extendTrackTemplate, shrinkTrackTemplate } from '@utils/gridUtils';
 import { useAttrSetter, useGridStoreAreasIO, useGridModel } from '@hooks';
-import { LABELS } from "@labels";
+import { LABELS as DEFAULT_LABELS } from "@labels";
 import { DEFAULT_GRID_UNIT } from '@config';
 
-export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resize } }) {
+export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resize }, labels = DEFAULT_LABELS.tokenGridNotice }) {
+
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set } = useAttrSetter(updateBlockAttributes, clientId);
 
@@ -92,35 +93,39 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
     if (!columnsMismatch && !rowsMismatch) return null;
 
     return (
-        <div className="costered-blocks-tokengrid__notices">
-            <Notice status="warning" isDismissible={false}>
-                {sprintf(LABELS.tokenGrid.mismatchText, areaCols, areaRows, trackCols, trackRows)}
+        <Flex direction="column" gap={2} className="costered-blocks--grid-area-notices">
+            <Notice status="info" isDismissible={false}>
+                {sprintf(labels.mismatchText, areaCols, areaRows, trackCols, trackRows)}
                 <Flex direction="column" gap={2} style={{ marginTop: 8 }}>
                     <FlexBlock>
-                        <Button variant="secondary" onClick={resizeAreasToTracks}>{LABELS.tokenGrid.resizeToTracks}</Button>
+                        <Button variant="secondary" onClick={resizeAreasToTracks}>{labels.resizeToTracks}</Button>
                     </FlexBlock>
-                    <FlexBlock>
-                        <Button variant="secondary" onClick={growTracksToAreas} disabled={!needGrowCols && !needGrowRows}>{LABELS.tokenGrid.growTracksToAreas}</Button>
-                    </FlexBlock>
+                    {needGrowCols || needGrowRows && (
+                        <FlexBlock>
+                            <Button variant="secondary" onClick={growTracksToAreas} disabled={!needGrowCols && !needGrowRows}>{labels.growTracksToAreas}</Button>
+                        </FlexBlock>
+                    )}
                     {canShrinkTracks && (
                         <FlexBlock>
-                            <Button variant="secondary" isDestructive onClick={requestShrink}>{LABELS.tokenGrid.shrinkTracks}</Button>
+                            <Button variant="secondary" isDestructive onClick={requestShrink}>{labels.shrinkTracks.button}</Button>
                         </FlexBlock>
                     )}
                 </Flex>
-                {canShrinkTracks && (
-                    <p className="costered-blocks-gridarea__noticeHint">{LABELS.tokenGrid.shrinkTracksNote}</p>
-                )}
             </Notice>
+            {canShrinkTracks && (
+                <Notice status="warning" isDismissible={false} className="costered-blocks--grid-area-notice--shrink-warning">
+                    <span>{labels.shrinkTracks.warning}</span>
+                </Notice>
+            )}
             <ConfirmDialog
                 isOpen={isConfirmOpen}
                 onConfirm={() => { performShrink(); setConfirmOpen(false); }}
                 onCancel={() => setConfirmOpen(false)}
-                confirmButtonText={LABELS.tokenGrid.shrinkTracksConfirm}
-                cancelButtonText={LABELS.tokenGrid.shrinkTracksCancel}>
-                <Heading>{LABELS.tokenGrid.shrinkTracksHeading}</Heading>
-                <p>{LABELS.tokenGrid.shrinkTracksDescription}</p>
+                confirmButtonText={labels.shrinkTracks.confirm}
+                cancelButtonText={labels.shrinkTracks.cancel}>
+                <Heading>{labels.shrinkTracks.heading}</Heading>
+                <p>{labels.shrinkTracks.description}</p>
             </ConfirmDialog>
-        </div>
+        </Flex>
     );
 }

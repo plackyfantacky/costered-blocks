@@ -64,13 +64,61 @@
     },
     "gridControls": {
         "panelTitle": "Grid Controls",
-        "gridTemplatePanel": "Grid Template",
-        "gridTemplatePanelSimple": "Simple",
-        "gridTemplatePanelTracks": "Tracks",
-        "gapPanel": "Gap",
-        "gridTemplateAreasPanel": "Grid Template Areas",
-        "gridTemplateAreasEditLarge": "Edit in larger view",
-        "gridTemplateAreasModal": "Edit Grid Template Areas"
+        "templateMode": "Template Mode",
+        "simplePanel": {
+            "title": "Simple",
+            "description": "In Simple mode, you can define the number of columns. All columns equally divide the total available width.",
+            "columns": "Columns",
+            "columnsClear": "Clear Columns",
+            "columnSpan": "Use %1$s as column width",
+            "columnUnit": "Unit",
+            "rows": "Rows",
+            "rowsClear": "Clear Rows",
+            "rowSpan": "Use %1$s as row height",
+            "rowUnit": "Unit"
+        },
+        "tracksPanel": {
+            "title": "Tracks",
+            "description": "In Tracks mode, you can define the exact track sizes using any valid CSS Grid value.",
+            "columns": {
+                "label": "Columns",
+                "clear": "Clear Columns",
+                "size": "Column Sizes",
+                "addPlaceholder": "Add track or [line names]",
+                "addToken": "Add column size",
+                "addLabel": "Add [line name]"
+            },
+            "rows": {
+                "label": "Rows",
+                "clear": "Clear Rows",
+                "size": "Row Sizes",
+                "addPlaceholder": "Add track or [line names]",
+                "addToken": "Add row size",
+                "addLabel": "Add [line name]"
+            }
+        },
+        "gapPanel": {
+            "title": "Gap"
+        },
+        "areasPanel": {
+            "title": "Grid Template Areas",
+            "sizeHint": "Grid Size: %1$d columns x %2$d rows",
+            "editLarge": "Edit in larger view",
+            "modalTitle": "Edit Grid Template Areas",
+            "noticePanel": {
+                "mismatchText": "Templates areas (%1$dx%2$d) do not match current tracks (%3$dx%4$d)",
+                "resizeToTracks": "Resize areas to match tracks",
+                "growTracksToAreas": "Grow tracks to match areas",
+                "shrinkTracks": {
+                    "button": "Shrink tracks to areas",
+                    "warning": "Shrinking tracks may remove named lines please review afterwards.",
+                    "confirm": "Shrink tracks",
+                    "cancel": "Cancel",
+                    "heading": "Remove named lines?",
+                    "description": "Shrinking tracks will drop line names (e.g. [sidebar-start]). This can change template references. Continue?"
+                }
+            }
+        }
     },
     "gridItemsControls": {
         "panelTitle": "Grid Item Controls",
@@ -204,10 +252,12 @@
         "label": "Grid Axis",
         "horizontal": "Horizontal",
         "vertical": "Vertical",
-        "pipTitleNoValue": "No value set",
-        "pipTitleValueHere": "Value matches this panel",
-        "pipTitleValueElsewhere": "Value set in %s panel",
-        "pipTitleValueRaw": "Value set (unrecognised format)",
+        "pip": {
+            "noValue": "No value set",
+            "valueHere": "Value matches this panel",
+            "valueElsewhere": "Value set in %s panel",
+            "valueRaw": "Value set (unrecognised format)"
+        },
         "clearRows": "Clear Rows",
         "clearColumns": "Clear Columns"
     },
@@ -222,19 +272,9 @@
         "moveRight": "Move right"
     },
     "tokenGrid": {
-        "title": "Areas",
+        "title": "Cells",
         "clear": "Clear",
-        "sizeHint": "%1$d columns x %2$d rows",
-        "mismatchText": "Templates areas (%1$dx%2$d) do not match current tracks (%3$dx%4$d)",
-        "resizeToTracks": "Resize areas to match tracks",
-        "growTracksToAreas": "Grow tracks to match areas",
-        "shrinkTracks": "Shrink tracks to areas",
-        "shrinkTracksWarning": "Shrinking may remove named lines. Continue?",
-        "shrinkTracksNote": "Shrinking tracks may remove named lines; please review afterwards.",
-        "shrinkTracksConfirm": "Shrink tracks",
-        "shrinkTracksCancel": "Cancel",
-        "shrinkTracksHeading": "Remove named lines?",
-        "shrinkTracksDescription": "Shrinking tracks will drop line names (e.g. [sidebar-start]). This can change template references. Continue?",
+        "sizeHint": "Cells: %1$d columns x %2$d rows",
         "tokenExpand": "Edit cell",
         "tokenCollapse": "Close editor",
         "tokenRemove": "Clear cell",
@@ -247,7 +287,7 @@
     },
     "tokenEditor": {
         "add": "Add",
-        "addPlaceholder": "Add token",
+        "addToken": "Add token",
         "addLineNames": "Add line names",
         "listAriaLabel": "List of tokens",
         "moveLeft": "Move left",
@@ -255,5 +295,18 @@
         "remove": "Remove",
         "expand": "Edit token",
         "collapse": "Close editor"
+    },
+    "tokenGridNotice": {
+        "mismatchText": "Cells (%1$dx%2$d) do not match current dimensions (%3$dx%4$d)",
+        "resizeToTracks": "Resize cells to match dimensions",
+        "growTracksToAreas": "Grow dimensions to match cells",
+        "shrinkTracks": {
+            "button": "Shrink dimensions to cells",
+            "warning": "Shrinking dimensions may remove columns/rows. Please review afterwards.",
+            "confirm": "Shrink dimensions",
+            "cancel": "Cancel",
+            "heading": "Remove rows/columns?",
+            "description": "Shrinking dimensions will drop rows/columns. Continue?"
+        }
     }
 }

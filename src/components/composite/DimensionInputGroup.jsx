@@ -68,7 +68,7 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
     );
 
     return (
-        <Flex direction={'column'} gap={4} style={{ marginBottom: '1rem' }}>
+        <Flex direction={'column'} gap={4} className={"costered-blocks--dimension-input-group"}>
             <FlexBlock>
                 <Flex gap={2} wrap={false} align="stretch" justify="space-between">
                     <Input

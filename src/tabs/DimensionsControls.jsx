@@ -28,7 +28,7 @@ const DimensionControls = () => {
     const [maxDimPanelOpen, setMaxDimPanelOpen] = useUIPreferences(maxDimensionsKey, false);
 
     return (
-        <Panel>
+        <Panel className="costered-blocks--tab--dimensions-controls">
             <PanelBody title={LABELS.dimensionControls.panelTitle} initialOpen={dimPanelOpen} onToggle={setDimPanelOpen}>
                 <DimensionInputGroup
                     attributes={attributes}

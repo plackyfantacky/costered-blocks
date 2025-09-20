@@ -78,7 +78,7 @@ export default function SidebarTabs() {
     return (
         <TabPanel
             key={signature}
-            className="costered-blocks-sidebar-tabs"
+            className="costered-blocks--tab-panel-outer"
             tabs={panelTabs}
             onSelect={setActiveName}
             initialTabName={activeName}

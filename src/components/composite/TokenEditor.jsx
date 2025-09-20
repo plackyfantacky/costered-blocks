@@ -2,23 +2,12 @@ import { useState, useCallback, useMemo } from '@wordpress/element';
 import { TextControl, Button, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { LABELS } from '@labels';
+import { LABELS as DEFAULT_LABELS  } from '@labels';
 import Token from '@components/composite/Token';
 
 export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, allowLineNames = true }) {
 
-    const defaultLabels = useMemo(() => ({
-        add: LABELS.tokenEditor.add,
-        addPlaceholder: LABELS.tokenEditor.addPlaceholder,
-        addLineNames: LABELS.tokenEditor.addLineNames,
-        listAriaLabel: LABELS.tokenEditor.listAriaLabel,
-        moveLeft: LABELS.tokenEditor.moveLeft,
-        moveRight: LABELS.tokenEditor.moveRight,
-        remove: LABELS.tokenEditor.remove,
-        expand: LABELS.tokenEditor.expand,
-        collapse: LABELS.tokenEditor.collapse,
-    }), []);
-    const labelData = useMemo(() => ({ ...defaultLabels, ...(labels || {}) }), [defaultLabels, labels]);
+    const tokenEditorLabels = useMemo(() => ({ ...DEFAULT_LABELS.tokenEditor, ...labels }), [labels]);
 
     const [draft, setDraft] = useState('');
     const [expandedIndex, setExpandedIndex] = useState(null); // number | null
@@ -58,8 +47,8 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
     }, [onMove]);
 
     return (
-        <div className="costered-token-editor" role="list" aria-label={labelData.listAriaLabel}>
-            <div className="costered-token-list">
+        <div className="costered-blocks--token-editor" role="list" aria-label={tokenEditorLabels.listAriaLabel}>
+            <div className="costered-blocks--token-editor--list">
                 {tokens.map((tokenValue, index) => (
                     <Token
                         key={`token-${index}`}
@@ -71,13 +60,13 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
                         onChange={handleEdit}
                         onMoveLeft={(i) => handleMove(i, -1)}
                         onMoveRight={(i) => handleMove(i, +1)}
-                        labels={labelData}
+                        labels={tokenEditorLabels}
                     />
                 ))}
             </div>
-            <div className="costered-token-add">
+            <div className="costered-blocks--token-editor--add">
                 <TextControl
-                    placeholder={labelData.addPlaceholder}
+                    placeholder={tokenEditorLabels.addPlaceholder}
                     value={draft}
                     onChange={setDraft}
                     onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
@@ -86,13 +75,13 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
                 />
 
                 {allowLineNames ? (
-                    <Flex className="costered-token-add-options" gap={0} align="center" style={{ width: 'fit-content' }}>
-                        <Button icon="editor-code" onClick={add} label={labelData.add} />
-                        <Button icon="tag" onClick={addNames} label={labelData.addLineNames} />
+                    <Flex className="costered-blocks--token-editor--add-options" gap={0} align="center">
+                        <Button icon="editor-code" onClick={add} label={tokenEditorLabels.addToken} />
+                        <Button icon="tag" onClick={addNames} label={tokenEditorLabels.addLabel} />
                     </Flex>
                 ) : 
                 (
-                    <Button variant="secondary" onClick={add}>{labelData.add}</Button>
+                    <Button variant="secondary" onClick={add}>{tokenEditorLabels.addToken}</Button>
                 )}
             </div>
         </div>

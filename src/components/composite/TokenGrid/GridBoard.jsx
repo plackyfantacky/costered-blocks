@@ -63,15 +63,15 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
     const removeRow = useCallback(() => resize(columnData, Math.max(1, rowData - 1)), [resize, columnData, rowData]);
 
     return (
-        <div className="costered-blocks-gridarea" ref={gridRef} style={{ gridTemplateColumns: `80px repeat(${safeColumnData}, minmax(110px, max-content))` }}>
+        <div className="costered-blocks--token-grid--area" ref={gridRef}>
             {/* header row: column controls */}
-            <div className="costered-blocks-gridarea__row costered-blocks-gridarea__row--head">
-                <div className="costered-blocks-gridarea__cell costered-blocks-gridarea__cell--corner" /> { /* corner cell. usually empty */}
+            <div className="costered-blocks--token-grid--row costered-blocks--token-grid--row-head">
+                <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-corner" /> { /* corner cell. usually empty */}
                 {Array.from({ length: safeColumnData }).map((_, x) => (
-                    <div className="costered-blocks-gridarea__cell costered-blocks-gridarea__cell--head" key={`col-${x}`}>
+                    <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-head" key={`col-${x}`}>
                         <div
                             key={`header-col-${x}`}
-                            className="costered-blocks-gridarea__headControls"
+                            className="costered-blocks--token-grid--controls"
                         >
                             <Button
                                 onClick={removeColumn}
@@ -91,10 +91,10 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
             </div>
             {/* body */}
             {matrix.map((row, y) => (
-                <div key={`row-${y}`} className="costered-blocks-gridarea__row">
+                <div key={`row-${y}`} className="costered-blocks--token-grid--row">
                     {/* row controls (left gutter) */}
-                    <div className="costered-blocks-gridarea__cell costered-blocks-gridarea__cell--head">
-                        <div className="costered-blocks-gridarea__headControls">
+                    <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-head">
+                        <div className="costered-blocks--token-grid--controls">
                             <Button
                                 onClick={removeRow}
                                 disabled={areaRows <= 1}
@@ -115,7 +115,7 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
                         const index = indexFromXY(x, y);
                         const inputValue = (cellValue === emptyToken) ? '' : cellValue;
                         return (
-                            <div key={`cell-${x}-${y}`} className="costered-blocks-gridarea__cell">
+                            <div key={`cell-${x}-${y}`} className="costered-blocks--token-grid--cell">
                                 <Token
                                     index={index}
                                     value={inputValue}

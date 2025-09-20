@@ -39,9 +39,9 @@ const DisplayControlsInner = ({clientId, attributes }) => {
     const setVisibility = useCallback((v) => set('visibility', v), [set]);
 
     return (
-        <Panel>
-            <PanelBody title={LABELS.displayControls.panelTitle} initialOpen={true} style={{ gap: '10rem' }}>
-                <Flex direction="column" gap={4} style={{ marginBottom: '1rem' }}>
+        <Panel className="costered-blocks--tab--display-controls">
+            <PanelBody title={LABELS.displayControls.panelTitle} initialOpen={true}>
+                <Flex direction="column" gap={4} className="costered-blocks--display-controls--inner">
                     <FlexItem>
                         <SelectControl
                             label={LABELS.displayControls.displayLabel}
@@ -58,7 +58,7 @@ const DisplayControlsInner = ({clientId, attributes }) => {
                     </FlexItem>
                     <FlexItem>
                         <SelectControl
-                            label={LABELS.visibilityLabel}
+                            label={LABELS.displayControls.visibilityLabel}
                             value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
                             onChange={setVisibility}
                         >

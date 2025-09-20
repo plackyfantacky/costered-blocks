@@ -17,10 +17,10 @@ const SpacingControls = () => {
     const { attributes, name } = selectedBlock;
 
     return (
-        <Panel>
-            <PanelBody title={LABELS.spacingControls.panelTitle} initialOpen={true}>
+        <Panel className="costered-blocks--tab--spacing-controls">
+            <PanelBody title={LABELS.spacingControls.panelTitle} className="costered-blocks--spacing-controls--inner" initialOpen={true}>
                 <Flex direction="column" gap={4}>
-                    <FlexItem>
+                    <FlexItem className="costered-blocks--spacing-controls--margin">
                         <BaseControl label={LABELS.spacingControls.marginLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="margin"
@@ -31,7 +31,7 @@ const SpacingControls = () => {
                             />
                         </BaseControl>
                     </FlexItem>
-                    <FlexItem>
+                    <FlexItem className="costered-blocks--spacing-controls--padding">
                         <BaseControl label={LABELS.spacingControls.paddingLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="padding"
