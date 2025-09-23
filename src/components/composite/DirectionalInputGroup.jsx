@@ -12,22 +12,8 @@ const GRID_MAP = {
     Top: { col: '4 / span 4', row: '1' },
     Left: { col: '1 / span 4', row: '2' },
     Right: { col: '7 / span 4', row: '2' },
-    Bottom: { col: '4 / span 4', row: ' 3' },
+    Bottom: { col: '4 / span 4', row: '3' },
 };
-
-function Rectangle() {
-    return (
-        <div style={{
-            position: 'absolute',
-            top: '43px',
-            left: '45px',
-            right: '45px',
-            bottom: '58px',
-            border: '1px solid #ccc',
-            zIndex: 1,
-        }} />
-    );
-}
 
 const FieldSlot = memo(function FieldSlot({ area, children }) {
     const grid = GRID_MAP[area];
@@ -38,40 +24,50 @@ const FieldSlot = memo(function FieldSlot({ area, children }) {
     );
 });
 
-function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttributes, blockName = null }) {
-    const { withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
-    const ns = useMemo(() => withPrefix(prefix), [withPrefix, prefix]);
+function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttributes, blockName = null, prefixed }) {
+    //prefixed by default so marginTop, paddingTop, etc are used. if false, just top, left for positioning, etc.
+    
+    const { set, withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
+    const isPrefixed = typeof prefixed === 'boolean' ? prefixed : Boolean(prefix);
+    
+    const ns = useMemo(
+        () => (isPrefixed ? withPrefix(prefix) : null),
+        [withPrefix, prefix, isPrefixed]
+    );
+
+    const resolveKey = useCallback(
+        (direction) => isPrefixed ? `${prefix}${direction}` : direction.toLowerCase(),
+        [isPrefixed, prefix]
+    );
 
     const values = useMemo(() => ({
-        Top: attributes?.[`${prefix}Top`] || '',
-        Left: attributes?.[`${prefix}Left`] || '',
-        Right: attributes?.[`${prefix}Right`] || '',
-        Bottom: attributes?.[`${prefix}Bottom`] || '',
-    }), [attributes, prefix]);
+        Top: attributes?.[resolveKey('Top')] ?? '',
+        Left: attributes?.[resolveKey('Left')] ?? '',
+        Right: attributes?.[resolveKey('Right')] ?? '',
+        Bottom: attributes?.[resolveKey('Bottom')] ?? '',
+    }), [attributes, resolveKey]);
 
     const safeBlockName = useSafeBlockName(blockName, clientId);
 
-    const modeKey = `${prefix}Mode`;
+    // Preference key: `${prefix}Mode` when prefixed, else shared `positionCoordinatesMode`
+    const modeKey = isPrefixed ? `${prefix}Mode` : `positionCoordinatesMode`;
     const prefKey = useScopedKey(modeKey, { blockName: safeBlockName });
     const [mode, setMode] = useUIPreferences(prefKey, 'unit');
-
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
 
     const onChange = useCallback(
-        (direction) => (next) => ns.set(direction, next),
-        [ns]
+        (direction) => (next) => {
+            if (ns) {
+                ns.set(direction, next);
+            } else {
+                set(resolveKey(direction), next);
+            }
+        }, [ns, set, resolveKey]
     );
 
     return (
-        <Grid
-            columns={10}
-            templateRows={"repeat(4, fit-content)"}
-            gap={2}
-            style={{ marginBottom: '1rem', position: 'relative' }}
-            __nextHasNoMarginBottom
-        >
-            <Rectangle />
-
+        <Grid className="costered-blocks--directional-input-group" columns={10} templateRows={"repeat(4, fit-content)"} gap={2} __nextHasNoMarginBottom>
+            <div className="costered-blocks--directional-input-group--rectangle" /> {/* Background rectangle */}
             <FieldSlot area="Top">
                 <Input
                     value={values.Top}
@@ -100,8 +96,8 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttrib
                     label={LABELS.directionalInputGroup.bottom}
                 />
             </FieldSlot>
-            
-            <div style={{ gridColumn: '1 / span 10', gridRow: '4' }}>
+
+            <div className="costered-blocks--directional-input-group--toggle">
                 <ToggleControl
                     label={LABELS.directionalInputGroup.useCustom}
                     checked={mode === 'text'}
@@ -113,16 +109,22 @@ function DirectionalInputGroup({ prefix, attributes, clientId, updateBlockAttrib
     );
 }
 
-export default memo(DirectionalInputGroup, (prev, next) => {
-    if (prev.clientId !== next.clientId) return false;
-    if (prev.prefix !== next.prefix) return false;
-    if (prev.updateBlockAttributes !== next.updateBlockAttributes) return false;
+export default memo(DirectionalInputGroup, (previous, next) => {
+    if (previous.clientId !== next.clientId) return false;
+    if (previous.updateBlockAttributes !== next.updateBlockAttributes) return false;
+    if (previous.prefix !== next.prefix) return false;
 
-    const p = prev.prefix;
-    const keys = [`${p}Mode`, `${p}Top`, `${p}Left`, `${p}Right`, `${p}Bottom`];
+    const prevPref = typeof previous.prefixed === 'boolean' ? previous.prefixed : Boolean(next.prefixed);
+    const nextPref = typeof next.prefixed === 'boolean' ? next.prefixed : Boolean(previous.prefixed);
+    if (prevPref !== nextPref) return false;
 
-    for (const k of keys) {
-        if (prev.attributes?.[k] !== next.attributes?.[k]) return false;
+    const p = previous.prefix;
+    const keys = prevPref
+        ? [`${p}Mode`, `${p}Top`, `${p}Left`, `${p}Right`, `${p}Bottom`]
+        : [`positionCoordinatesMode`, `top`, `left`, `right`, `bottom`];
+
+    for (const key of keys) {
+        if (previous.attributes?.[key] !== next.attributes?.[key]) return false;
     }
     return true;
 });

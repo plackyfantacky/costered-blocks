@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
@@ -29,7 +28,7 @@ const DimensionControls = () => {
 
     return (
         <Panel className="costered-blocks--tab--dimensions-controls">
-            <PanelBody title={LABELS.dimensionControls.panelTitle} initialOpen={dimPanelOpen} onToggle={setDimPanelOpen}>
+            <PanelBody title={LABELS.dimensionControls.panelTitle} initialOpen={dimPanelOpen} onToggle={setDimPanelOpen} className="costered-blocks--dimensions-controls--dimensions-inner">
                 <DimensionInputGroup
                     attributes={attributes}
                     clientId={clientId}
@@ -38,7 +37,7 @@ const DimensionControls = () => {
                     labels={LABELS.dimensionControls.dimensions}
                 />
             </PanelBody>
-            <PanelBody title={LABELS.dimensionControls.minPanel} initialOpen={minDimPanelOpen} onToggle={setMinDimPanelOpen}>
+            <PanelBody title={LABELS.dimensionControls.minPanel} initialOpen={minDimPanelOpen} onToggle={setMinDimPanelOpen} className="costered-blocks--dimensions-controls--min-inner">
                 <DimensionInputGroup
                     groupKey="min"
                     attributes={attributes}
@@ -48,7 +47,7 @@ const DimensionControls = () => {
                     labels={LABELS.dimensionControls.minDimensions}
                 />
             </PanelBody>
-            <PanelBody title={LABELS.dimensionControls.maxPanel} initialOpen={maxDimPanelOpen} onToggle={setMaxDimPanelOpen}>
+            <PanelBody title={LABELS.dimensionControls.maxPanel} initialOpen={maxDimPanelOpen} onToggle={setMaxDimPanelOpen} className="costered-blocks--dimensions-controls--max-inner">
                 <DimensionInputGroup
                     groupKey="max"
                     attributes={attributes}

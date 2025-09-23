@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 

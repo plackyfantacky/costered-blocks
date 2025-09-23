@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import { TextControl, Button, Flex } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 import { LABELS as DEFAULT_LABELS  } from '@labels';
 import Token from '@components/composite/Token';

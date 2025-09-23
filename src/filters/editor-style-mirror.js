@@ -119,6 +119,13 @@ function buildMirror(attributes = {}) {
         hasMr = true;
     }
 
+    // zIndex
+    if (hasNonEmptyString(attributes.zIndex)) {
+        const value = Number(attributes.zIndex);
+        style.zIndex = value;
+        any = true;
+    }
+
     // grid shorthands
     const area = String(attributes[PLACEMENT.gridArea.attr] || '').trim();
     if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[PLACEMENT.gridArea.attr] = area; any = true; }
@@ -136,6 +143,7 @@ function buildMirror(attributes = {}) {
         if (
             key === 'marginTop' || key === 'marginBottom' ||
             key === 'marginLeft' || key === 'marginRight' ||
+            key === 'zIndex' || key === 'z-index' ||
             key === PLACEMENT.gridArea.attr || key === PLACEMENT.gridColumn.attr || key === PLACEMENT.gridRow.attr
         ) continue;
         const value = attributes[key];

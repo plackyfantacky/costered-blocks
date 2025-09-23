@@ -32,12 +32,6 @@ const FlexBoxControls = () => {
     const flexBoxKey = useScopedKey('flexBoxPanelOpen', { blockName: safeBlockName });
     const [flexBoxPanelOpen, setFlexBoxPanelOpen] = useUIPreferences(flexBoxKey, true);
 
-    const alignmentKey = useScopedKey('flexBoxAlignmentPanelOpen', { blockName: safeBlockName });
-    const [alignmentPanelOpen, setAlignmentPanelOpen] = useUIPreferences(alignmentKey, false);
-
-    const gapKey = useScopedKey('flexBoxGapPanelOpen', { blockName: safeBlockName });
-    const [gapPanelOpen, setGapPanelOpen] = useUIPreferences(gapKey, false);
-
     // Normaliser: respond to 'display' and 'flexDirection' attribute changes
     const prevDisplayRef = useRef(attributes?.display ?? '');
     useEffect(() => {
@@ -65,7 +59,7 @@ const FlexBoxControls = () => {
     return (
         <Panel className="costered-blocks--tab--flexbox-controls">
             <PanelBody title={LABELS.flexBoxControls.panelTitle} className="costered-blocks--flexbox-controls--inner" initialOpen={flexBoxPanelOpen} onToggle={setFlexBoxPanelOpen}>
-                <Flex direction="column">
+                <Flex gap={4} direction="column">
                     <FlexItem>
                         { /* RTL aware */}
                         <FlexDirectionControl
@@ -84,10 +78,6 @@ const FlexBoxControls = () => {
                             <CustomToggleGroup.CombinedOption value="wrap-reverse" icon={<FlexWrapReverse />} label={LABELS.flexBoxControls.flexWrapReverse} />
                         </CustomToggleGroup>
                     </FlexItem>
-                </Flex>
-            </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.alignmentPanel} className="costered-blocks--flexbox-controls--alignment" initialOpen={alignmentPanelOpen} onToggle={setAlignmentPanelOpen}>
-                <Flex direction="column">
                     <FlexItem>
                         { /* RTL aware */ }
                         <JustifyControl
@@ -102,10 +92,6 @@ const FlexBoxControls = () => {
                             setAlignItems={setAlignItems}
                         />
                     </FlexItem>
-                </Flex>
-            </PanelBody>
-            <PanelBody title={LABELS.flexBoxControls.gapPanel} className="costered-blocks--flexbox-controls--gap" initialOpen={gapPanelOpen} onToggle={setGapPanelOpen}>
-                <Flex direction="column">
                     <FlexItem>
                         <GapControls
                             attributes={attributes}

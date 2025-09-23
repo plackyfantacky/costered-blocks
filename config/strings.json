@@ -9,17 +9,21 @@
     "displayControls": {
         "panelTitle": "Display Controls",
         "displayLabel": "Display",
-        "unset": "unset / initial",
-        "displayBlock": "Block",
-        "displayInline": "Inline",
-        "displayFlex": "Flex",
-        "displayGrid": "Grid",
-        "displayNone": "None",
+        "display": {
+            "unset": "unset / initial",
+            "block": "Block",
+            "inline": "Inline",
+            "flex": "Flex",
+            "grid": "Grid",
+            "none": "None"
+        },
         "visibilityLabel": "Visibility",
-        "visibilityUnset": "unset / initial",
-        "visibilityVisible": "Visible",
-        "visibilityHidden": "Hidden",
-        "visibilityCollapse": "Collapse"
+        "visibility": {
+            "unset": "unset / initial",
+            "visible": "Visible",
+            "hidden": "Hidden",
+            "collapse": "Collapse"
+        }
     },
     "dimensionControls": {
         "panelTitle": "Dimension Controls",
@@ -193,6 +197,34 @@
         "orderPanel": {
             "title": "Order",
             "label": "Order"
+        }
+    },
+    "positioningControls": {
+        "panelTitle": "Positioning Controls",
+        "position": {
+            "label": "Position",
+            "help": "Controls the positioning of the element.",
+            "values": {
+                "unset": "unset / initial",
+                "static": "Static",
+                "relative": "Relative",
+                "absolute": "Absolute",
+                "fixed": "Fixed",
+                "sticky": "Sticky"
+            }
+        },
+        "coordinates": {
+            "label": "Coordinates",
+            "help": "Set the coordinates for the element. Works with relative, absolute, fixed, and sticky positioning.",
+            "top": "Top",
+            "right": "Right",
+            "bottom": "Bottom",
+            "left": "Left",
+            "useCustom": "Use custom values (e.g auto, calc)"
+        },
+        "zIndex": {
+            "label": "Z-Index",
+            "help": "Controls the stack order of the element. Elements with a higher z-index cover those with a lower one."
         }
     },
     "flexDirection": {

@@ -1,3 +1,12 @@
+/* :root {
+    --selected-top: 0;
+    --selected-left: 0;
+    --selected-bottom: 0;
+    --selected-right: 0;
+    --selected-width: 0;
+    --selected-height: 0;
+} */
+
 .costered-blocks--sidebar {
     /* Override default notice width */
     .components-notice__content {
@@ -32,37 +41,34 @@
     }
 
     .costered-blocks--sidebar-body {
-
         .costered-blocks--tab-panel-outer {
-            
             .costered-blocks--tab--display-controls {
-
                 .costered-blocks--display-controls--inner {
                     margin-bottom: 1rem;
                 }
             }
-    
+
             /* .costered-blocks--tab--flexbox-controls {
                 .costered-blocks--flexbox-controls--inner {}
                 .costered-blocks--flexbox-controls--alignment {}
                 .costered-blocks--flexbox-controls--gap {}
             } */
-            
+
             /* .costered-blocks--tab--dimensions-controls {} */
-            
+
             /* .costered-blocks--tab--flexitem-controls {
                 .costered-blocks--flexitem-controls--inner {}
                 .costered-blocks--flexitem-controls--order {}
                 .costered-blocks--flexitem-controls--alignself {}
             } */
-    
+
             /* .costered-blocks--tab--grid-controls {
                 .costered-blocks--grid-controls--template-axis {}
                 .costered-blocks--grid-controls--gap {}
                 .costered-blocks--grid-controls--template-areas {}
                 .costered-blocks--grid-control--modal {}
             } */
-    
+
             /* .costered-blocks--griditem-controls-tab {
                 .costered-blocks--griditem-controls--inner {}
                 .costered-blocks--griditem-controls-alignment {
@@ -94,9 +100,96 @@
     }
 }
 
+/* CustomToggleGrid */
+.costered-blocks--custom-toggle-grid {
+    --selected-top: 0;
+    --selected-left: 0;
+    --selected-bottom: 0;
+    --selected-right: 0;
+    --selected-width: 0;
+    --selected-height: 0;
+
+    .costered-blocks--custom-toggle-grid--control {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        
+        .costered-blocks--custom-toggle-grid--grid {
+            position: relative;
+            display: grid;
+            gap: 0.5rem;
+
+            grid-template-columns: var(--cb-grid-template-columns, repeat(3, minmax(0, 1fr)));
+    
+            .costered-blocks--custom-toggle-grid--tile {
+                width: 100%;
+                outline:0 none;
+                box-sizing: border-box;
+                justify-content: center;
+                padding: 0;
+                aspect-ratio: 1 / 1;
+                border-radius:4px;
+                border: 1px solid transparent;
+    
+                & > div {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.25rem;
+                }
+
+                &:focus,
+                &:focus-within,
+                &:focus-visible {
+                    outline:0 none;
+                    box-shadow:none;
+                }
+            }
+        }
+        
+        &::before {
+            content: "";
+            display:block;
+            position: absolute;
+            top: calc(var(--selected-top, 0) * 1px);
+            border-radius: 4px;
+            box-shadow:none;
+            pointer-events: none;
+            transition:
+            left 120ms ease,
+            top 120ms ease,
+            width 120ms ease,
+            height 120ms ease;
+        }
+    }
+}
+
 /* DimensionInputGroup */
 .costered-blocks--dimension-input-group {
     margin-bottom: 1rem;
+}
+
+/* DirectionalInputGroup */
+.costered-blocks--directional-input-group {
+    margin-bottom: 1rem;
+    position: relative;
+
+    .costered-blocks--directional-input-group--rectangle {
+        position: absolute;
+        top: 43px;
+        left: 45px;
+        right: 45px;
+        bottom: 58px;
+        border: 1px solid #CCC;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .costered-blocks--directional-input-group--toggle {
+        grid-column: 1 / span 10;
+        grid-row: 4;
+    }
 }
 
 /* GridAxisAside */
@@ -161,11 +254,10 @@
 
 /* TokenGrid */
 .costered-blocks--token-grid-component {
-
     .costered-blocks--token-grid--area {
         grid-template-columns: 80px;
         grid-auto-columns: minmax(132px, max-content);
-        grid-auto-flow:column;
+        grid-auto-flow: column;
         border-top: 1px solid var(--wp--custom--token-border, #dcdcde);
         border-left: 1px solid var(--wp--custom--token-border, #dcdcde);
         display: grid;

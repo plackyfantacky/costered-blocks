@@ -49,8 +49,9 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
 
     return (
         <Panel className="costered-blocks--tab--grid-controls">
-            <PanelBody title={LABELS.gridControls.panelTitle} className="costered-blocks--grid-controls--template-axis" initialOpen={gridTemplatePanelOpen} onToggle={setGridTemplatePanelOpen}>
+            <PanelBody title={LABELS.gridControls.panelTitle} className="costered-blocks--grid-controls--template-axis-inner" initialOpen={gridTemplatePanelOpen} onToggle={setGridTemplatePanelOpen}>
                 <PanelToggle
+                    className="costered-blocks--grid-controls--template-axis"
                     value={activeKey}
                     onChange={setActiveKey}
                     label={LABELS.gridControls.templateMode}
@@ -65,8 +66,8 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
                     <PanelToggle.TextOption value="tracks" label={LABELS.gridControls.tracksPanel.title} />
                 </PanelToggle>
             </PanelBody>
-            <PanelBody title={LABELS.gridControls.gapPanel.title} className="costered-blocks--grid-controls--gap" initialOpen={gridGapPanelOpen} onToggle={setGridGapPanelOpen}>
-                <Flex direction="column" expanded={true}>
+            <PanelBody title={LABELS.gridControls.gapPanel.title} className="costered-blocks--grid-controls--gap-inner" initialOpen={gridGapPanelOpen} onToggle={setGridGapPanelOpen}>
+                <Flex direction="column" expanded={true} className="costered-blocks--grid-controls--gap">
                     <FlexBlock>
                         <GapControls
                             attributes={attributes}
@@ -77,8 +78,8 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridControls.areasPanel.title} className="costered-blocks--grid-controls--template-areas" initialOpen={gridTemplateAreasPanelOpen} onToggle={setGridTemplateAreasPanelOpen}>
-                <Flex direction="column" gap={4}>
+            <PanelBody title={LABELS.gridControls.areasPanel.title} className="costered-blocks--grid-controls--template-areas-inner" initialOpen={gridTemplateAreasPanelOpen} onToggle={setGridTemplateAreasPanelOpen}>
+                <Flex direction="column" gap={4} className="costered-blocks--grid-controls--template-areas">
                     <TokenGrid
                         clientId={clientId}
                         labels={{

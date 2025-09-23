@@ -42,7 +42,7 @@ add_action('enqueue_block_editor_assets', function () {
         );
     }
 
-    wp_enqueue_style('costered--blocks-styles-plugin', COSTERED_BLOCKS_URL . 'css/plugin.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/resets.css'));
+    wp_enqueue_style('costered--blocks-styles-plugin', COSTERED_BLOCKS_URL . 'css/plugin.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/plugin.css'));
     wp_enqueue_style('costered--blocks-styles-overrides', COSTERED_BLOCKS_URL . 'css/overrides.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/overrides.css'));
 });
 

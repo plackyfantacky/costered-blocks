@@ -28,6 +28,7 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
 function TextOption({ value, label, disabled }) {
     return (
         <ToggleGroupControlOption
+            className={`costered-blocks--custom-toggle-group--text-option`}
             value={value}
             label={label}
             disabled={disabled}
@@ -38,6 +39,7 @@ function TextOption({ value, label, disabled }) {
 function IconOption({ value, icon, label, showTooltip = true, disabled }) {
     return (
         <ToggleGroupControlOptionIcon
+            className={`costered-blocks--custom-toggle-group--icon-option`}
             value={value}
             icon={icon}
             aria-label={label}
@@ -51,6 +53,7 @@ function IconOption({ value, icon, label, showTooltip = true, disabled }) {
 function CombinedOption({ value, icon, label, disabled }) {
     return (
         <ToggleGroupControlOption
+            className={`costered-blocks--custom-toggle-group--combined-option`}
             value={value}
             aria-label={label}
             label={
@@ -59,6 +62,18 @@ function CombinedOption({ value, icon, label, disabled }) {
                     <FlexItem>{label}</FlexItem>
                 </Flex>
             }
+            disabled={disabled}
+        />
+    );
+}
+
+function CompositeOption({ value, children, label, disabled }) {
+    return (
+        <ToggleGroupControlOption
+            className={`costered-blocks--custom-toggle-group--composite-option`}
+            value={value}
+            aria-label={label}
+            label={children} // label accepts React nodes.
             disabled={disabled}
         />
     );

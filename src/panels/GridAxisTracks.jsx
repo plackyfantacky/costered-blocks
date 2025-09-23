@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+import { Flex, FlexBlock } from '@wordpress/components';
 
 import { useAttrSetter, useGridModel } from '@hooks';
 import { normaliseTemplate } from '@utils/gridUtils';

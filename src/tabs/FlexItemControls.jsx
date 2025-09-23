@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
@@ -32,9 +31,9 @@ const FlexItemControls = () => {
 
     return (
         <Panel className="costered-blocks--tab--flexitem-controls">
-            <PanelBody title={LABELS.flexItemControls.panelTitle} initialOpen={true}>
+            <PanelBody title={LABELS.flexItemControls.panelTitle} initialOpen={true} className="costered-blocks--flexitem-controls-inner">
                 <Flex expanded={true} gap={4} direction="column">
-                    <FlexBlock className="costered-blocks--flexitem-controls-inner">
+                    <FlexBlock className="costered-blocks--flexitem-controls--flex">
                         <Flex expanded={true} gap={0} direction="row">
                             <FlexItem>
                                 <NumberControlInput

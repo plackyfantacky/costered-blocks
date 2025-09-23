@@ -14,6 +14,7 @@ export const flexProps = pickByGroup('flex');
 export const flexItemProps = pickByGroup('flex-item');
 export const gridProps = pickByGroup('grid');
 export const gridItemsProps = pickByGroup('grid-item');
+export const positionProps = pickByGroup('position');
 export const sharedProps = pickByGroup('shared');
 
 export const COSTERED_LAYOUT_SCHEMA = {
@@ -25,6 +26,7 @@ export const COSTERED_LAYOUT_SCHEMA = {
     ...flexItemProps,
     ...gridProps,
     ...gridItemsProps,
+    ...positionProps,
     ...sharedProps,
 }
 
@@ -41,6 +43,13 @@ export const BLOCKS_WITH_EDITOR_STYLES = [
     'core/pullquote',
     'core/table'
 ];
+
+export const UNITLESS = new Set([
+    'order',
+    'zIndex',
+    'flexGrow',
+    'flexShrink'
+]);
 
 export const DEFAULT_GRID_UNIT = '1fr';
 
@@ -62,6 +71,7 @@ export const MIRRORED_STYLE_KEYS = new Set([
     ...Object.keys(flexItemProps),
     ...Object.keys(gridProps),
     ...Object.keys(gridItemsProps),
+    ...Object.keys(positionProps),
     ...Object.keys(sharedProps)
 ]);
 

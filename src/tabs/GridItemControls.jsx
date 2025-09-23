@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
@@ -38,8 +37,8 @@ const GridItemControls = () => {
 
     return (
         <Panel className="costered-blocks--tab--griditem-controls">
-            <PanelBody title={LABELS.gridItemsControls.panelTitle} className="costered-blocks--griditem-controls--inner" initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column">
+            <PanelBody title={LABELS.gridItemsControls.panelTitle} className="costered-blocks--griditem-controls--griditem-inner" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls--griditem">
                     <FlexBlock>
                         <PanelToggle
                             value={activeGridItemPanel}
@@ -60,8 +59,8 @@ const GridItemControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.alignmentPanel.title} className="costered-blocks--griditem-controls-alignment" initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls-alignment-flex">
+            <PanelBody title={LABELS.gridItemsControls.alignmentPanel.title} className="costered-blocks--griditem-controls--alignment-inner" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls--alignment">
                     <FlexBlock className={'costered-blocks--griditem-controls--justifyself'}>
                         { /* RTL aware */ }
                         <JustifySelfControl
@@ -78,8 +77,8 @@ const GridItemControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody title={LABELS.gridItemsControls.orderPanel.title} className="costered-blocks--griditem-controls-order" initialOpen={true}>
-                <Flex expanded={true} gap={4} direction="column">   
+            <PanelBody title={LABELS.gridItemsControls.orderPanel.title} className="costered-blocks--griditem-controls--order-inner" initialOpen={true}>
+                <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls--order">
                     <FlexBlock>
                         <NumberControlInput
                             label={LABELS.gridItemsControls.orderPanel.label}

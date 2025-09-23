@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, useEffect } from '@wordpress/element';
 import { Button, Flex, FlexBlock, FlexItem, ToggleControl } from '@wordpress/components';
 
@@ -68,7 +67,7 @@ export default function GapControls({ attributes, clientId, updateBlockAttribute
     const Input = unitMode === 'unit' ? UnitControlInput : TextControlInput;
     const labelText = inputMode === 'single'
         ? LABELS.gapControls.label
-        : LABELS.gapControls.rowLabel;
+        : LABELS.gapControls.columnLabel;
 
 
     //toggle between single and dual input modes
@@ -92,7 +91,7 @@ export default function GapControls({ attributes, clientId, updateBlockAttribute
                             </FlexItem>
                             {inputMode === 'dual' && (
                                 <FlexItem>
-                                    <Input label={LABELS.gapControls.column} value={col} onChange={setCol} allowReset={true} />
+                                    <Input label={LABELS.gapControls.rowLabel} value={col} onChange={setCol} allowReset={true} />
                                 </FlexItem>
                             )}
                         </Flex>

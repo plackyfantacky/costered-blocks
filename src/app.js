@@ -46,10 +46,12 @@ const Sidebar = () => {
                         </Notice>
                     )}
                 </PanelBody>
-            </Panel>
-            <SidebarTabs className="costered-blocks--sidebar-body" />
-        </PluginSidebar>
-    );
+            {selectedBlock !== null ? (
+                <SidebarTabs className="costered-blocks--sidebar-body" />
+            ) : null}
+        </Panel>
+    </PluginSidebar>
+);
 };
 
 registerPlugin('costered-blocks', {

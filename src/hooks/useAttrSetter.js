@@ -3,27 +3,59 @@
  */
 import { useCallback } from '@wordpress/element';
 
-import { VERBATIM_STRING_KEYS } from "@config";
+import { VERBATIM_STRING_KEYS, UNITLESS } from "@config";
 
 export function useAttrSetter(updateFn, target, { trim = true, emptyUnsets = true } = {}) {
     const isStoreForm = target !== undefined && target !== null;
 
     const normalise = useCallback((rawValue, key) => {
-        if (rawValue === undefined || rawValue === null) return undefined; //exit early
-        if (VERBATIM_STRING_KEYS.has(key)) {
-            //verbatim strings; only trim and allow empty to truly unset
-            const v = typeof rawValue === 'string' && trim ? rawValue.trim() : String(rawValue);
-            return (emptyUnsets && v === '') ? undefined : v;
-        }
-        //existing behaviour for all other keys
-        let value = rawValue;
-        if (trim && typeof value === 'string') value = value.trim();
-        if (emptyUnsets && (value === '' || value == null)) return undefined;
+        
+        //exit early
+        if (rawValue === undefined || rawValue === null) return undefined;
 
-        //guard against 'undefined' and 'null' strings
-        const outputValue = String(value).trim();
-        if (!outputValue || outputValue === 'undefined' || outputValue === 'null') return undefined;
-        return outputValue;
+        //verbatim strings; only trim and allow empty to truly unset
+        if (VERBATIM_STRING_KEYS.has(key)) {
+            const value = (typeof rawValue === 'string' && trim) ? rawValue.trim() : String(rawValue);
+            return (emptyUnsets && value === '') ? undefined : value;
+        }
+        
+        let value = rawValue;
+
+        //trim only if it's a string
+        if (trim && typeof value === 'string') value = value.trim();
+
+        //collapse empty strings to undefined
+        if (emptyUnsets && (
+            value === '' || 
+            value == 'null' ||
+            value == 'undefined'
+        )) return undefined;
+        
+        // for unitless numbers, coerce to number
+        if (UNITLESS.has(key)) {
+            if(typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value)) {
+                const num = Number(value);
+                return Number.isFinite(num) ? num : undefined;
+            }
+            if (typeof value === 'number') return Number.isFinite(value) ? value : undefined;
+            //anything else is invalid
+            return undefined;
+        }
+
+        //final coercion. numbers become numbers, everything else becomes string
+        if(typeof value === 'number') return Number.isFinite(value) ? value : undefined;
+
+        if(typeof value === 'string') {
+            if (value === 'null' || value === 'undefined') return undefined;
+            return value;
+        }
+
+        // fallback - try to stringify
+        try {
+            return String(value);
+        } catch {
+            return undefined;
+        }
     }, [trim, emptyUnsets]);
 
     const apply = useCallback((partial) => {

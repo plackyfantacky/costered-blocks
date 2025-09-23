@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Notice, Flex, FlexItem, FlexBlock, ComboboxControl } from '@wordpress/components';
