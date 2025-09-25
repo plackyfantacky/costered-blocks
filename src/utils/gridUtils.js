@@ -36,7 +36,7 @@ export function splitTopLevel(input) {
 }
 
 export function parseRepeat(template) {
-    if(!template) return null;
+    if (!template) return null;
     const m = template.match(/^repeat\(\s*(\d+)\s*,\s*([^)]+)\s*\)$/i);
     if (!m) return null;
     return { count: parseInt(m[1], 10), unit: m[2].trim() };
@@ -284,7 +284,7 @@ function sliceTrackTokens(trackList, targetCount) {
 /* simple: repeat(12, 1fr)  */
 export function decodeSimple(template) {
     const repeats = parseRepeat(template);
-    if(!repeats) return null;
+    if (!repeats) return null;
 
     const normalised = normaliseTemplate(makeRepeat(repeats.count, repeats.unit));
     return {
@@ -298,7 +298,7 @@ export function decodeSimple(template) {
 /* tracks: [line-name-start] 300px [line-name-end]  */
 export function decodeTracks(template) {
     const tokens = splitTopLevel(template);
-    if(!tokens.length) return null;
+    if (!tokens.length) return null;
     const normalised = normaliseTemplate(tokens.join(' '));
     return {
         mode: 'tracks',

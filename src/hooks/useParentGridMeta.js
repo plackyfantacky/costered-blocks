@@ -1,60 +1,44 @@
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useParentAttrs, useGridModel } from '@hooks';
+
 import { countTracks, parseAreas, ensureSize } from '@utils/gridUtils';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
+import { augmentAttributes } from '@utils/breakpointUtils.js';
 
-export function useParentGridMeta(emptyToken = '.') {
-    const { parentId } = useParentAttrs();
-    const model = useGridModel(parentId);
+export function useParentGridMeta(passedClientId) {
+    const { parentId, parentBlock } = useSelect((select) => {
+        const blockEditor = select('core/block-editor');
+        
+        const selectedId = passedClientId || blockEditor.getSelectedBlockClientId();
+        if (!selectedId) return { parentId: null, parentBlock: null };
 
-    const columnTemplate = model?.columns?.template ?? '';
-    const rowTemplate    = model?.rows?.template ?? '';
-    const areasTemplate  = model?.areas?.template ?? '';
+        const parentId = blockEditor.getBlockRootClientId(selectedId);
+        if (!parentId) return { parentId: null, parentBlock: null };
+        return { parentId, parentBlock: blockEditor.getBlock(parentId) || null };
+    }, [passedClientId]);
 
-    const columns = useMemo(() => {
-        const c = countTracks(columnTemplate).count;
-        if (c > 0) return c;
-        const parsed = parseAreas(areasTemplate, emptyToken);
-        return parsed[0]?.length || 0;
-    }, [columnTemplate, areasTemplate, emptyToken]);
+    const breakpoint = useSelect(selectActiveBreakpoint, []);
+    
+    const parent = useMemo(
+        () => parentBlock?.attributes ? augmentAttributes(parentBlock.attributes, breakpoint) : null, 
+        [parentBlock?.attributes, breakpoint]
+    );
 
-    const rows = useMemo(() => {
-        const r = countTracks(rowTemplate).count;
-        if (r > 0) return r;
-        const parsed = parseAreas(areasTemplate, emptyToken);
-        return parsed.length || 0;
-    }, [rowTemplate, areasTemplate, emptyToken]);
-
-    const matrix = useMemo(() => {
-        const parsed = parseAreas(areasTemplate, emptyToken);
-        const cols = parsed[0]?.length || columns || 1;
-        const rws  = parsed.length || rows || 1;
-        return ensureSize(parsed, cols, rws, emptyToken);
-    }, [areasTemplate, columns, rows, emptyToken]);
-
-    const areaNames = useMemo(() => {
-        const names = new Set();
-        for (const row of matrix) {
-            for (const cell of row) {
-                const v = String(cell || '').trim();
-                if (v && v !== emptyToken) names.add(v);
-            }
-        }
-        return Array.from(names);
-    }, [matrix, emptyToken]);
-
-    const hasGrid = Boolean(columnTemplate || rowTemplate || areasTemplate);
+    const isGrid = useMemo(() => {
+        const display = parent?.$get?.('display', { cascade: true }) ?? '';
+        return /^(grid|inline-grid)$/i.test(String(display).trim());
+    }, [parent, parent?.$bp]);
 
     return {
         parentId,
-        hasGrid,
-        columns,
-        rows,
-        matrix,
-        areaNames,
-        areasTemplate,
-        columnTemplate,
-        rowTemplate,
-        emptyToken,
-    };
-    
+        parentBlock,
+        parent,
+        isGrid,
+        display: parent?.$get('display', { cascade: true }),
+        cols: parent?.$get('gridTemplateColumns', { cascade: true }),
+        rows: parent?.$get('gridTemplateRows', { cascade: true }),
+        areas: parent?.$get('gridTemplateAreas', { cascade: true }),
+    }
 }

@@ -1,8 +1,9 @@
-import { useDispatch } from '@wordpress/data';
-import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter, useParentAttrs, useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
+import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
+
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
+    useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
 import { LABELS } from "@labels";
 import { F7Rectangle3OffgridFill as GridItem } from "@assets/icons";
 
@@ -20,20 +21,23 @@ const minInteger = -maxInteger;
 
 const GridItemControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    if (!selectedBlock) return null;
+    const { name } = selectedBlock;
 
-    const { parentAttrs } = useParentAttrs();
-    const { attributes, blockName } = selectedBlock;
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+    const { get } = useAttrGetter(clientId);
+    const { set } = useAttrSetter(clientId);
 
-    const safeBlockName = useSafeBlockName(blockName, clientId);
-    const preferenceKey = useScopedKey('activeGridItemPanel', { blockName: safeBlockName });
+    const blockName = useSafeBlockName(name, clientId);
+    const preferenceKey = useScopedKey('activeGridItemPanel', { blockName: blockName });
     const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences(preferenceKey, 'simple');
 
-    const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
-    const setJustifySelf = useCallback((v) => set('justifySelf', v), [set]);
-    const setOrder = useCallback((v) => set('order', v), [set]);
+    const alignSelf = get('alignSelf') || 'auto';
+    const setAlignSelf = useCallback((value) => set('alignSelf', value), [set]);
+
+    const justifySelf = get('justifySelf') || 'auto';
+    const setJustifySelf = useCallback((value) => set('justifySelf', value), [set]);
+    
+    const order = get('order') || 0;
+    const setOrder = useCallback((value) => set('order', value), [set]);
 
     return (
         <Panel className="costered-blocks--tab--griditem-controls">
@@ -50,7 +54,7 @@ const GridItemControls = () => {
                                 tracks: GridItemTracks,
                                 areas: GridItemAreas,
                             }}
-                            panelProps={{ clientId, attributes, parentAttrs, safeBlockName }}
+                            panelProps={{ clientId, blockName }}
                         >
                             <PanelToggle.TextOption value="simple" label={LABELS.gridItemsControls.simplePanel.title} />
                             <PanelToggle.TextOption value="tracks" label={LABELS.gridItemsControls.tracksPanel.title} />
@@ -64,14 +68,14 @@ const GridItemControls = () => {
                     <FlexBlock className={'costered-blocks--griditem-controls--justifyself'}>
                         { /* RTL aware */ }
                         <JustifySelfControl
-                            attributes={attributes}
+                            value={justifySelf}
                             setJustifySelf={setJustifySelf}
                         />
                     </FlexBlock>
                     <FlexBlock className={'costered-blocks--griditem-controls--alignself'}>
                         { /* RTL aware */ }
                         <AlignSelfControl
-                            attributes={attributes}
+                            value={alignSelf}
                             setAlignSelf={setAlignSelf}
                         />
                     </FlexBlock>
@@ -82,7 +86,7 @@ const GridItemControls = () => {
                     <FlexBlock>
                         <NumberControlInput
                             label={LABELS.gridItemsControls.orderPanel.label}
-                            value={attributes?.order || 0}
+                            value={order || 0}
                             onChange={setOrder}
                             step={1} min={minInteger} max={maxInteger}
                         />
@@ -97,6 +101,12 @@ export default {
     name: 'grid-item-controls',
     title: LABELS.gridItemsControls.panelTitle,
     icon: <GridItem />,
-    isVisible: ({ parentAttrs } = {}) => ['grid', 'inline-grid'].includes(parentAttrs?.display),
+    isVisible: ({ parentAttrs } = {}) => {
+        // Prefer responsive-aware read; fallback to legacy top-level
+        const value = (typeof parentAttrs?.$get === 'function'
+            ? parentAttrs.$get('display', { cascade: true })
+            : parentAttrs?.display) ?? ''
+        return /^(grid|inline-grid)$/i.test(String(value).trim());
+    },
     render: () => <GridItemControls />,
 };

@@ -3,18 +3,18 @@ import { Button } from '@wordpress/components';
 
 import Token from '@components/composite/Token';
 
-export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', labels, setCell, resize, onEditingChange }) {
+export function GridBoard(props) {
+    const { matrix, columnData, rowData, setCell, resize, clear, emptyToken = '.', labels = {}, onEditingChange } = props;
 
-    const numericColumns = Number(matrix?.[0]?.length ?? columnData ?? 0);
-    // Ensure we never compute with 0/NaN
-    // tolerate "3" (string), NaN, etc.
-    const safeColumnData = Math.max(1, Number.isFinite(columnData) ? numericColumns : parseInt(columnData, 10) || 0);
-    const safeRowData = Math.max(1, Number.isFinite(rowData) ? rowData : parseInt(rowData, 10) || 0);
+    // Ensure we never compute with 0/NaN for layout math
+    const safeColumnData = Math.max(1, Number(columnData) || 0);
+    const safeRowData = Math.max(1, Number(rowData) || 0);
 
     const [expandedIndex, setExpandedIndex] = useState(null);
     const gridRef = useRef(null);
 
     const indexFromXY = useCallback((x, y) => (y * safeColumnData) + x, [safeColumnData]);
+
     const xyFromIndex = useCallback((index) => {
         const columnIndex = index % safeColumnData;
         const rowIndex = Math.floor(index / safeColumnData);
@@ -121,8 +121,15 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
                                     value={inputValue}
                                     isExpanded={expandedIndex === index}
                                     onToggle={handleToggle}
-                                    onRemove={(i) => { const [cx, cy] = xyFromIndex(i); setCell(cx, cy, ''); setExpandedIndex(null); }}
-                                    onChange={(i, next) => { const [cx, cy] = xyFromIndex(i); setCell(cx, cy, next); }}
+                                    onRemove={(index) => {
+                                        const [cellX, cellY] = xyFromIndex(index);
+                                        setCell(cellX, cellY, '');
+                                        setExpandedIndex(null);
+                                    }}
+                                    onChange={(cellIndex, next) => { 
+                                        const [cellX, cellY] = xyFromIndex(cellIndex); 
+                                        setCell(cellX, cellY, next);
+                                     }}
                                     onMoveLeft={moveLeftFromIndex}
                                     onMoveRight={moveRightFromIndex}
                                     emptyPlaceholder={emptyToken}

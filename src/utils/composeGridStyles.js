@@ -17,7 +17,7 @@ export function composeExclusiveGridStyle({ gridArea, gridColumn, gridRow }) {
 export function withImportant(style = {}) {
     const output = {};
     Object.entries(style).forEach(([key, value]) => {
-        if(typeof value === 'string' && value.trim() !== '') {
+        if (typeof value === 'string' && value.trim() !== '') {
             output[key] = `${value} !important`;
         }
     });

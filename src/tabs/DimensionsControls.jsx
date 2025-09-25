@@ -1,4 +1,3 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody } from '@wordpress/components';
 
 import { LABELS } from "@labels";
@@ -8,11 +7,9 @@ import { DimensionInputGroup } from "@components/composite/DimensionInputGroup";
 import { RadixIconsDimensions as DimensionsIcon } from "@assets/icons";
 
 const DimensionControls = () => {
-    const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
 
-    if (!selectedBlock) return null;
-    const { attributes, name } = selectedBlock;
+    const { selectedBlock, clientId } = useSelectedBlockInfo();
+    const { name } = selectedBlock;
 
     // user preferences (panel open/close state)
     const safeBlockName = useSafeBlockName(name, clientId);
@@ -30,9 +27,7 @@ const DimensionControls = () => {
         <Panel className="costered-blocks--tab--dimensions-controls">
             <PanelBody title={LABELS.dimensionControls.panelTitle} initialOpen={dimPanelOpen} onToggle={setDimPanelOpen} className="costered-blocks--dimensions-controls--dimensions-inner">
                 <DimensionInputGroup
-                    attributes={attributes}
                     clientId={clientId}
-                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                     labels={LABELS.dimensionControls.dimensions}
                 />
@@ -40,9 +35,7 @@ const DimensionControls = () => {
             <PanelBody title={LABELS.dimensionControls.minPanel} initialOpen={minDimPanelOpen} onToggle={setMinDimPanelOpen} className="costered-blocks--dimensions-controls--min-inner">
                 <DimensionInputGroup
                     groupKey="min"
-                    attributes={attributes}
                     clientId={clientId}
-                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                     labels={LABELS.dimensionControls.minDimensions}
                 />
@@ -50,9 +43,7 @@ const DimensionControls = () => {
             <PanelBody title={LABELS.dimensionControls.maxPanel} initialOpen={maxDimPanelOpen} onToggle={setMaxDimPanelOpen} className="costered-blocks--dimensions-controls--max-inner">
                 <DimensionInputGroup
                     groupKey="max"
-                    attributes={attributes}
                     clientId={clientId}
-                    updateBlockAttributes={updateBlockAttributes}
                     blockName={name}
                     labels={LABELS.dimensionControls.maxDimensions}
                 />

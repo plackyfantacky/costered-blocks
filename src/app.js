@@ -1,8 +1,13 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
+import { useSelect, select, subscribe } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 
-import { BLOCKS_WITH_EDITOR_STYLES } from "@config";
+import '@stores/breakpoint.js';
+import { startViewportSync } from '@utils/viewportSync.js';
+
+import { BLOCKS_WITH_EDITOR_STYLES, IS_DEBUG } from "@config";
 import { LABELS } from '@labels';
 import { useSelectedBlockInfo } from "@hooks";
 import SidebarTabs from "@components/SidebarTabs";
@@ -10,7 +15,13 @@ import TabIcon from '@components/TabIcon';
 
 import { GameIconsHammerBreak as HammerBreakIcon } from "@assets/icons";
 
+window.COSTERED_DEBUG = IS_DEBUG;
+
+startViewportSync();
+
 const Sidebar = () => {
+    
+
     const { selectedBlock } = useSelectedBlockInfo();
     return (
         <PluginSidebar name="costered-blocks--sidebar" title={LABELS.pluginSidebar.title} className="costered-blocks--sidebar">

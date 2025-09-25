@@ -16,6 +16,49 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const pluginRoot = path.resolve(__dirname, '..');
 
+const pathAliases = {
+    'assets': 'src/assets',
+    'components': 'src/components',
+    'config': 'src/config.js',
+    'filters': 'src/filters',
+    'hooks': 'src/hooks',
+    'labels': 'src/labels.js',
+    'panels': 'src/panels',
+    'stores': 'src/stores',
+    'tabs': 'src/tabs',
+    'utils': 'src/utils',
+};
+
+const globalsMap = {
+    "@wordpress/components": "wp.components",
+    "@wordpress/compose": "wp.compose",
+    "@wordpress/api-fetch": "wp.apiFetch",
+    "@wordpress/edit-post": "wp.editPost",
+    "@wordpress/element": "wp.element",
+    "@wordpress/plugins": "wp.plugins",
+    "@wordpress/editor": "wp.editor",
+    "@wordpress/block-editor": "wp.blockEditor",
+    "@wordpress/blocks": "wp.blocks",
+    "@wordpress/hooks": "wp.hooks",
+    "@wordpress/utils": "wp.utils",
+    "@wordpress/date": "wp.date",
+    "@wordpress/data": "wp.data",
+    "@wordpress/dom-ready": "wp.domReady",
+    "@wordpress/icons": "wp.icons",
+    "@wordpress/i18n": "wp.i18n",
+    "@wordpress/preferences": "wp.preferences",
+    "@wordpress/keycodes": "wp.keycodes",
+    "@wordpress/html-entities": "wp.htmlEntities",
+    "@wordpress/url": "wp.url",
+    "@wordpress/media-utils": "wp.mediaUtils",
+    "@wordpress/media-upload": "wp.mediaUpload",
+    "@wordpress/blob": "wp.blob",
+    "@wordpress/customize-posts": "wp.customizePosts",
+    "@wordpress/viewport": "wp.viewport",
+    "react": "React",
+    "react-dom": "ReactDOM",
+};
+
 function importAsGlobals(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); // https://stackoverflow.com/a/3561711/153718
     const filter = new RegExp(
@@ -54,41 +97,18 @@ function importAsGlobals(mapping) {
     };
 }
 
-const globalsMap = {
-    "@wordpress/components": "wp.components",
-    "@wordpress/compose": "wp.compose",
-    "@wordpress/api-fetch": "wp.apiFetch",
-    "@wordpress/edit-post": "wp.editPost",
-    "@wordpress/element": "wp.element",
-    "@wordpress/plugins": "wp.plugins",
-    "@wordpress/editor": "wp.editor",
-    "@wordpress/block-editor": "wp.blockEditor",
-    "@wordpress/blocks": "wp.blocks",
-    "@wordpress/hooks": "wp.hooks",
-    "@wordpress/utils": "wp.utils",
-    "@wordpress/date": "wp.date",
-    "@wordpress/data": "wp.data",
-    "@wordpress/dom-ready": "wp.domReady",
-    "@wordpress/icons": "wp.icons",
-    "@wordpress/i18n": "wp.i18n",
-    "@wordpress/preferences": "wp.preferences",
-    "@wordpress/keycodes": "wp.keycodes",
-    "@wordpress/html-entities": "wp.htmlEntities",
-    "@wordpress/url": "wp.url",
-    "@wordpress/media-utils": "wp.mediaUtils",
-    "@wordpress/media-upload": "wp.mediaUpload",
-    "@wordpress/blob": "wp.blob",
-    "@wordpress/customize-posts": "wp.customizePosts",
-    "@wordpress/viewport": "wp.viewport",
-    "react": "React",
-    "react-dom": "ReactDOM",
-};
-
 function cleanOutputDir(outdir) {
     if (fs.existsSync(outdir)) {
         fs.rmSync(outdir, { recursive: true, force: true });
     }
 }
+
+const resolvedAliases = Object.fromEntries(
+    Object.entries(pathAliases).map(([key, relPath]) => [
+        `@${key}`,
+        path.resolve(pluginRoot, relPath),
+    ])
+);
 
 const jsConfig = {
     entryPoints: await glob('src/**/*.{js,jsx,ts,tsx}').then((files) =>
@@ -116,17 +136,7 @@ const jsConfig = {
     platform: 'browser',
     plugins: [
         importAsGlobals(globalsMap),
-        pathAlias({
-            '@assets': path.resolve(pluginRoot, 'src/assets'),
-            '@components': path.resolve(pluginRoot, 'src/components'),
-            '@config': path.resolve(pluginRoot, 'src/config.js'),
-            '@filters': path.resolve(pluginRoot, 'src/filters'),
-            '@hooks': path.resolve(pluginRoot, 'src/hooks'),
-            '@labels': path.resolve(pluginRoot, 'src/labels.js'),
-            '@panels': path.resolve(pluginRoot, 'src/panels'),
-            '@tabs': path.resolve(pluginRoot, 'src/tabs'),
-            '@utils': path.resolve(pluginRoot, 'src/utils'),
-        })
+        pathAlias(resolvedAliases),
     ],
     logLevel: 'info',
     resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],

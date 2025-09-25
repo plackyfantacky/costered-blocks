@@ -2,7 +2,8 @@ import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock, Button, Modal } from '@wordpress/components';
 
-import { useSelectedBlockInfo, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
+    useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { LABELS } from "@labels";
 
 import GapControls from '@components/composite/GapControls';
@@ -16,20 +17,7 @@ import { MaterialSymbolsGridViewRounded as GridViewRounded } from "@assets/icons
 
 const GridControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { attributes, name } = selectedBlock;
-    if (!selectedBlock) return null;
-
-    return (
-        <GridControlsInner
-            clientId={clientId}
-            attributes={attributes}
-            name={name}
-        />
-    );
-};
-
-const GridControlsInner = ({ clientId, attributes, name }) => {
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
+    const { name } = selectedBlock;
 
     const [activeKey, setActiveKey] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -39,13 +27,13 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
 
     const safeBlockName = useSafeBlockName(name, clientId);
     const gridTemplateKey = useScopedKey('gridTemplatePanelOpen', { blockName: safeBlockName });
-    const [gridTemplatePanelOpen, setGridTemplatePanelOpen] = useUIPreferences(gridTemplateKey, true);
-
     const gridGapKey = useScopedKey('gridGapPanelOpen', { blockName: safeBlockName });
-    const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
-
     const gridTemplateAreasKey = useScopedKey('gridTemplateAreasPanelOpen', { blockName: safeBlockName });
+    
+    const [gridTemplatePanelOpen, setGridTemplatePanelOpen] = useUIPreferences(gridTemplateKey, true);
+    const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
     const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences(gridTemplateAreasKey, false);
+
 
     return (
         <Panel className="costered-blocks--tab--grid-controls">
@@ -70,9 +58,7 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
                 <Flex direction="column" expanded={true} className="costered-blocks--grid-controls--gap">
                     <FlexBlock>
                         <GapControls
-                            attributes={attributes}
                             clientId={clientId}
-                            updateBlockAttributes={updateBlockAttributes}
                             blockName={name}
                         />
                     </FlexBlock>
@@ -115,8 +101,10 @@ const GridControlsInner = ({ clientId, attributes, name }) => {
 };
 
 const isGrid = (attributes = {}) => {
-    const value = attributes?.display ?? attributes?.style?.display ?? '';
-    return /^(grid|inline-grid)$/.test(value);
+    const value = (typeof attributes?.$get === 'function'
+        ? attributes.$get('display')
+        : attributes?.display) ?? '';
+    return /^(grid|inline-grid)$/i.test(String(value));
 };
 
 export default {

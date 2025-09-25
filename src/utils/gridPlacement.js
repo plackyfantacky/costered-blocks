@@ -8,7 +8,7 @@ export function toInt  (value, fallback = 1) {
 };
 
 export function isIntToken (token) {
-    if(typeof token === 'number') return Number.isInteger(token);
+    if (typeof token === 'number') return Number.isInteger(token);
     const tokenString = String(token);
     return /^-?\d+$/.test(tokenString);
 }
@@ -47,7 +47,7 @@ export const parsePlacementSimple = (input) => {
 export const composePlacementSimple = (start, span, collapseSpanOne = true) => {
     const outputStart = String(start).trim() || 'auto';
     const num = toInt(span, 1);
-    if(collapseSpanOne && num === 1 && outputStart !== 'auto') return outputStart; // "2 / span 1" -> "2"
+    if (collapseSpanOne && num === 1 && outputStart !== 'auto') return outputStart; // "2 / span 1" -> "2"
     return `${outputStart} / span ${num}`;
 }
 
@@ -58,7 +58,7 @@ export const parsePlacementAdvanced = (input) => {
 
     const parts = value.split('/').map((part) => part.trim());
     if (parts.length === 1) {
-        if(/^span\s+\d+$/i.test(parts[0])) output.span = parts[0].replace(/^span\s+/i, '');
+        if (/^span\s+\d+$/i.test(parts[0])) output.span = parts[0].replace(/^span\s+/i, '');
         else output.start = parts[0];
         return output;
     }
@@ -77,7 +77,7 @@ export const composePlacementAdvanced = ({start, span, end}, {mode = 'span', col
         return `${outputStart} / ${outputEnd}`;
     }
     const num = toInt(span, 1);
-    if(collapseSpanOne && num === 1 && outputStart !== 'auto') return outputStart; // "2 / span 1" -> "2"
+    if (collapseSpanOne && num === 1 && outputStart !== 'auto') return outputStart; // "2 / span 1" -> "2"
     return `${outputStart} / span ${num}`;
 }
 

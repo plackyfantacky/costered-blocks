@@ -17,12 +17,12 @@ export function useUIPreferences(key, defaultValue, ns = 'costered-blocks') {
     const { set, __experimentalReset: resetPref } = useDispatch(preferenceStore);
 
     const setValue = (next) => {
-        if(key.startsWith('__invalid__')) return; // Prevent accidental writes to unscoped keys.
+        if (key.startsWith('__invalid__')) return; // Prevent accidental writes to unscoped keys.
         set(ns, key, next);
     };
 
     const reset = () => {
-        if(key.startsWith('__invalid__')) return; // Prevent accidental writes to unscoped keys.
+        if (key.startsWith('__invalid__')) return; // Prevent accidental writes to unscoped keys.
         resetPref?.(ns, key);
     };
     

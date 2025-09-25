@@ -1,8 +1,27 @@
-import attributes from '../config/attributes.json' with { type: 'json' };
+import configData from '../config/config.json' with { type: 'json' };
+
+// helpers
+const arr = (value) => (Array.isArray(value) ? value : []);
+const toSet = (value) => new Set(arr(value));
+
+export const COSTERED_ATTRIBUTE_SHAPE = {
+    type: 'object',
+    default: {
+        desktop: {
+            styles: {}
+        },
+        tablet: {
+            styles: {}
+        },
+        mobile: {
+            styles: {}
+        }
+    },
+}
 
 function pickByGroup(group) {
     return Object.fromEntries(
-        Object.entries(attributes).filter(([key, value]) => value.group === group)
+        Object.entries(configData.attributes).filter(([key, value]) => value.group === group)
     );
 }
 
@@ -35,25 +54,19 @@ export const VERBATIM_STRING_KEYS = new Set([
 ]);
 
 /** misc */
-export const BLOCKS_WITH_EDITOR_STYLES = [
-    'core/paragraph',
-    'core/heading',
-    'core/list',
-    'core/quote',
-    'core/pullquote',
-    'core/table'
-];
+export const BLOCKS_WITH_EDITOR_STYLES = arr(configData?.collections?.editorStyles);
+export const UNITLESS = toSet(configData?.collections?.unitless);
 
-export const UNITLESS = new Set([
-    'order',
-    'zIndex',
-    'flexGrow',
-    'flexShrink'
-]);
+export const DEFAULT_GRID_UNIT = configData?.settings?.gridUnit || '1fr';
+export const MIRROR_APPEND_IMPORTANT_FOR_GRID = !!configData?.settings?.appendImportantToMirroredStyles;
+export const STYLE_TAG_ID = configData?.settings?.styleTagId || 'costered-blocks-style-mirror';
+export const REDUX_STORE_KEY = configData?.settings?.reduxStoreKey || 'costered/ui';
 
-export const DEFAULT_GRID_UNIT = '1fr';
+export const MOBILE_THRESHOLD = configData?.settings?.breakpoints?.mobile ?? 782;
+export const TABLET_THRESHOLD = configData?.settings?.breakpoints?.tablet ?? 1024;
+export const DESKTOP_THRESHOLD = configData?.settings?.breakpoints?.desktop ?? 1440;
 
-export const MIRROR_APPEND_IMPORTANT_FOR_GRID = true;
+export const IS_DEBUG = false;
 
 /**
  * Editor Style Mirror keys.
@@ -76,5 +89,5 @@ export const MIRRORED_STYLE_KEYS = new Set([
 ]);
 
 export const ATTRS_TO_CSS = Object.fromEntries(
-    Object.entries(attributes).map(([key, def]) => [key, def.css])
+    Object.entries(configData.attributes).map(([key, def]) => [key, def.css])
 );

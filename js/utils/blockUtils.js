@@ -1,0 +1,1 @@
+(()=>{var o=t=>typeof t=="string"&&t.trim().length>0,r=()=>{if(typeof crypto<"u"&&typeof crypto.randomUUID=="function")return crypto.randomUUID();let t=Date.now().toString(36),e=Math.random().toString(36).slice(2,10);return`${t}-${e}`},n=t=>{t&&!o(t.costeredId)&&(t.costeredId=r())};})();

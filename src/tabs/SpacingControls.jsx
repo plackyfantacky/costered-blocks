@@ -9,11 +9,8 @@ import { TablerBoxMargin as BoxMargin } from "@assets/icons";
 
 const SpacingControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-
-    if (!selectedBlock) return null;
-
-    const { attributes, name } = selectedBlock;
+    if (!selectedBlock) return null; // do not remove. prevents error when switching to code editor mode
+    const { name } = selectedBlock;
 
     return (
         <Panel className="costered-blocks--tab--spacing-controls">
@@ -23,9 +20,7 @@ const SpacingControls = () => {
                         <BaseControl label={LABELS.spacingControls.marginLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="margin"
-                                attributes={attributes}
                                 clientId={clientId}
-                                updateBlockAttributes={updateBlockAttributes}
                                 blockName={name}
                             />
                         </BaseControl>
@@ -34,9 +29,7 @@ const SpacingControls = () => {
                         <BaseControl label={LABELS.spacingControls.paddingLabel} __nextHasNoMarginBottom>
                             <DirectionalInputGroup
                                 prefix="padding"
-                                attributes={attributes}
                                 clientId={clientId}
-                                updateBlockAttributes={updateBlockAttributes}
                                 blockName={name}
                             />
                         </BaseControl>

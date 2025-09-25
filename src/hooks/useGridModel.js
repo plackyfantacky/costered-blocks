@@ -1,40 +1,48 @@
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
+
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
 import { decodeAxis, measureAreas } from "@utils/gridUtils";
+import { augmentAttributes } from '@utils/breakpointUtils';
 
 export function useGridModel(clientId) {
-    const attrs = useSelect((select) => {
-        if(!clientId) return {};
-        const be = select(blockEditorStore);
-        const block = be.getBlock(clientId);
+
+    const rawAttributes = useSelect((select) => {
+        if (!clientId) return {};
+        const blockEditor = select(blockEditorStore);
+        const block = blockEditor.getBlock(clientId);
         return block?.attributes ?? {};
     }, [clientId]);
 
-    const model = useMemo(() => {
-        const cols = decodeAxis(attrs.gridTemplateColumns);
-        const rows = decodeAxis(attrs.gridTemplateRows);
-        
-        const areasTemplate = attrs.gridTemplateAreas ?? null;
-        const areasMeta = measureAreas(areasTemplate);
+    const activeBreakpoint = useSelect(selectActiveBreakpoint, []);
+    
+    const attributes = useMemo(
+        () => augmentAttributes(rawAttributes, activeBreakpoint),
+        [rawAttributes, activeBreakpoint]
+    );
+    const read = (key, options = {}) => attributes.$get(key, options);
 
+    const model = useMemo(() => {
+        const gridTemplateColumns = read('gridTemplateColumns');
+        const gridTemplateRows = read('gridTemplateRows');
+        const gridTemplateAreas = read('gridTemplateAreas');
+
+        const cols = decodeAxis(gridTemplateColumns);
+        const rows = decodeAxis(gridTemplateRows);
+
+        const {template: areasTemplate, ...areasMeta} = measureAreas(
+            gridTemplateAreas,
+            cols.count,
+            rows.count
+        );
         return {
             columns: cols,
             rows: rows,
-            areas: {
-                template: areasTemplate,
-                ...areasMeta
-            },
-            activePane: {
-                columns: cols.mode,
-                rows: rows.mode
-            }
+            areas: { template: areasTemplate, ...areasMeta},
+            activePane: { columns: cols.mode, rows: rows.mode }
         }
-    },[
-        attrs.gridTemplateColumns,
-        attrs.gridTemplateRows,
-        attrs.gridTemplateAreas
-    ])
+    }, [ activeBreakpoint, attributes?.costered, attributes?.$get ]);
 
     return model;
 } 

@@ -1,50 +1,49 @@
-import { useState, useCallback, useRef, useMemo } from '@wordpress/element';
-import { Button, Flex, FlexItem } from '@wordpress/components';
+import { useState, useCallback, useRef, useMemo, useEffect } from '@wordpress/element';
+import { Flex, FlexItem } from '@wordpress/components';
 import { sprintf } from '@wordpress/i18n';
 
-import { useGridAreasMatrix, useGridStoreAreasIO } from '@hooks';
+import { useGridAreasMatrix } from '@hooks';
 import { GridBoard } from './GridBoard';
 import { NoticePanel } from './NoticePanel';
 import { LABELS as DEFAULT_LABELS } from '@labels';
 
 export default function TokenGrid({ clientId, labels = {} }) {
-
-    const tokenGridLabels = useMemo(() => ({ ...DEFAULT_LABELS.tokenGrid, ...labels.tokenGrid }), [labels]);
-    const tokenGridNoticeLabels = useMemo(() => ({ ...DEFAULT_LABELS.tokenGridNotice, ...labels.tokenGridNotice }), [labels]);
-
-    const {
-        applyMatrixToStore,
-        seedFromStore,
-        trackColumnCount,
-        trackRowCount,
-    } = useGridStoreAreasIO(clientId);
-
-    const seedMatrix = useMemo(() => seedFromStore('.'), [seedFromStore]);
-
     // Suspend/resume resync around editing
     const [isEditing, setIsEditing] = useState(false);
     const resumeRef = useRef(null);
 
+    const tokenGridLabels = useMemo(
+        () => ({ ...DEFAULT_LABELS.tokenGrid, ...labels.tokenGrid }),
+        [labels]
+    );
+
+    const tokenGridNoticeLabels = useMemo(
+        () => ({ ...DEFAULT_LABELS.tokenGridNotice, ...labels.tokenGridNotice }),
+        [labels]
+    );
+
+    const { matrix, columnData: columns, rowData: rows, setCell, resize, clear } = useGridAreasMatrix(clientId);
+
+    // Treat matrix as the visible source of truth; still warn if counts diverge.
+    const columnData = Array.isArray(matrix) && Array.isArray(matrix[0]) ? matrix[0].length : 0;
+    const rowData = Array.isArray(matrix) ? matrix.length : 0;
+    const mismatch = columnData !== columns || rowData !== rows;
+
     const handleEditingChange = useCallback((editing) => {
         if (resumeRef.current) clearTimeout(resumeRef.current);
-        if (editing) setIsEditing(true);
-        else resumeRef.current = setTimeout(() => setIsEditing(false), 60);
+        if (editing) {
+            setIsEditing(true);
+        } else {
+            resumeRef.current = setTimeout(() => setIsEditing(false), 60);
+        }
     }, []);
 
-    const gridMatrix = useGridAreasMatrix({
-        seedMatrix,
-        emptyToken: '.',
-        onApply: applyMatrixToStore,
-        suspendResync: isEditing,
-    });
-    const { matrix, setCell, resize, clear } = gridMatrix;
-
-    const columnData = matrix[0]?.length || 0;
-    const rowData = matrix.length || 0;
-
-    const mismatch = (
-        (trackColumnCount || 0) !== columnData || (trackRowCount || 0) !== rowData
-    );
+    // Cleanup any pending timer on unmount
+    useEffect(() => {
+        return () => {
+            if (resumeRef.current) clearTimeout(resumeRef.current);
+        };
+    }, []);
 
     return (
         <Flex direction="column" gap={2} className="costered-blocks--token-grid-component">
@@ -53,7 +52,7 @@ export default function TokenGrid({ clientId, labels = {} }) {
                     clientId={clientId}
                     columnData={columnData}
                     rowData={rowData}
-                    gridMatrix={gridMatrix}
+                    gridMatrix={matrix}
                     labels={tokenGridNoticeLabels}
                 />
             )}
@@ -82,6 +81,7 @@ export default function TokenGrid({ clientId, labels = {} }) {
                 labels={tokenGridLabels}
                 setCell={setCell}
                 resize={resize}
+                clear={clear}
                 onEditingChange={handleEditingChange}
             />
         </Flex>

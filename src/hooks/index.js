@@ -1,6 +1,6 @@
+export { useAttrGetter } from "@hooks/useAttrGetter";
 export { useAttrSetter } from "@hooks/useAttrSetter";
 export { useGridAreasMatrix } from "@hooks/useGridAreasMatrix";
-export { useGridItemBounds } from "@hooks/useGridItemBounds";
 export { useGridItemTracksController } from "@hooks/useGridItemTracksController"; //choo choo
 export { useGridItemWriter } from "@hooks/useGridItemWriter";
 export { useGridModel } from "@hooks/useGridModel";

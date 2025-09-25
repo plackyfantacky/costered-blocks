@@ -25,6 +25,9 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
+import { augmentAttributes } from '@utils/breakpointUtils';
+
 import {
     MIRRORED_STYLE_KEYS,
     ATTRS_TO_CSS,
@@ -76,6 +79,13 @@ for (const key of keys) {
  *   - haveFlexDir: Boolean indicating if flexDirection is set
  */
 function buildMirror(attributes = {}) {
+    // prefer responsive-aware reads (raw per active breakpoint); fallback to legacy props (if any left)
+    const read = (key) => (
+        typeof attributes?.$get === 'function'
+            ? attributes.$get(key)
+            : attributes?.[key]
+    );
+
     const style = {};
     let any = false;
 
@@ -84,8 +94,8 @@ function buildMirror(attributes = {}) {
     let hasMt = false, hasMb = false, hasMl = false, hasMr = false;
 
     // margin top
-    if (hasNonEmptyString(attributes.marginTop)) {
-        const value = String(attributes.marginTop);
+    if (hasNonEmptyString(read('marginTop'))) {
+        const value = String(read('marginTop'));
         style.marginTop = value;
         style.marginBlockStart = value; // <- beats parent’s blockGap rule
         any = true;
@@ -93,8 +103,8 @@ function buildMirror(attributes = {}) {
     }
 
     // margin bottom
-    if (hasNonEmptyString(attributes.marginBottom)) {
-        const value = String(attributes.marginBottom);
+    if (hasNonEmptyString(read('marginBottom'))) {
+        const value = String(read('marginBottom'));
         style.marginBottom = value;
         style.marginBlockEnd = value; // <- beats parent’s blockGap rule
         any = true;
@@ -102,8 +112,8 @@ function buildMirror(attributes = {}) {
     }
 
     // margin left
-    if (hasNonEmptyString(attributes.marginLeft)) {
-        const value = String(attributes.marginLeft);
+    if (hasNonEmptyString(read('marginLeft'))) {
+        const value = String(read('marginLeft'));
         style.marginLeft = value;
         style.marginInlineStart = value; // <- beats parent’s blockGap rule
         any = true;
@@ -111,8 +121,8 @@ function buildMirror(attributes = {}) {
     }
 
     // margin right
-    if (hasNonEmptyString(attributes.marginRight)) {
-        const value = String(attributes.marginRight);
+    if (hasNonEmptyString(read('marginRight'))) {
+        const value = String(read('marginRight'));
         style.marginRight = value;
         style.marginInlineEnd = value; // <- beats parent’s blockGap rule
         any = true;
@@ -120,22 +130,22 @@ function buildMirror(attributes = {}) {
     }
 
     // zIndex
-    if (hasNonEmptyString(attributes.zIndex)) {
-        const value = Number(attributes.zIndex);
+    if (hasNonEmptyString(read('zIndex'))) {
+        const value = Number(read('zIndex'));
         style.zIndex = value;
         any = true;
     }
 
     // grid shorthands
-    const area = String(attributes[PLACEMENT.gridArea.attr] || '').trim();
+    const area = String(read(PLACEMENT.gridArea.attr) || '').trim();
     if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[PLACEMENT.gridArea.attr] = area; any = true; }
 
     //grid column
-    const col = (attributes[PLACEMENT.gridColumn.attr] || '').trim();
+    const col = (read(PLACEMENT.gridColumn.attr) || '').trim();
     if (col) { style[PLACEMENT.gridColumn.attr] = col; any = true; }
 
     //grid row
-    const row = (attributes[PLACEMENT.gridRow.attr] || '').trim();
+    const row = (read(PLACEMENT.gridRow.attr) || '').trim();
     if (row) { style[PLACEMENT.gridRow.attr] = row; any = true; }
 
     // All other mirrored style keys (skip margins and grid shorthands already handled)
@@ -146,7 +156,7 @@ function buildMirror(attributes = {}) {
             key === 'zIndex' || key === 'z-index' ||
             key === PLACEMENT.gridArea.attr || key === PLACEMENT.gridColumn.attr || key === PLACEMENT.gridRow.attr
         ) continue;
-        const value = attributes[key];
+        const value = read(key);
         if (hasNonEmptyString(value)) {
             style[key] = String(value);
             any = true;
@@ -155,7 +165,7 @@ function buildMirror(attributes = {}) {
 
     // has flexDirection: ensure display:flex is set if it is
     // ensure flexDirection “sticks”
-    const haveFlexDir = hasNonEmptyString(attributes.flexDirection);
+    const haveFlexDir = hasNonEmptyString(read('flexDirection'));
     if (haveFlexDir && !style.display) {
         style.display = 'flex';
         any = true;
@@ -163,7 +173,7 @@ function buildMirror(attributes = {}) {
 
     // drop any empty/"undefined"/"null" strings from style
     Object.keys(style).forEach((key) => {
-        if(!hasNonEmptyString(style[key])) {
+        if (!hasNonEmptyString(style[key])) {
             delete style[key];
         } else {
             // normalise strings in-place (trim)
@@ -187,15 +197,21 @@ function buildMirror(attributes = {}) {
 function withEditorStyleMirror(BlockListBlock) {
     const Wrapped = memo((props) => {
         const block = useSelect(
-            (sel) => (props.clientId ? sel('core/block-editor').getBlock(props.clientId) : null),
+            (select) => (props.clientId ? select('core/block-editor').getBlock(props.clientId) : null),
             [props.clientId]
         );
         const attrs = block?.attributes || {};
 
+        const activeBreakpoint = selectActiveBreakpoint(useSelect);
+        const augmented = useMemo(
+            () => augmentAttributes(attrs, activeBreakpoint),
+            [attrs, activeBreakpoint]
+        );
+
         const {
             style: mirrorStyle,
             any, hasMt, hasMb, hasMl, hasMr, haveFlexDir
-        } = useMemo(() => buildMirror(attrs), [attrs]);
+        } = useMemo(() => buildMirror(augmented), [augmented, augmented?.$bp]);
 
         // Apply !important where the editor forces auto centering etc. 
         useLayoutEffect(() => {
@@ -237,11 +253,15 @@ function withEditorStyleMirror(BlockListBlock) {
             hasMr ? 'has-cb-mr' : '',
         ].filter(Boolean).join(' ');
 
+        const costeredUid = augmented?.costeredId || augmented?.costeredID || attrs?.costeredId || attrs?.costeredID || null;
+
         const wrapperProps = {
             ...(props.wrapperProps || {}),
             className,
             // IMPORTANT: if `any` is false, provide an empty style object to clear old inline styles
             style: any ? { ...(props.wrapperProps?.style || {}), ...mirrorStyle } : {},
+            // pass data attribute straight through JSX (React forwards data-* as-is)
+            ...(costeredUid ? { ['data-costered']: String(costeredUid) } : {}),
         };
 
         return <BlockListBlock {...props} wrapperProps={wrapperProps} />;

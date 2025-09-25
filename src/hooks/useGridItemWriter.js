@@ -1,20 +1,24 @@
+import { useAttrSetter } from '@hooks/useAttrSetter';
 import { useCallback } from '@wordpress/element';
 
-export function useGridItemWriter(setMany, attributeName, mode) {
-    return useCallback((next) => {
-        const start = `${next.start ?? 'auto'}`.trim();
-        const value = mode === 'end'
-            ? `${start} / ${next.end ?? 'auto'}`.trim()
-            : (() => {
-                const span = Number(next.span) || 1;
-                return span === 1 && start !== 'auto'
-                    ? start
-                    : `${start} / span ${span}`;
-            })();
-        setMany({
-            [attributeName]: value,
-            // Clear area if present, as it would conflict
-            gridArea: '', //TODO: don't use undefined here -> it gets saved as a string and that breaks everything
-        });
-    }, [setMany, attributeName, mode]);
+export function useGridItemWriter(clientId) {
+    const { set, setMany, unset } = useAttrSetter(clientId);
+
+    const setArea = useCallback((area) => {
+        if (!area || typeof area !== 'string') { unset('gridArea'); return; }
+        set('gridArea', area.trim());
+    }, [set, unset]);
+
+    const setTracks = useCallback((rowStart, rowEnd, colStart, colEnd) => {
+        const patch = {};
+
+        if (rowStart !== undefined) patch.gridRowStart = rowStart || undefined;
+        if (rowEnd !== undefined) patch.gridRowEnd = rowEnd || undefined;
+        if (colStart !== undefined) patch.gridColumnStart = colStart || undefined;
+        if (colEnd !== undefined) patch.gridColumnEnd = colEnd || undefined;
+
+        setMany(patch);
+    }, [setMany]);
+
+    return { setArea, setTracks, set, setMany, unset };
 }

@@ -2,7 +2,7 @@ import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, FlexBlock, BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter } from "@hooks";
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo } from "@hooks";
 import { LABELS } from "@labels";
 import {
     MaterialSymbolsRemoveSelectionRounded as DefaultIcon,
@@ -23,13 +23,15 @@ const minInteger = -maxInteger;
 
 const PositioningControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    if (!selectedBlock) return null;
-    
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { attributes, name } = selectedBlock;
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+    const { name } = selectedBlock;
 
+    const { get } = useAttrGetter(clientId);
+    const { set } = useAttrSetter(clientId);
+
+    const position = get("position") || "";
     const setPosition = useCallback((value) => set("position", value), [set]);
+
+    const zIndex = get("zIndex") || 0;
     const setZIndex = useCallback((value) => set("zIndex", value), [set]);
 
     return (
@@ -39,7 +41,7 @@ const PositioningControls = () => {
                     <FlexItem>
                         <CustomToggleGrid
                             label={LABELS.positioningControls.position.label}
-                            value={typeof attributes?.position === "string" ? attributes.position : ""}
+                            value={position}
                             onChange={setPosition}
                             help={LABELS.positioningControls.position.help}
                             isDeselectable={false}
@@ -77,9 +79,7 @@ const PositioningControls = () => {
                             help={LABELS.positioningControls.coordinates.help}
                         >  
                             <DirectionalInputGroup
-                                attributes={attributes}
                                 clientId={clientId}
-                                updateBlockAttributes={updateBlockAttributes}
                                 blockName={name}
                             />
                         </BaseControl>
@@ -87,7 +87,7 @@ const PositioningControls = () => {
                     <FlexBlock>
                         <NumberControlInput
                             label={LABELS.positioningControls.zIndex.label}
-                            value={attributes?.zIndex || 0}
+                            value={zIndex}
                             onChange={setZIndex}
                             step={1} min={minInteger} max={maxInteger}
                             help={LABELS.positioningControls.zIndex.help}
