@@ -5,7 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
     useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
 import { LABELS } from "@labels";
-import { F7Rectangle3OffgridFill as GridItem } from "@assets/icons";
+import { FluentTableCellCenter24Regular as GridItem } from "@assets/icons";
 
 import PanelToggle from '@components/composite/PanelToggle';
 import JustifySelfControl from "@components/RtlAware/JustifySelfControl";

@@ -95,6 +95,7 @@ export default function Token({
                 placeholder={emptyPlaceholder ?? ''}
                 onChange={(next) => onChange(index, next)}
                 onBlur={(event) => onChange(index, event?.target?.value ?? '')}
+                onKeyDownCapture={(e) => e.stopPropagation()} // prevent outer handlers (e.g. esc to close modal)
                 __nextHasNoMarginBottom
                 __next40pxDefaultSize
             />
@@ -129,7 +130,7 @@ export default function Token({
                     type="button"
                     className="costered-blocks--token--chipButton"
                     aria-expanded={isExpanded}
-                    aria-controls={`costered-token-panel-${index}`}
+                    aria-controls={`costered-blocks--token--panel-${index}`}
                     onClick={openFromPointer}
                     onKeyDown={handleChipKeyDown}
                     title={isExpanded ? labelData.collapse : labelData.expand}
@@ -151,13 +152,14 @@ export default function Token({
             {!floatingEditor && isExpanded && EditorPanel}
 
             {/* Floating panel (opt-in) */}
-            {floatingEditor && isExpanded && (
+            {floatingEditor && isExpanded && chipRef.current && (
                 <Popover
                     className="costered-blocks--token--popover"
                     anchor={chipRef.current}
                     placement={popoverPlacement} // e.g. 'bottom-start', 'right-start'
                     onClose={() => onToggle(index, false)}
                     focusOnMount="firstElement"
+                    onFocusOutside={(e) => e.preventDefault()}
                     expandOnMobile
                 >
                     <div

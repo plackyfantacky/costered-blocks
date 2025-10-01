@@ -3,14 +3,14 @@ import { sprintf } from '@wordpress/i18n';
 import { pretty } from "@utils/gridUtils";
 import { LABELS } from '@labels';
 
-export function GridAxisAside({ axis, canClear = false, onClear, active, owner = null, here = null, label }) {
+export function GridAxisAside({ axis, canClear = false, onClear, active, owner = null, here = null, label, disabled = false }) {
     const clearLabel = label || (
         axis === 'columns'
             ? LABELS.gridAxisAside.clearColumns
             : LABELS.gridAxisAside.clearRows
         );
 
-    const isSet = !!canClear;
+    const isSet = !disabled && canClear;
     // Resolve state
     const ownedHere = typeof active === 'boolean'
         ? active

@@ -24,4 +24,4 @@ require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 add_action('wp', 'costered_styles_reset', 1); // function in helpers.php
 
 // Print collected styles once per page.
-add_action('wp_footer', 'costered_styles_output', 999); // function in helpers.php
+add_action('wp_footer', 'costered_print_collected_css_link', 999); // function in helpers.php

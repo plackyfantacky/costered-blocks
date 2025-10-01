@@ -1,7 +1,5 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
-import { useSelect, select, subscribe } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 
 import '@stores/breakpoint.js';
@@ -12,6 +10,7 @@ import { LABELS } from '@labels';
 import { useSelectedBlockInfo } from "@hooks";
 import SidebarTabs from "@components/SidebarTabs";
 import TabIcon from '@components/TabIcon';
+import CustomNotice from '@components/CustomNotice';
 
 import { GameIconsHammerBreak as HammerBreakIcon } from "@assets/icons";
 
@@ -41,14 +40,12 @@ const Sidebar = () => {
                                 </FlexItem>
                             </Flex>
                             {BLOCKS_WITH_EDITOR_STYLES.includes(selectedBlock.name) && (
-                                <Notice className="costered-blocks--notice-info costered-blocks--notice-style-differences" status="info" isDismissible={false}>
-                                    <details key={".0"}>
-                                        <summary>{LABELS.pluginSidebar.blockWarningSummary}</summary>
-                                        <Flex className="costered-blocks--notice-style-differences-body" direction="column" gap={2}>
-                                            {LABELS.pluginSidebar.blockWarningDetails}
-                                        </Flex>
-                                    </details>
-                                </Notice>
+                                <CustomNotice 
+                                    type="info"
+                                    title={LABELS.pluginSidebar.blockWarningSummary}
+                                    content={LABELS.pluginSidebar.blockWarningDetails}
+                                    className="costered-blocks--block-difference-warning"
+                                />
                             )}
                         </>
                     ) : (

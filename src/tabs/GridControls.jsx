@@ -1,23 +1,26 @@
 import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { Panel, PanelBody, Flex, FlexBlock, Button, Modal } from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexBlock, Button, Modal, ToggleControl, Notice } from '@wordpress/components';
 
 import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
-    useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
+    useParentAttrs, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { LABELS } from "@labels";
 
 import GapControls from '@components/composite/GapControls';
 import TokenGrid from '@components/composite/TokenGrid';
 import PanelToggle from '@components/composite/PanelToggle';
+import SubGridToggle from "@components/composite/SubGridToggle";
 
 import { GridAxisSimple } from '@panels/GridAxisSimple';
 import { GridAxisTracks } from '@panels/GridAxisTracks';
 
-import { MaterialSymbolsGridViewRounded as GridViewRounded } from "@assets/icons";
+import { MaterialSymbolsBackgroundGridSmall as GridIcon } from "@assets/icons";
 
 const GridControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
     const { name } = selectedBlock;
+
+    const { get } = useAttrGetter(clientId);
 
     const [activeKey, setActiveKey] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -34,9 +37,14 @@ const GridControls = () => {
     const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
     const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences(gridTemplateAreasKey, false);
 
+    const subgridCols = get('gridTemplateColumns', {raw: true}) === 'subgrid';
+    const subgridRows = get('gridTemplateRows', {raw: true}) === 'subgrid';
+
+    const [axisDisabled, setAxisDisabled] = useState({ columns: subgridCols, rows: subgridRows });
 
     return (
         <Panel className="costered-blocks--tab--grid-controls">
+            <SubGridToggle clientId={clientId} blockName={safeBlockName} onAxisDisableChange={setAxisDisabled} />
             <PanelBody title={LABELS.gridControls.panelTitle} className="costered-blocks--grid-controls--template-axis-inner" initialOpen={gridTemplatePanelOpen} onToggle={setGridTemplatePanelOpen}>
                 <PanelToggle
                     className="costered-blocks--grid-controls--template-axis"
@@ -48,7 +56,7 @@ const GridControls = () => {
                         simple: GridAxisSimple,
                         tracks: GridAxisTracks,
                     }}
-                    panelProps={{ clientId }}
+                    panelProps={{ clientId, axisDisabled }}
                 >
                     <PanelToggle.TextOption value="simple" label={LABELS.gridControls.simplePanel.title} />
                     <PanelToggle.TextOption value="tracks" label={LABELS.gridControls.tracksPanel.title} />
@@ -110,7 +118,7 @@ const isGrid = (attributes = {}) => {
 export default {
     name: 'grid-controls',
     title: LABELS.gridControls.panelTitle,
-    icon: <GridViewRounded />,
+    icon: <GridIcon />,
     isVisible: ({ attributes }) => isGrid(attributes),
     render: () => <GridControls />,
 };

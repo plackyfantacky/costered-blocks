@@ -66,7 +66,22 @@
             "core/quote",
             "core/pullquote",
             "core/table"
-        ]
+        ],
+        "clearSets": {
+            "gridAreas": [
+                "gridAreas"
+            ],
+            "gridColumns": [
+                "gridColumn",
+                "gridColumnStart",
+                "gridColumnEnd"
+            ],
+            "gridRows": [
+                "gridRow",
+                "gridRowStart",
+                "gridRowEnd"
+            ]
+        }
     },
     "settings": {
         "gridUnit": "1fr",

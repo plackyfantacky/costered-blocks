@@ -1,11 +1,9 @@
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
-import { useParentAttrs, useGridModel } from '@hooks';
 
-import { countTracks, parseAreas, ensureSize } from '@utils/gridUtils';
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
 import { augmentAttributes } from '@utils/breakpointUtils.js';
+import { countTracks } from "@utils/gridUtils";
 
 export function useParentGridMeta(passedClientId) {
     const { parentId, parentBlock } = useSelect((select) => {
@@ -26,6 +24,12 @@ export function useParentGridMeta(passedClientId) {
         [parentBlock?.attributes, breakpoint]
     );
 
+    const columnsTemplate = parent?.$get('gridTemplateColumns', { cascade: true });
+    const rowsTemplate = parent?.$get('gridTemplateRows', { cascade: true });
+
+    const { count: columnCount } = useMemo(() => countTracks(columnsTemplate), [columnsTemplate]);
+    const { count: rowCount } = useMemo(() => countTracks(rowsTemplate), [rowsTemplate]);
+
     const isGrid = useMemo(() => {
         const display = parent?.$get?.('display', { cascade: true }) ?? '';
         return /^(grid|inline-grid)$/i.test(String(display).trim());
@@ -37,8 +41,10 @@ export function useParentGridMeta(passedClientId) {
         parent,
         isGrid,
         display: parent?.$get('display', { cascade: true }),
-        cols: parent?.$get('gridTemplateColumns', { cascade: true }),
-        rows: parent?.$get('gridTemplateRows', { cascade: true }),
+        columns: columnsTemplate,
+        rows: rowsTemplate,
         areas: parent?.$get('gridTemplateAreas', { cascade: true }),
+        columnCount,
+        rowCount
     }
 }

@@ -9,7 +9,7 @@ import { LABELS } from '@labels';
 import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { TokenEditor } from '@components/composite/TokenEditor';
 
-export function GridAxisTracks({ clientId }) {
+export function GridAxisTracks({ clientId, axisDisabled }) {
     if (!clientId) return null;
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);

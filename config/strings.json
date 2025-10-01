@@ -67,7 +67,7 @@
         "order": "Order"
     },
     "gridControls": {
-        "panelTitle": "Grid Controls",
+        "panelTitle": "Grid Container Controls",
         "templateMode": "Template Mode",
         "simplePanel": {
             "title": "Simple",
@@ -76,10 +76,14 @@
             "columnsClear": "Clear Columns",
             "columnSpan": "Use %1$s as column width",
             "columnUnit": "Unit",
+            "columnIsDisabled": "Column settings are disabled because the parent grid uses subgrid for columns.",
+            "columnIsDisabledHelp": "To enable column settings, change the parent grid to not use subgrid for columns.",
             "rows": "Rows",
             "rowsClear": "Clear Rows",
             "rowSpan": "Use %1$s as row height",
-            "rowUnit": "Unit"
+            "rowUnit": "Unit",
+            "rowIsDisabled": "Row settings are disabled because the parent grid uses subgrid for rows.",
+            "rowIsDisabledHelp": "To enable row settings, change the parent grid to not use subgrid for rows."
         },
         "tracksPanel": {
             "title": "Tracks",
@@ -99,6 +103,19 @@
                 "addPlaceholder": "Add track or [line names]",
                 "addToken": "Add row size",
                 "addLabel": "Add [line name]"
+            }
+        },
+        "subgridPanel": {
+            "title": "Subgrid",
+            "columns": {
+                "label": "Columns use subgrid (%1$s)",
+                "help": "Inherit column tracks from the parent grid on this breakpoint.",
+                "notice": "Parent grid has no explicit columns; subgrid columns will inherit implicit tracks."
+            },
+            "rows": {
+                "label": "Rows use subgrid (%1$s)",
+                "help": "Inherit row tracks from the parent grid on this breakpoint.",
+                "notice": "Parent grid has no explicit rows; subgrid rows will inherit implicit tracks."
             }
         },
         "gapPanel": {
@@ -130,12 +147,15 @@
             "title": "Simple",
             "columnStart": "Column Start",
             "columnStartHelp": "%1$d columns",
+            "columnStartHelpUnknown": "Parent grid columns unknown; using a default range (1–24).",
             "columnSpan": "Column Span",
             "columnSpanHelp": "Max updates with start",
             "rowStart": "Row Start",
             "rowStartHelp": "%1$d rows",
+            "rowStartHelpUnknown": "Parent grid rows unknown; using a default range (1–24).",
             "rowSpan": "Row Span",
             "rowSpanHelp": "Max updates with start"
+            
         },
         "tracksPanel": {
             "title": "Tracks",
@@ -340,5 +360,20 @@
             "heading": "Remove rows/columns?",
             "description": "Shrinking dimensions will drop rows/columns. Continue?"
         }
+    },
+    "actions": {
+        "apply": "Apply",
+        "close": "Close",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "clear": "Clear",
+        "reset": "Reset",
+        "remove": "Remove",
+        "add": "Add",
+        "edit": "Edit",
+        "save": "Save",
+        "copy": "Copy",
+        "undo": "Undo",
+        "redo": "Redo"
     }
 }

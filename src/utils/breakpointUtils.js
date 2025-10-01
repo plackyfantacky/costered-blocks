@@ -49,11 +49,15 @@ export function augmentAttributes(baseAttrs, bp) {
         }
     }
 
-    //RAW by default
+    // CASCADE by default; opt into raw with { raw: true } or { cascade: false }
     const boundGet = (key, options = undefined) => {
-        const cascade = !!(options && options.cascade);
-        const explicitRaw = options && Object.prototype.hasOwnProperty.call(options, 'raw');
-        const raw = explicitRaw ? !!options.raw : !cascade;
+        const cascade = (options && Object.prototype.hasOwnProperty.call(options, 'cascade'))
+            ? !!options.cascade
+            : true; //default to true
+
+        const raw = (options && Object.prototype.hasOwnProperty.call(options, 'raw')
+            ? !!options.raw
+            : !cascade); //if cascade is true, raw is false
         
         const active = bp || BP_DESKTOP;
         if (raw) {

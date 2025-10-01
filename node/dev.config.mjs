@@ -27,6 +27,7 @@ const pathAliases = {
     'stores': 'src/stores',
     'tabs': 'src/tabs',
     'utils': 'src/utils',
+    'debug': 'src/utils/debug.js'
 };
 
 const globalsMap = {

@@ -100,7 +100,7 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
                     <FlexBlock>
                         <Button variant="secondary" onClick={resizeAreasToTracks}>{labels.resizeToTracks}</Button>
                     </FlexBlock>
-                    {needGrowCols || needGrowRows && (
+                    {(needGrowCols || needGrowRows) && (
                         <FlexBlock>
                             <Button variant="secondary" onClick={growTracksToAreas} disabled={!needGrowCols && !needGrowRows}>{labels.growTracksToAreas}</Button>
                         </FlexBlock>

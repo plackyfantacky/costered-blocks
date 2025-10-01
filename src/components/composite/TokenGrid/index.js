@@ -6,9 +6,9 @@ import { useGridAreasMatrix } from '@hooks';
 import { GridBoard } from './GridBoard';
 import { NoticePanel } from './NoticePanel';
 import { LABELS as DEFAULT_LABELS } from '@labels';
+import { toCount } from '@utils/gridUtils';
 
 export default function TokenGrid({ clientId, labels = {} }) {
-    // Suspend/resume resync around editing
     const [isEditing, setIsEditing] = useState(false);
     const resumeRef = useRef(null);
 
@@ -22,12 +22,24 @@ export default function TokenGrid({ clientId, labels = {} }) {
         [labels]
     );
 
-    const { matrix, columnData: columns, rowData: rows, setCell, resize, clear } = useGridAreasMatrix(clientId);
+    const {
+        matrix,
+        columnData: columns,
+        rowData: rows,
+        setCell,
+        resize,
+        clear
+    } = useGridAreasMatrix(clientId);
 
-    // Treat matrix as the visible source of truth; still warn if counts diverge.
-    const columnData = Array.isArray(matrix) && Array.isArray(matrix[0]) ? matrix[0].length : 0;
-    const rowData = Array.isArray(matrix) ? matrix.length : 0;
-    const mismatch = columnData !== columns || rowData !== rows;
+    const areaCols = Array.isArray(matrix) && Array.isArray(matrix[0]) ? matrix[0].length : 0;
+    const areaRows = Array.isArray(matrix) ? matrix.length : 0;
+
+    const trackCols = toCount(columns?.count ?? columns);
+    const trackRows = toCount(rows?.count ?? rows);
+
+    const mismatch = (areaCols || areaRows || trackCols || trackRows)
+        ? (areaCols !== trackCols || areaRows !== trackRows)
+        : false;
 
     const handleEditingChange = useCallback((editing) => {
         if (resumeRef.current) clearTimeout(resumeRef.current);
@@ -39,29 +51,27 @@ export default function TokenGrid({ clientId, labels = {} }) {
     }, []);
 
     // Cleanup any pending timer on unmount
-    useEffect(() => {
-        return () => {
-            if (resumeRef.current) clearTimeout(resumeRef.current);
-        };
-    }, []);
+    useEffect(() => () => resumeRef.current && clearTimeout(resumeRef.current), []);
 
     return (
         <Flex direction="column" gap={2} className="costered-blocks--token-grid-component">
             {mismatch && (
                 <NoticePanel
                     clientId={clientId}
-                    columnData={columnData}
-                    rowData={rowData}
+                    columnData={trackCols}
+                    rowData={trackRows}
                     gridMatrix={matrix}
                     labels={tokenGridNoticeLabels}
                 />
             )}
             <Flex direction="row" gap={2} align="center" justify="space-between" className={"costered-blocks--token-grid-header"}>
-                <FlexItem>
-                    <span className="costered-blocks--token-grid-help">
-                        {sprintf(tokenGridLabels.sizeHint, columnData, rowData)}
-                    </span>
-                </FlexItem>
+                {areaCols > 0 && areaRows > 0 && (
+                    <FlexItem>
+                        <span className="costered-blocks--token-grid-help">
+                            {sprintf(tokenGridLabels.sizeHint, areaCols, areaRows)}
+                        </span>
+                    </FlexItem>
+                )}
                 {/* disabling this for now, as this action is destructive and I should at least confirm with the user */}
                 {/* <FlexItem>
                     <Button
@@ -75,8 +85,8 @@ export default function TokenGrid({ clientId, labels = {} }) {
             </Flex>
             <GridBoard
                 matrix={matrix}
-                columnData={columnData}
-                rowData={rowData}
+                columnData={areaCols}
+                rowData={areaRows}
                 emptyToken={'.'}
                 labels={tokenGridLabels}
                 setCell={setCell}

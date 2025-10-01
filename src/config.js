@@ -66,7 +66,11 @@ export const MOBILE_THRESHOLD = configData?.settings?.breakpoints?.mobile ?? 782
 export const TABLET_THRESHOLD = configData?.settings?.breakpoints?.tablet ?? 1024;
 export const DESKTOP_THRESHOLD = configData?.settings?.breakpoints?.desktop ?? 1440;
 
-export const IS_DEBUG = false;
+export const GRID_AREA_KEYS = configData?.collections?.clearSets?.gridAreas;
+export const GRID_COLUMN_KEYS = configData?.collections?.clearSets?.gridColumns;
+export const GRID_ROW_KEYS = configData?.collections?.clearSets?.gridRows;
+
+export const IS_DEBUG = true;
 
 /**
  * Editor Style Mirror keys.

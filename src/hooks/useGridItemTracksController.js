@@ -1,7 +1,7 @@
 // chugga chugga choo choo chugga chugga 🚂
 import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 
-import { useGridItemWriter } from '@hooks';
+import { useAttrGetter, useGridItemWriter } from '@hooks';
 import {
     clamp, isIntToken, toInt, parsePlacementAdvanced, extractNamedLines,
     toSignedLine, parseSigned, isGridPlacement
@@ -9,13 +9,16 @@ import {
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 
-export function useGridItemTracksController({ attributes, setMany, parentMeta }) {
-    const hasArea = isGridPlacement(attributes.gridArea);
+export function useGridItemTracksController({ clientId, setMany, parentMeta }) {
+    if (!clientId) return null;
+    const { get } = useAttrGetter(clientId);
+
+    const hasArea = isGridPlacement(get('gridArea'));
     const { columns, rows, columnTemplate, rowTemplate } = parentMeta;
 
     //parse the current values
-    const col = useMemo(() => parsePlacementAdvanced(attributes.gridColumn), [attributes.gridColumn]);
-    const row = useMemo(() => parsePlacementAdvanced(attributes.gridRow), [attributes.gridRow]);
+    const col = useMemo(() => parsePlacementAdvanced(get('gridColumn')), [get]);
+    const row = useMemo(() => parsePlacementAdvanced(get('gridRow')), [get]);
 
     //UI mode state (decoupled from attribute value)
     //if the attribute changes externally, update the mode
@@ -65,8 +68,8 @@ export function useGridItemTracksController({ attributes, setMany, parentMeta })
     // Drafts for "0 is invalid" inputs    
     const [colEndDraft, setColEndDraft] = useState(null); // number | '' | null;
     const [rowEndDraft, setRowEndDraft] = useState(null); // number | '' | null;
-    useEffect(() => { setColEndDraft(null); }, [attributes.gridColumn]);
-    useEffect(() => { setRowEndDraft(null); }, [attributes.gridRow]);
+    useEffect(() => { setColEndDraft(null); }, [get('gridColumn')]);
+    useEffect(() => { setRowEndDraft(null); }, [get('gridRow')]);
 
     //collumn handlers
     const onColStartNumber = useCallback((value) => {

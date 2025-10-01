@@ -302,3 +302,81 @@ function costered_build_css_for_uid($uid, array $stylesByBp) {
     
     return $css;
 }
+
+/**
+ * Write collected CSS to uploads/costered and return (url, path, version).
+ */
+function costered_write_css_file($css, $post_id = 0) {
+    if (!is_string($css)) return [null, null, null];
+
+    $css = trim($css);
+    if ($css === '') return [null, null, null];
+
+    $uploads = wp_upload_dir();
+    if (!empty($uploads['error'])) return [null, null, null];
+
+    $base_dir = rtrim($uploads['basedir'], '/\\') . '/costered';
+    $base_url = rtrim($uploads['baseurl'], '/\\') . '/costered';
+
+    if (is_ssl()) {
+        $base_url = set_url_scheme($base_url, 'https');
+    }
+
+    if (!is_dir($base_dir) && !wp_mkdir_p($base_dir)) {
+        return [null, null, null];
+    }
+
+    if(!is_writable($base_dir)) {
+        return [null, null, null];
+    }
+    
+    // Prefer per-post file on singulars for cache-friendliness
+    $pid = $post_id ?: (int) get_the_ID() ?: 0;
+
+    $hash = md5($css);
+    $filename = ($pid ? "post-{$pid}-" : 'global-') . substr($hash, 0, 12) . '.css';
+    $path = $base_dir . '/' . $filename;
+    $url  = $base_url . '/' . $filename;
+
+    // Write only if new or changed
+    $need_write = !file_exists($path) || @md5_file($path) !== $hash;
+    if ($need_write) {
+        $bytes = @file_put_contents($path, $css, LOCK_EX);
+        if ($bytes === false || !file_exists($path)) {
+            return [null, null, null];
+        }
+
+        //GC: remove old files for this post or global
+        foreach (glob($base_dir . '/' . ($pid ? "post-{$pid}-*.css" : 'global-*.css') ) as $oldfile) {
+            if ($oldfile !== $path) @unlink($oldfile);
+        }
+    }
+
+    return [$url, $path, $hash];
+}
+
+/**
+ * Footer emitter: turn the buffer into a file and print a <link>.
+ * Runs after blocks have rendered (buffer is full).
+ */
+function costered_print_collected_css_link() {
+    $buffer = $GLOBALS['costered_css_buffer'] ?? [];
+    if (empty($buffer)) return;
+
+    $css = implode("\n", array_unique($buffer));
+    if ($css === '') return;
+
+    $post_id = (is_singular() ? (int) get_queried_object_id() : 0);
+    list($url, $path, $version) = costered_write_css_file($css, $post_id);
+
+    if (!$url) return;
+
+    //clear the buffer
+    $GLOBALS['costered_css_buffer'] = [];
+
+    if (is_ssl()) {
+        $url = set_url_scheme($url, 'https');
+    }
+
+    echo '<link id="costered-blocks-stylesheet" rel="stylesheet" href="' . esc_url($url) . '?ver=' . esc_attr($version) . "\" />\n";
+}

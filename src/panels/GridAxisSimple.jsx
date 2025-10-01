@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { Flex, FlexBlock, FlexItem, RangeControl, ToggleControl } from '@wordpress/components';
+import { Flex, FlexBlock, RangeControl, ToggleControl } from '@wordpress/components';
 import { sprintf } from '@wordpress/i18n';
 
 import { useAttrSetter, useGridModel } from '@hooks';
@@ -9,6 +9,7 @@ import { LABELS } from '@labels';
 import { makeRepeat } from '@utils/gridUtils';
 
 import UnitControlInput from '@components/UnitControlInput';
+import CustomNotice from "@components/CustomNotice";
 import { GridAxisAside } from "@components/composite/GridAxisAside";
 
 const EMPTY_AXIS = {
@@ -19,7 +20,7 @@ const EMPTY_AXIS = {
     tracks: null
 };
 
-export function GridAxisSimple({ clientId }) {
+export function GridAxisSimple({ clientId, axisDisabled = {} }) {
     if (!clientId) return null;
     const { updateBlockAttributes } = useDispatch('core/block-editor');
     const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
@@ -134,11 +135,23 @@ export function GridAxisSimple({ clientId }) {
         unset('gridTemplateRows');
     }, [unset]);
 
+    const colDisabled = axisDisabled?.columns ?? false;
+    const rowDisabled = axisDisabled?.rows ?? false;
+
     return (
         <Flex direction="column" gap={6}>
             <FlexBlock className="costered-blocks--grid-panel-simple--description">
                 {LABELS.gridControls.simplePanel.description}
             </FlexBlock>
+            {colDisabled && (
+                <FlexBlock>
+                    <CustomNotice 
+                        type="info"
+                        title={LABELS.gridControls.simplePanel.columnIsDisabled}
+                        content={LABELS.gridControls.simplePanel.columnIsDisabledHelp}
+                    />
+                </FlexBlock>
+            )}
             <Flex direction="column" gap={3} className={"costered-blocks--grid-panel-simple--axis-controls"}>
                 <Flex direction="row" justify="space-between" align="center">
                     <span className="costered-blocks--grid-panel-simple--axis-label">{LABELS.gridControls.simplePanel.columns}</span>
@@ -149,6 +162,7 @@ export function GridAxisSimple({ clientId }) {
                         owner={model.activePane.columns}
                         here="simple"
                         label={LABELS.gridControls.simplePanel.columnsClear}
+                        disabled={colDisabled}
                     />
                 </Flex>
                 <RangeControl
@@ -157,6 +171,7 @@ export function GridAxisSimple({ clientId }) {
                     step={1}
                     value={colCount}
                     onChange={handleColCount}
+                    disabled={colDisabled}
                     className="costered-blocks--grid-columns-simple--axis-control"
                     __next40pxDefaultSize
                     __nextHasNoMarginBottom
@@ -165,6 +180,7 @@ export function GridAxisSimple({ clientId }) {
                     label={sprintf(LABELS.gridControls.simplePanel.columnSpan, DEFAULT_GRID_UNIT)}
                     checked={colUseDGU}
                     onChange={handleColUseDGU}
+                    disabled={colDisabled}
                     __nextHasNoMarginBottom
                 />
                 {!colUseDGU && (
@@ -172,9 +188,19 @@ export function GridAxisSimple({ clientId }) {
                         label={LABELS.gridControls.simplePanel.columnUnit}
                         value={colUnit}
                         onChange={handleColUnit}
+                        disabled={colDisabled}
                     />
                 )}
             </Flex>
+            {rowDisabled && (
+                <FlexBlock>
+                    <CustomNotice
+                        type="info"
+                        title={LABELS.gridControls.simplePanel.rowIsDisabled}
+                        content={LABELS.gridControls.simplePanel.rowIsDisabledHelp}
+                    />
+                </FlexBlock>
+            )}
             <Flex direction="column" gap={2} className={"costered-blocks--grid-panel-simple--axis-controls"}>
                 <Flex direction="row" justify="space-between" align="center">
                     <span className="costered-blocks--grid-panel-simple--axis-label">{LABELS.gridControls.simplePanel.rows}</span>
@@ -185,6 +211,7 @@ export function GridAxisSimple({ clientId }) {
                         owner={model.activePane.rows}
                         here="simple"
                         label={LABELS.gridControls.simplePanel.rowsClear}
+                        disabled={rowDisabled}
                     />
                 </Flex>
                 <RangeControl
@@ -193,6 +220,7 @@ export function GridAxisSimple({ clientId }) {
                     step={1}
                     value={rowCount}
                     onChange={handleRowCount}
+                    disabled={rowDisabled}
                     className="costered-blocks--grid-rows-simple--axis-control"
                     __next40pxDefaultSize
                     __nextHasNoMarginBottom
@@ -201,6 +229,7 @@ export function GridAxisSimple({ clientId }) {
                     label={sprintf(LABELS.gridControls.simplePanel.rowSpan, DEFAULT_GRID_UNIT)}
                     checked={rowUseDGU}
                     onChange={handleRowUseDGU}
+                    disabled={rowDisabled}
                     __nextHasNoMarginBottom
                 />
                 {!rowUseDGU && (
@@ -208,6 +237,7 @@ export function GridAxisSimple({ clientId }) {
                         label={LABELS.gridControls.simplePanel.rowUnit}
                         value={rowUnit}
                         onChange={handleRowUnit}
+                        disabled={rowDisabled}
                     />
                 )}
             </Flex>

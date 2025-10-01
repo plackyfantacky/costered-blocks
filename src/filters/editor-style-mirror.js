@@ -25,14 +25,16 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
-import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
 import { augmentAttributes } from '@utils/breakpointUtils';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
 
 import {
     MIRRORED_STYLE_KEYS,
     ATTRS_TO_CSS,
     gridItemsProps,
 } from '@config';
+
+//console.log('MIRRORED_STYLE_KEYS', MIRRORED_STYLE_KEYS)
 
 // helpers
 const kebabToCamel = (value) => value.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
@@ -201,12 +203,8 @@ function withEditorStyleMirror(BlockListBlock) {
             [props.clientId]
         );
         const attrs = block?.attributes || {};
-
-        const activeBreakpoint = selectActiveBreakpoint(useSelect);
-        const augmented = useMemo(
-            () => augmentAttributes(attrs, activeBreakpoint),
-            [attrs, activeBreakpoint]
-        );
+        const breakpoint = useSelect(selectActiveBreakpoint, []);
+        const augmented = useMemo(() => augmentAttributes(attrs, breakpoint), [attrs, breakpoint]);
 
         const {
             style: mirrorStyle,
