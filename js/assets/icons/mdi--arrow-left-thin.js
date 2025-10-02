@@ -1,1 +1,1 @@
-(()=>{var l=({size:t=24,...h})=>React.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:t,height:t,...h},React.createElement("path",{fill:"currentColor",d:"M10.05 16.94v-4h8.92l.03-2.01h-8.95V6.94l-5 5Z"})),r=l;})();
+(()=>{var l=({size:t=24,...h})=>wp.element.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:t,height:t,...h},wp.element.createElement("path",{fill:"currentColor",d:"M10.05 16.94v-4h8.92l.03-2.01h-8.95V6.94l-5 5Z"})),r=l;})();

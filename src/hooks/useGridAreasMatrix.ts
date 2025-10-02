@@ -4,9 +4,22 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { useGridStoreAreasIO } from '@hooks';
 import { ensureSize, toCount } from '@utils/gridUtils';
 
-import { log } from '@debug';
+type Token = String;
+type Matrix = Token[][];
 
-export function useGridAreasMatrix(clientId) {
+type ColumnInfo = { count: number };
+type RowInfo = { count: number };
+
+interface GridStoreAreasIO {
+    areasTemplate?: string;
+    trackColumnCount?: unknown;
+    trackRowCount?: unknown;
+    applyMatrixToStore: (matrix: Matrix) => void;
+    clearAreasInStore: () => void;
+    seedFromStore: (defaultToken?: Token) => Matrix; 
+}
+
+export function useGridAreasMatrix(clientId: string) {
     const {
         areasTemplate,
         trackColumnCount,
@@ -14,28 +27,37 @@ export function useGridAreasMatrix(clientId) {
         applyMatrixToStore,
         clearAreasInStore,
         seedFromStore,
-    } = useGridStoreAreasIO(clientId);
+    } = useGridStoreAreasIO(clientId) as GridStoreAreasIO;
 
     // 1) Seed matrix from store/model; bootstrap from tracks if areas are empty
-    const matrix = useMemo(() => {
-        const m = seedFromStore('.');
-        console.log('[areas seed -> shape]', m.length, m[0]?.length);
-        return m;
+    const matrix: Matrix = useMemo(() => {
+        const seeded = seedFromStore('.');
+        //console.log('[areas seed -> shape]', seeded.length, seeded[0]?.length);
+        return seeded;
     }, [seedFromStore]);
 
     // 2) Expose counts (prefer matrix; fall back to track counts)
-    const columnData = useMemo(() => ({ count: matrix?.[0]?.length || toCount(trackColumnCount) }), [matrix, trackColumnCount]);
-    const rowData = useMemo(() => ({ count: matrix?.length || toCount(trackRowCount) }), [matrix, trackRowCount]);
+    const columnData: ColumnInfo = useMemo(
+        () => ({ count: matrix?.[0]?.length || toCount(trackColumnCount) }),
+        [matrix, trackColumnCount]
+    );
+
+    const rowData: RowInfo = useMemo(
+        () => ({ count: matrix?.length || toCount(trackRowCount) }),
+        [matrix, trackRowCount]
+    );
 
     // 3) Commit helpers
-    const commitMatrix = useCallback((next) => {
+    const commitMatrix = useCallback((next: Matrix) => {
         const cols = next[0]?.length || 0;
         const rows = next.length || 0;
-        const rectangular = ensureSize(
-            next.map(row => row.map(token => (String(token ?? '').trim() || '.'))),
-            cols, rows,
-            '.'
+
+        // trim tokens, collapse empties to '.', and enforce rectangular bounds.
+        const cleaned: Matrix = next.map((row) => 
+            row.map((token) => (String(token ?? '').trim() || '.') as Token)
         );
+
+        const rectangular = ensureSize(cleaned, cols, rows, '.') as Matrix;
         applyMatrixToStore(rectangular);
     }, [applyMatrixToStore]);
 

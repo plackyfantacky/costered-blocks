@@ -1,3 +1,4 @@
+// @ts-nocheck
 import esbuild from 'esbuild';
 import { context, build } from 'esbuild';
 import { glob } from 'glob';
@@ -27,7 +28,8 @@ const pathAliases = {
     'stores': 'src/stores',
     'tabs': 'src/tabs',
     'utils': 'src/utils',
-    'debug': 'src/utils/debug.js'
+    'debug': 'src/utils/debug.js',
+    'types': 'types'
 };
 
 const globalsMap = {
@@ -125,13 +127,21 @@ const jsConfig = {
     outdir: jsOutDir,
     loader: {
         '.js': 'jsx',
-        '.ts': 'tsx',
+        '.ts': 'ts',
         '.jsx': 'jsx',
         '.tsx': 'tsx'
     },
     jsx: 'transform',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
+    jsxFactory: 'wp.element.createElement',
+    jsxFragment: 'wp.element.Fragment',
+    tsconfigRaw: {
+        compilerOptions: {
+            // Force classic JSX at bundle-time even if tsconfig says react-jsx
+            jsx: 'react',
+            jsxFactory: 'wp.element.createElement',
+            jsxFragmentFactory: 'wp.element.Fragment'
+        }
+    },
     target: ['es2020'],
     format: 'iife',
     platform: 'browser',
