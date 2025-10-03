@@ -114,13 +114,13 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
     }, [rowCount, rowUnit, writeRows]);
 
     const handleColUnit = useCallback((unit) => {
-        const u = (unit || '').trim();
+        const u = (unit ?? '').trim();
         setColUnit(u);
         writeCols(colCount, colUseDGU ? DEFAULT_GRID_UNIT : (u || DEFAULT_GRID_UNIT));
     }, [colCount, colUseDGU, writeCols]);
 
     const handleRowUnit = useCallback((unit) => {
-        const u = (unit || '').trim();
+        const u = (unit ?? '').trim();
         setRowUnit(u);
         writeRows(rowCount, rowUseDGU ? DEFAULT_GRID_UNIT : (u || DEFAULT_GRID_UNIT));
     }, [rowCount, rowUseDGU, writeRows]);

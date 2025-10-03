@@ -16,7 +16,6 @@ interface GridModel {
     areas?: { template?: string | null };
 }
 
-
 export function useGridStoreAreasIO(clientId: string) {
     const { set, unset } = useAttrSetter(clientId);
 
@@ -28,10 +27,10 @@ export function useGridStoreAreasIO(clientId: string) {
     const model = useGridModel(clientId) as GridModel | undefined;
     const columnTemplate: string = model?.columns?.template ?? '';
     const rowTemplate: string = model?.rows?.template ?? '';
-    const areasTemplate: string = model?.areas?.template ?? '';
+    const areasTemplate: string | null = model?.areas?.template ?? '';
 
     // COLS: prefer explicit template; else infer from children & known rows; else 0
-    const trackColumnCount = useMemo(() => {
+    const trackColumnCount = useMemo<number>(() => {
         // 1) explicit template
         if (columnTemplate) {
             const info: TrackInfo = countTracks(columnTemplate);
@@ -54,10 +53,10 @@ export function useGridStoreAreasIO(clientId: string) {
 
         // 3) unknown
         return 0;
-    }, [columnTemplate]);
+    }, [columnTemplate, rowTemplate, model?.rows?.count, childCount]);
 
     // ROWS: prefer explicit model count; else explicit template; else infer from children & known cols; else 0
-    const trackRowCount = useMemo(() => {
+    const trackRowCount = useMemo<number>(() => {
         // 1) model count
         const modelHint = toCount(model?.rows?.count);
         if (modelHint > 0) return modelHint;

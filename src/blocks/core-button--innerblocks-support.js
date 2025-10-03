@@ -167,7 +167,7 @@ registerBlockType('costered-blocks/button-text', {
                     ref={inputRef}
                     type="text"
                     className="cb-button-text-input"
-                    value={content || ''}
+                    value={content ?? ''}
                     onInput={(e) => setAttributes({ content: e.target.value })}
                     size={4}
                     placeholder="Button Text"

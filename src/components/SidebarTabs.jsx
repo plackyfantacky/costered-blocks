@@ -5,8 +5,8 @@ import { TabPanel } from '@wordpress/components';
 
 import { useParentAttrs } from "@hooks";
 
-import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
-import { augmentAttributes } from '@utils/breakpointUtils.js';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
+import { augmentAttributes } from '@utils/breakpointUtils';
 
 import DimensionsControls from "@tabs/DimensionsControls";
 import DisplayControls from "@tabs/DisplayControls";

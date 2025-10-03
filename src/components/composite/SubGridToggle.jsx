@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 
 import { LABELS } from '@labels';
 import { useAttrGetter, useAttrSetter, useParentAttrs, useUIPreferences, useScopedKey  } from '@hooks';
-import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 
 export default function SubGridToggle({ clientId, blockName, onAxisDisableChange }) {
 

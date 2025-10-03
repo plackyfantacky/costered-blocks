@@ -1,1 +1,1 @@
-(()=>{function n(...o){window.COSTERED_DEBUG&&console.log("[TokenGrid]",...o)}})();
+(()=>{function n(...o){typeof window<"u"&&!window.COSTERED_DEBUG||console.log("[CosteredBlocks]",...o)}})();

@@ -1,33 +1,12 @@
+// src/hooks/useAttrGetter.ts
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo, useCallback } from '@wordpress/element';
 
-import type { Breakpoint, BlockAttributes } from '@types';
-
+import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, AugmentedAttributes } from '@types';
 import { REDUX_STORE_KEY as BP_STORE } from '@config';
 import { augmentAttributes } from '@utils/breakpointUtils';
 
-/**
- * Options supported by the augmented attribute reader.
- */
-export type GetterOptions = {
-    breakpoint?: Breakpoint;
-    resolve?: boolean;
-    //allow adding more options in the future
-    [key: string]: unknown
-}
-
-/**
- * Shape returned by `augmentAttributes`. Only the bits we use are typed.
-*/
-export interface AugmentedAttributes {
-    /* read single value by key */
-    $get: <Value = unknown>(key: string, options?: GetterOptions) => Value | undefined;
-    /** original raw attrs (should be rare) */
-    raw?: Record<string, unknown>;
-    /** Current breakpoint context baked into augmentation. */
-    breakpoint?: Breakpoint;
-}
 
 type AttributesMap = Record<string, unknown>;
 
@@ -49,31 +28,31 @@ export function useAttrGetter(clientId: string) {
     );
 
     const get = useCallback(
-        <Value = unknown>(key: string, options?: GetterOptions) => {
+        (key: string, options?: CascadeOptions) => {
             if (!attributes?.$get) return undefined;
-            return attributes.$get<Value>(key, options);
+            return attributes.$get(key, options);
         },
+        [attributes]
+    );
+
+    const getAs = useCallback(
+        <Value = CSSPrimitive>(key: string, options?: CascadeOptions): Value | undefined => 
+            (attributes?.$get ? (attributes.$get(key, options) as unknown as Value | undefined) : undefined),
         [attributes]
     );
 
     const getMany = useCallback(
-        <KeyList extends readonly string[], Value = unknown>(
-            keyList: KeyList,
-            options?: GetterOptions
-        ): { [K in KeyList[number]]: Value | undefined } => {
-            const result = {} as { [K in KeyList[number]]: Value | undefined };
-            if (!attributes?.$get) {
-                for (let i = 0; i < keyList.length; i++) result[keyList[i] as KeyList[number]] = undefined;
-                return result;
+        (keys: readonly string[], options?: CascadeOptions): Record<string, CSSPrimitive | undefined> => {
+            if(!attributes?.$getMany) {
+                return Object.fromEntries(keys.map((key) => [key, undefined] )) as Record<string, CSSPrimitive | undefined>;
             }
-            for (let i = 0; i < keyList.length; i++) {
-                const key = keyList[i] as KeyList[number];
-                result[key] = attributes.$get<Value>(key, options);
-            }
-            return result;
+            return attributes.$getMany([...keys], options);
         },
         [attributes]
     );
 
-    return useMemo(() => ({ get, getMany, bp: breakpoint, attributes }), [get, getMany, breakpoint, attributes]);
+    return useMemo(
+        () => ({ get, getAs, getMany, bp: breakpoint, attributes }),
+        [get, getAs, getMany, breakpoint, attributes]
+    );
 }

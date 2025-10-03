@@ -33,7 +33,7 @@ export default function GapControls({ clientId, blockName = null }) {
     const [inputMode, setInputMode] = useUIPreferences(inputModePrefKey, 'single');
 
     //initial values
-    const initialValue = get('gap') || '';
+    const initialValue = get('gap') ?? '';
 
     //control mode state (either 'single' or 'dual'). if not defined, determine from initial value
 
@@ -46,7 +46,7 @@ export default function GapControls({ clientId, blockName = null }) {
     //split initial value into row and column parts
     const [row, col] = useMemo(() => {
         const parts = splitGap(initialValue);
-        return [parts[0] || '', parts[1] || ''];
+        return [parts[0] ?? '', parts[1] ?? ''];
     }, [initialValue]);
 
     //actually setting the values

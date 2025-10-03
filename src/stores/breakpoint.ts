@@ -1,9 +1,13 @@
 import { createReduxStore, register } from '@wordpress/data';
 import { REDUX_STORE_KEY  } from '@config';
 
+import type { Breakpoint } from '@types';
 const DEFAULT_STATE = { breakpoint: 'desktop' };
 
-const actions = { setBreakpoint(breakpoint) { return { type: 'SET_BREAKPOINT', breakpoint }; } }
+const actions = { setBreakpoint(breakpoint: Breakpoint) { 
+    return { type: 'SET_BREAKPOINT', breakpoint }; }
+}
+
 const selectors = { getBreakpoint(state) { return state.breakpoint; } }
  
 function reducer(state = DEFAULT_STATE, action) {

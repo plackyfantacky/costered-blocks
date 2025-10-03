@@ -2,7 +2,7 @@ import { select as sel } from '@wordpress/data';
 import { REDUX_STORE_KEY } from '@config';
 
 const mapDeviceToBp = (device) => {
-    const dev = String(device || '').toLowerCase();
+    const dev = String(device ?? '').toLowerCase();
     if (dev === 'mobile' || dev === 'phone' || dev === 'tablet') return 'mobile';
     return 'desktop';
 };

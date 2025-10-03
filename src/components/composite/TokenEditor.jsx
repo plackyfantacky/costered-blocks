@@ -12,7 +12,7 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
     const [expandedIndex, setExpandedIndex] = useState(null); // number | null
 
     const add = useCallback(() => {
-        const value = String(draft || '').trim();
+        const value = String(draft ?? '').trim();
         if (!value) return;
         onAdd(value);
         setDraft('');
@@ -20,7 +20,7 @@ export function TokenEditor({ tokens, onAdd, onEdit, onRemove, onMove, labels, a
     }, [draft, onAdd]);
 
     const addNames = useCallback(() => {
-        const value = String(draft || '').trim();
+        const value = String(draft ?? '').trim();
         if (!value) return;
         onAdd(`[${value}]`);
         setDraft('');

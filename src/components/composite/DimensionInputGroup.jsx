@@ -51,8 +51,8 @@ export function DimensionInputGroup({ groupKey = "", clientId, blockName = null,
     // Prepare the values for width and height based on the groupKey
     // If groupKey is provided, it will use minWidth, minHeight etc.
     const values = useMemo(() => ({
-        width: get(keyFor('width')) || '',
-        height: get(keyFor('height')) || ''
+        width: get(keyFor('width')) ?? '',
+        height: get(keyFor('height')) ?? ''
     }), [get, groupKey]);
 
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;

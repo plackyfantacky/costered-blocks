@@ -42,7 +42,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
             onStartNumber(fallback);
         } else if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(colStart) && colStart) || lines[0] || '';
+                const fallback = (!isIntToken(colStart) && colStart) ?? lines[0] ?? '';
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
@@ -65,7 +65,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
         }
         if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) || lines[0] || '';
+                const fallback = (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) ?? lines[0] ?? '';
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);
@@ -85,7 +85,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
             onStartNumber(fallback);
         } else if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(rowStart) && rowStart) || lines[0] || '';
+                const fallback = (!isIntToken(rowStart) && rowStart) ?? lines[0] ?? '';
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
@@ -106,7 +106,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
         }
         if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) || lines[0] || '';
+                const fallback = (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) ?? lines[0] ?? '';
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);

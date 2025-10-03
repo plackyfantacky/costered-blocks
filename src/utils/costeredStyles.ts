@@ -1,4 +1,5 @@
 // src/utils/costeredStyles.ts
+
 import type {
     BlockAttributes,
     Breakpoint,
@@ -7,7 +8,7 @@ import type {
     RawStyle,
     StyleDeclaration,
     CSSPrimitive
-} from '../../types/costered';
+} from '@types';
 
 export const BREAKPOINTS: Breakpoint[] = ['desktop', 'tablet', 'mobile'];
 

@@ -37,15 +37,15 @@ export function GridAxisTracks({ clientId, axisDisabled }) {
     const [rowTokens, setRowTokens] = useState(seedRows);
 
     // Resynchronise when underlying template meaningfully changes
-    const colKey = (col && (col.normalised ?? normaliseTemplate(col.template || ''))) || '';
-    const rowKey = (row && (row.normalised ?? normaliseTemplate(row.template || ''))) || '';
+    const colKey = (col && (col.normalised ?? normaliseTemplate(col.template ?? ''))) ?? '';
+    const rowKey = (row && (row.normalised ?? normaliseTemplate(row.template ?? ''))) ?? '';
 
     useEffect(() => { setColTokens(seedCols); }, [colKey]);
     useEffect(() => { setRowTokens(seedRows); }, [rowKey]);
 
     // Serialisers
     const serialise = useCallback((tokens) => {
-        const cleaned = tokens.map((t) => String(t || '').trim()).filter(Boolean);
+        const cleaned = tokens.map((t) => String(t ?? '').trim()).filter(Boolean);
         return cleaned.length ? cleaned.join(' ') : null;
     }, []);
 
@@ -62,17 +62,17 @@ export function GridAxisTracks({ clientId, axisDisabled }) {
     // Active indicators
     const colsActive = useMemo(() => {
         const now = serialise(colTokens);
-        return !!col?.template && normaliseTemplate(now || '') === colKey;
+        return !!col?.template && normaliseTemplate(now ?? '') === colKey;
     }, [col?.template, colKey, colTokens, serialise]);
 
     const rowsActive = useMemo(() => {
         const now = serialise(rowTokens);
-        return !!row?.template && normaliseTemplate(now || '') === rowKey;
+        return !!row?.template && normaliseTemplate(now ?? '') === rowKey;
     }, [row?.template, rowKey, rowTokens, serialise]);
 
     // Handlers for token lists
     const addToken = useCallback((tokens, setTokens, write, value) => {
-        const v = String(value || '').trim();
+        const v = String(value ?? '').trim();
         if (!v) return;
         const next = [...tokens, v];
         setTokens(next);

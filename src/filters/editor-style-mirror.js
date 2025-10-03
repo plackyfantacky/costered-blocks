@@ -139,15 +139,15 @@ function buildMirror(attributes = {}) {
     }
 
     // grid shorthands
-    const area = String(read(PLACEMENT.gridArea.attr) || '').trim();
+    const area = String(read(PLACEMENT.gridArea.attr) ?? '').trim();
     if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[PLACEMENT.gridArea.attr] = area; any = true; }
 
     //grid column
-    const col = (read(PLACEMENT.gridColumn.attr) || '').trim();
+    const col = (read(PLACEMENT.gridColumn.attr) ?? '').trim();
     if (col) { style[PLACEMENT.gridColumn.attr] = col; any = true; }
 
     //grid row
-    const row = (read(PLACEMENT.gridRow.attr) || '').trim();
+    const row = (read(PLACEMENT.gridRow.attr) ?? '').trim();
     if (row) { style[PLACEMENT.gridRow.attr] = row; any = true; }
 
     // All other mirrored style keys (skip margins and grid shorthands already handled)
@@ -243,7 +243,7 @@ function withEditorStyleMirror(BlockListBlock) {
         ]);
 
         const className = [
-            props?.wrapperProps?.className || '',
+            props?.wrapperProps?.className ?? '',
             any ? 'is-cb-mirrored' : '',
             hasMt ? 'has-cb-mt' : '',
             hasMb ? 'has-cb-mb' : '',

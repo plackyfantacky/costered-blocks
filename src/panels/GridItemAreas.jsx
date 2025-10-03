@@ -30,7 +30,7 @@ export function GridItemAreas({ clientId, blockName}) {
             <FlexBlock className={'costered-blocks-grid-item-advanced-controls--grid-area-selector'}>
                 <ComboboxControl
                     label={LABELS.gridItemsControls.areasPanel.gridAreaLabel}
-                    value={get('gridArea') || ''}
+                    value={get('gridArea') ?? ''}
                     options={[
                         { label: LABELS.gridItemsControls.areasPanel.gridAreaNone, value: '' },
                         ...areaNames.map((area) => ({ label: area, value: area }))

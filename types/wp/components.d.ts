@@ -1,13 +1,28 @@
 // types/wp/components.d.ts
 declare module '@wordpress/components' {
+    export const __experimentalConfirmDialog: any;
+    export const __experimentalGrid: any;
+    export const __experimentalHStack: any;
+    export const __experimentalNumberControl: any;
+    export const __experimentalToggleGroupControl: any;
+    export const __experimentalToggleGroupControlOption: any;
+    export const __experimentalToggleGroupControlOptionIcon: any;
+    export const __experimentalUnitControl: any;
+    export const __experimentalVStack: any;
+    export const Button: any;
+    export const ComboboxControl: any;
+    export const Flex: any;
+    export const FlexBlock: any;
+    export const FlexItem: any;
+    export const Icon: any;
+    export const Notice: any;
+    export const Panel: any;
     export const PanelBody: any;
+    export const PanelRow: any;
+    export const Popover: any;
+    export const Suspense: any;
     export const TabPanel: any;
     export const TextControl: any;
     export const ToggleControl: any;
-    export const Button: any;
-    export const Popover: any;
     export const Tooltip: any;
-    export const __experimentalConfirmDialog: any;
-    export const __experimentalHStack: any;
-    export const __experimentalVStack: any;
 }

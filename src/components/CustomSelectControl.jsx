@@ -88,7 +88,7 @@ export function CustomSelectControl({
                     <ul
                         role="listbox"
                         tabIndex={-1}
-                        className={`costered-custom-select__list ${className || ''}`}
+                        className={`costered-custom-select__list ${className ?? ''}`}
                         style={listStyle}
                     >
                         {children}

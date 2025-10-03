@@ -1,3 +1,5 @@
+// src/utils/gridUtils.ts
+
 import { DEFAULT_GRID_UNIT } from "@config";
 
 /** Capitalise the first character of a string. */
@@ -12,7 +14,7 @@ export const pretty = (s: unknown): string =>
   * @returns {string}
   */
 export function normaliseTemplate(input: unknown): string {
-    return String(input || '')
+    return String(input ?? '')
         .replace(/\s+/g, ' ')
         .replace(/\s*\(\s*/g, '(')
         .replace(/\s*\)\s*/g, ')')
@@ -120,7 +122,7 @@ export function extendTrackTemplate(
 
     // Indeterminate or empty templates: replace with a clean repeat()
     if (count === 0) {
-        const unit = (String(fill || '').trim()) || '1fr';
+        const unit = (String(fill ?? '').trim()) || '1fr';
         return `repeat(${safeTarget}, ${unit})`;
     }
 
@@ -128,7 +130,7 @@ export function extendTrackTemplate(
     if (count >= safeTarget) return current;
 
     const delta = safeTarget - count;
-    const unit = (String(fill || '').trim()) || '1fr';
+    const unit = (String(fill ?? '').trim()) || '1fr';
 
     // If template is simple repeat(n, X) where X is a single simple token - rewrite as repeat(target, X)
     const match = current.match(/^repeat\(\s*([0-9]+)\s*,\s*([^)]+)\)\s*$/i);
@@ -261,7 +263,7 @@ function countAndUnit(source: string, fallbackUnit: string): TrackCount {
 
         // Prefer a simple size token to set the unit hint
         if (!unitHint && isSimpleSizeToken(token)) {
-            unitHint = normaliseUnit(token) || '';
+            unitHint = normaliseUnit(token) ?? '';
         }
     }
 
@@ -312,10 +314,10 @@ function countRepeatToken(token: string): { count: number, unitHint: string } | 
 
     let unitHint = '';
     if (innerTokens.length === 1) {
-        unitHint = normaliseUnit(innerTokens[0]!) || '';
+        unitHint = normaliseUnit(innerTokens[0]!) ?? '';
     } else {
         const simple = innerTokens.find(isSimpleSizeToken);
-        unitHint = normaliseUnit(simple) || '';
+        unitHint = normaliseUnit(simple) ?? '';
     }
 
     return { count, unitHint };
@@ -818,7 +820,7 @@ const DECODERS = [decodeSimple, decodeTracks];
  * @returns {{ mode:'simple'|'tracks'|'raw', template:string|null, normalised:string, simple?:object, tracks?:string[] }}
  */
 export function decodeAxis(template: unknown): AxisDecode {
-    const tpl = template || '';
+    const tpl = template ?? '';
     for(const dec of DECODERS) {
         const out = dec(tpl);
         if (out) return out;
@@ -827,6 +829,6 @@ export function decodeAxis(template: unknown): AxisDecode {
     return {
         mode: 'raw',
         template: (template ? String(template) : null),
-        normalised: normaliseTemplate(template || '')
+        normalised: normaliseTemplate(template ?? '')
     }
 }

@@ -2,8 +2,8 @@ import { registerPlugin } from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/editor';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 
-import '@stores/breakpoint.js';
-import { startViewportSync } from '@utils/viewportSync.js';
+import '@stores/breakpoint';
+import { startViewportSync } from '@utils/viewportSync';
 
 import { BLOCKS_WITH_EDITOR_STYLES, IS_DEBUG } from "@config";
 import { LABELS } from '@labels';

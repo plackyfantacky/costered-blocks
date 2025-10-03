@@ -28,7 +28,7 @@ const FlexItemControls = () => {
     const flexShrink = get('flexShrink') || 0;
     const setFlexShrink = useCallback((value) => set('flexShrink', value), [set]);
 
-    const flexBasis = get('flexBasis') || '';
+    const flexBasis = get('flexBasis') ?? '';
     const setFlexBasis = useCallback((value) => set('flexBasis', value), [set]);
 
     const order = get('order') || 0;
