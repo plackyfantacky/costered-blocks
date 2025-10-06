@@ -7,8 +7,8 @@
         "lib": ["ES2022", "DOM"],
         "jsx": "react-jsx",
         "jsxImportSource": "@wordpress/element",
+        "resolveJsonModule": true,
         "types": ["react"],
-        
         "allowJs": true,
         "checkJs": true,
         "strict": true,
@@ -16,35 +16,34 @@
         "paths": {
             "@assets/*": ["src/assets/*"],
             "@components/*": ["src/components/*"],
-            "@config": ["src/config.js"],
+            "@config": ["src/config.ts"],
             "@debug": ["src/utils/debug.ts"],
             "@filters/*": ["src/filters/*"],
             "@hooks": ["src/hooks"],
             "@hooks/*": ["src/hooks/*"],
             "@icons/*": ["src/icons/*"],
-            "@labels/*": ["src/labels.js"],
+            "@labels": ["src/labels"],
             "@panels/*": ["src/panels/*"],
             "@stores/*": ["src/stores/*"],
             "@tabs/*": ["src/tabs/*"],
             "@types": ["src/types/index.ts"],
             "@types/*": ["src/types/*"],
-            "@utils": ["src/utils/index.js"],
             "@utils/*": ["src/utils/*"],
             "@wordpress/*": ["types/wp/*"],
             "@wordpress/element/jsx-runtime": ["types/wp/element-jsx-runtime.d.ts"]
         },
-
         "noEmit": true,
         "isolatedModules": true,
         "verbatimModuleSyntax": true,
         "noUncheckedSideEffectImports": true,
+        "noImplicitAny": true,
         "moduleDetection": "force",
         "skipLibCheck": true,
-        
         "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true,
+        "exactOptionalPropertyTypes": true
     },
     "include": [
+        "config",
         "src",
         "types"
     ],
@@ -52,7 +51,6 @@
         "node_modules",
         "js",
         "css",
-        "config",
         "node",
         "php",
         "svgr.config.cjs",

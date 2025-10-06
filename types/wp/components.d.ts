@@ -9,6 +9,7 @@ declare module '@wordpress/components' {
     export const __experimentalToggleGroupControlOptionIcon: any;
     export const __experimentalUnitControl: any;
     export const __experimentalVStack: any;
+    export const BaseControl: any;
     export const Button: any;
     export const ComboboxControl: any;
     export const Flex: any;

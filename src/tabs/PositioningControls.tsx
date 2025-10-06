@@ -1,4 +1,3 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, FlexBlock, BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
@@ -23,16 +22,27 @@ const minInteger = -maxInteger;
 
 const PositioningControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
+    if (!clientId || !selectedBlock) return null;
+    
     const { name } = selectedBlock;
 
     const { get } = useAttrGetter(clientId);
     const { set } = useAttrSetter(clientId);
 
-    const position = get("position") || "";
-    const setPosition = useCallback((value) => set("position", value), [set]);
+    const position: string = String(get("position") || "");
+    const setPosition = useCallback((value: string) => set("position", value), [set]);
 
-    const zIndex = get("zIndex") || 0;
-    const setZIndex = useCallback((value) => set("zIndex", value), [set]);
+    const rawZ = get("zIndex");
+    const zIndex: number | '' = 
+        rawZ === '' || rawZ === null
+            ? ''
+            : Number.isFinite(Number(rawZ)) ? Number(rawZ) : '';
+
+    const setZIndex = useCallback((value: number | '') => {
+        set("zIndex", value === '' ? undefined : value);
+    }, [set]);
+
+    const showOffsets = position !== '' && position.toLowerCase() !== 'static';
 
     return (
         <Panel className="costered-blocks--tab--positioning-controls">
@@ -77,6 +87,7 @@ const PositioningControls = () => {
                         <BaseControl
                             label={LABELS.positioningControls.coordinates.label}
                             help={LABELS.positioningControls.coordinates.help}
+                            __nextHasNoMarginBottom
                         >  
                             <DirectionalInputGroup
                                 clientId={clientId}

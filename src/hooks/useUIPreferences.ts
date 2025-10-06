@@ -50,9 +50,18 @@ export function useUIPreferences<Token>(
  */
 export function useScopedKey(
     base: string,
-    opts: { blockName?: string; variant?: string } = {}
+    opts: { blockName?: string | null; variant?: string | null } = {}
 ): string {
-    const { blockName, variant } = opts;
+    const normalise = (value?: string | null): string | undefined => {
+        if (value === null) return undefined;
+        const trimmed = value?.trim();
+        if (!trimmed) return undefined;
+        return encodeURIComponent(trimmed);
+    };
+
+    const blockName = normalise(opts.blockName);
+    const variant = normalise(opts.variant);
+
     if (!blockName && !variant) return base;
     if (blockName && !variant) return `${base}:${blockName}`;
     if (!blockName && variant) return `${base}#${variant}`;

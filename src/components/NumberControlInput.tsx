@@ -1,20 +1,48 @@
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { useCallback } from "@wordpress/element";
+import type { ReactNode } from "react";
 
 import { maybeFormat } from "@utils/componentUtils";
 
-export default function NumberControlInput({ value, onChange, label, placeholder, min = 2, max = 100, step = 1, asInteger = false, clamp = true, ...rest }) {
+type NumberControlInputProps = {
+    value: number | '';
+    onChange: (value: number | '') => void;
+    label?: ReactNode | string;
+    placeholder?: string;
+    min?: number;
+    max?: number;
+    step?: number;
+    asInteger?: boolean;
+    clamp?: boolean;
+    [extraProps: string]: unknown;
+}
 
-    const formattedLabel = maybeFormat(label, { toDashes: true, toSpaces: false });
-    const displayValue = value === '' || value === undefined ? '' : String(value);
+export default function NumberControlInput({ 
+    value, 
+    onChange, 
+    label, 
+    placeholder,
+    min = 2, 
+    max = 100, 
+    step = 1,
+    asInteger = false,
+    clamp = true,
+    ...rest
+} : NumberControlInputProps) {
+    const formattedLabel = maybeFormat(label as string, { toDashes: true, toSpaces: false });
+
+    const displayValue: string | number | undefined =  value === '' ? '' : value;
 
     const handleChange = useCallback(
-        (next) => {
+        (next: string | number | undefined) => {
             if (next === '' || next === undefined || next === null) {
                 onChange(''); //signal to unset the attribute
                 return;
             }
-            let n = asInteger ? parseInt(next, 10) : parseFloat(next);
+
+            const raw = typeof next === 'number' ? String(next) : next;
+            let n = asInteger ? parseInt(raw, 10) : parseFloat(raw);
+            
             if (Number.isNaN(n)) {
                 onChange('');
                 return;

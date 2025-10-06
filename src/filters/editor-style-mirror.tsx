@@ -25,8 +25,9 @@ import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
+import type { AugmentedAttributes, CSSPrimitive } from "@types";
 import { augmentAttributes } from '@utils/breakpointUtils';
-import { selectActiveBreakpoint } from '@stores/activeBreakpoint.js';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 
 import {
     MIRRORED_STYLE_KEYS,
@@ -37,15 +38,15 @@ import {
 //console.log('MIRRORED_STYLE_KEYS', MIRRORED_STYLE_KEYS)
 
 // helpers
-const kebabToCamel = (value) => value.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
-const hasNonEmptyString = (input) => {
+const kebabToCamel = (value: string) => value.replace(/-([a-z])/g, (_:string, char: string) => char.toUpperCase());
+const hasNonEmptyString = (input: unknown) => {
     if (input === undefined || input === null) return false;
     const output = String(input).trim();
     return output !== '' && output !== 'undefined' && output !== 'null';
 };
 
 // Logical CSS properties for margin overrides (to beat blockGap)
-const LOGICAL_CSS_PROPS = {
+const LOGICAL_CSS_PROPS: Record<string, string> = {
     marginInlineStart: 'margin-inline-start',
     marginInlineEnd: 'margin-inline-end',
     marginBlockStart: 'margin-block-start',
@@ -57,14 +58,34 @@ const LOGICAL_CSS_PROPS = {
  * Mapping of grid placement attribute keys to CSS properties and camelCase versions.
  * Used to ensure exclusivity of grid-area over grid-column/row and to append !important if configured.
  */
-const keys = Object.keys(gridItemsProps || {});
-const PLACEMENT = {};
+
+type PlacementEntry = { css: string; attr: string };
+type PlacementKey = 'gridArea' | 'gridColumn' | 'gridRow';
+
+const DEFAULT_PLACEMENT: Record<PlacementKey, PlacementEntry> = {
+    gridArea: { css: 'grid-area', attr: 'gridArea' },
+    gridColumn: { css: 'grid-column', attr: 'gridColumn' },
+    gridRow: { css: 'grid-row', attr: 'gridRow' },
+};
+
+const PLACEMENT: Record<PlacementKey, PlacementEntry> & Record<string, PlacementEntry> = {
+    ...DEFAULT_PLACEMENT
+};
+
+type GridItemProp = { css?: string };
+const keys = Object.keys((gridItemsProps || {}) as Record<string, GridItemProp>);
+
 for (const key of keys) {
-    PLACEMENT[key] = {
-        css: gridItemsProps[key]?.css || key,
-        attr: kebabToCamel(gridItemsProps[key]?.css || key)
-    };
+    const css = 
+        (gridItemsProps as Record<string, GridItemProp>)[key]?.css
+        ?? PLACEMENT[key]?.css 
+        ?? key;
+    PLACEMENT[key] = { css, attr: kebabToCamel(css) };
 }
+
+const GRID_AREA_ATTR = PLACEMENT.gridArea.attr;
+const GRID_COLUMN_ATTR = PLACEMENT.gridColumn.attr;
+const GRID_ROW_ATTR = PLACEMENT.gridRow.attr;
 
 /**
  * Build a style object from block attributes.
@@ -73,24 +94,22 @@ for (const key of keys) {
  * inline styles. Also sets logical margin properties to override blockGap and returns flags 
  * for which sides are set.
  * 
- * @param {Object} attributes - Block attributes to process.
- * @returns {Object} An object containing:
- *   - style: The constructed style object.
- *   - any: Boolean indicating if any styles were set.
- *   - hasMt, hasMb, hasMl, hasMr: Booleans indicating if specific margins are set.
- *   - haveFlexDir: Boolean indicating if flexDirection is set
+* @param {Object} attributes - The block attributes to build the style from.
+* @returns {Object} An object containing:
+* - style: The constructed style object.
+* - any: Boolean indicating if any styles were set.
+* - hasMt, hasMb, hasMl, hasMr: Booleans indicating if respective margins are set.
+* - haveFlexDir: Boolean indicating if flexDirection is set.
  */
-function buildMirror(attributes = {}) {
+function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
     // prefer responsive-aware reads (raw per active breakpoint); fallback to legacy props (if any left)
-    const read = (key) => (
-        typeof attributes?.$get === 'function'
-            ? attributes.$get(key)
-            : attributes?.[key]
-    );
+    const read = (key: string): CSSPrimitive | undefined => {
+        const getter = (attributes as any)?.$get;
+        return typeof getter === 'function' ? getter(key) : (attributes as any)?.[key];
+    };
 
-    const style = {};
+    const style: Record<string, string | number> = {};
     let any = false;
-
 
     // Track which margin sides are set for class flags
     let hasMt = false, hasMb = false, hasMl = false, hasMr = false;
@@ -139,24 +158,24 @@ function buildMirror(attributes = {}) {
     }
 
     // grid shorthands
-    const area = String(read(PLACEMENT.gridArea.attr) ?? '').trim();
-    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[PLACEMENT.gridArea.attr] = area; any = true; }
+    const area = String(read(GRID_AREA_ATTR) ?? '').trim();
+    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[GRID_AREA_ATTR] = area; any = true; }
 
     //grid column
-    const col = (read(PLACEMENT.gridColumn.attr) ?? '').trim();
-    if (col) { style[PLACEMENT.gridColumn.attr] = col; any = true; }
+    const col = String(read(GRID_COLUMN_ATTR) ?? '').trim();
+    if (col) { style[GRID_COLUMN_ATTR] = col; any = true; }
 
     //grid row
-    const row = (read(PLACEMENT.gridRow.attr) ?? '').trim();
-    if (row) { style[PLACEMENT.gridRow.attr] = row; any = true; }
+    const row = String(read(GRID_ROW_ATTR) ?? '').trim();
+    if (row) { style[GRID_ROW_ATTR] = row; any = true; }
 
     // All other mirrored style keys (skip margins and grid shorthands already handled)
-    for (const key of MIRRORED_STYLE_KEYS) {
+    for (const key of Array.from(MIRRORED_STYLE_KEYS)) {
         if (
             key === 'marginTop' || key === 'marginBottom' ||
             key === 'marginLeft' || key === 'marginRight' ||
             key === 'zIndex' || key === 'z-index' ||
-            key === PLACEMENT.gridArea.attr || key === PLACEMENT.gridColumn.attr || key === PLACEMENT.gridRow.attr
+            key === GRID_AREA_ATTR || key === GRID_COLUMN_ATTR || key === GRID_ROW_ATTR
         ) continue;
         const value = read(key);
         if (hasNonEmptyString(value)) {
@@ -196,43 +215,49 @@ function buildMirror(attributes = {}) {
  * @param {Function} BlockListBlock - The original BlockListBlock component.
  * @returns {Function} A memoized component that applies the style mirror.
  */
-function withEditorStyleMirror(BlockListBlock) {
-    const Wrapped = memo((props) => {
+function withEditorStyleMirror(BlockListBlock: any) {
+    const Wrapped = memo((props: any) => {
         const block = useSelect(
-            (select) => (props.clientId ? select('core/block-editor').getBlock(props.clientId) : null),
+            (select: any) => (props.clientId ? select('core/block-editor').getBlock(props.clientId) : null),
             [props.clientId]
         );
-        const attrs = block?.attributes || {};
+        const attrs = (block?.attributes as Record<string, unknown>) || {};
         const breakpoint = useSelect(selectActiveBreakpoint, []);
-        const augmented = useMemo(() => augmentAttributes(attrs, breakpoint), [attrs, breakpoint]);
+        const augmented = useMemo<AugmentedAttributes>(
+            () => augmentAttributes(attrs as any, breakpoint as any),
+            [attrs, breakpoint]
+        );
 
         const {
             style: mirrorStyle,
             any, hasMt, hasMb, hasMl, hasMr, haveFlexDir
-        } = useMemo(() => buildMirror(augmented), [augmented, augmented?.$bp]);
+        } = useMemo(() => buildMirror(augmented), [augmented, (augmented as any)?.$bp]);
 
         // Apply !important where the editor forces auto centering etc. 
         useLayoutEffect(() => {
             if (!props.clientId) return;
 
-            const root = document.querySelector(`[data-block="${props.clientId}"]`);
+            const root = document.querySelector<HTMLElement>(`[data-block="${props.clientId}"]`);
             if (!root) return;
-
+        
             // The wrapper itself can be the layout container; fall back to inner if present
-            let el = root;
-            if (!el.classList.contains('block-editor-block-list__layout')) {
-                el = root.querySelector(':scope > .block-editor-inner-blocks > .block-editor-block-list__layout') || el;
+            let element: HTMLElement = root;
+            if (!element.classList.contains('block-editor-block-list__layout')) {
+                element = (root.querySelector(':scope > .block-editor-inner-blocks > .block-editor-block-list__layout') as HTMLElement) || element;
             }
 
             // Set all mirrored styles with !important
             for (const [key, value] of Object.entries(mirrorStyle)) {
                 //Only set known mirrored keys
                 if (typeof value !== 'undefined') {
-                    const cssProp = ATTRS_TO_CSS[key] || LOGICAL_CSS_PROPS[key] || key;
+                    const cssProp = 
+                        (ATTRS_TO_CSS as Record<string, string>)[key] || 
+                        LOGICAL_CSS_PROPS[key] || 
+                        key;
                     if (value != null && value !== '') {
-                        el.style.setProperty(cssProp, value, 'important');
+                        element.style.setProperty(cssProp, String(value), 'important');
                     } else {
-                        el.style.removeProperty(cssProp);
+                        element.style.removeProperty(cssProp);
                     }
                 }
             }
@@ -251,7 +276,12 @@ function withEditorStyleMirror(BlockListBlock) {
             hasMr ? 'has-cb-mr' : '',
         ].filter(Boolean).join(' ');
 
-        const costeredUid = augmented?.costeredId || augmented?.costeredID || attrs?.costeredId || attrs?.costeredID || null;
+        const costeredUid = 
+            (augmented as any)?.costeredId || 
+            (augmented as any)?.costeredID || 
+            (attrs as any)?.costeredId || 
+            (attrs as any)?.costeredID || 
+            null;
 
         const wrapperProps = {
             ...(props.wrapperProps || {}),

@@ -1,15 +1,14 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem, BaseControl } from '@wordpress/components';
 
 import { LABELS } from "@labels";
 import DirectionalInputGroup from "@components/composite/DirectionalInputGroup";
 import { useSelectedBlockInfo } from "@hooks";
-
 import { TablerBoxMargin as BoxMargin } from "@assets/icons";
+
 
 const SpacingControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    if (!selectedBlock) return null; // do not remove. prevents error when switching to code editor mode
+    if (!selectedBlock || !clientId) return null; // do not remove. prevents error when switching to code editor mode
     const { name } = selectedBlock;
 
     return (

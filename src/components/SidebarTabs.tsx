@@ -4,7 +4,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
 
 import { useParentAttrs } from "@hooks";
-
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { augmentAttributes } from '@utils/breakpointUtils';
 
@@ -17,7 +16,24 @@ import GridControls from "@tabs/GridControls";
 import GridItemControls from "@tabs/GridItemControls";
 import PositioningControls from "@tabs/PositioningControls";
 
-const tabs = [
+import type { ReactNode } from 'react';
+import type { AugmentedAttributes } from "@types";
+
+type VisibleCtx = {
+    attributes: AugmentedAttributes;
+    parentAttrs: Record<string, unknown> | null;
+}
+
+type TabDef = {
+    name: string;
+    title: ReactNode;
+    icon?: ReactNode;
+    render?: () => ReactNode;
+    content?: ReactNode | null;
+    isVisible?: (ctx: VisibleCtx) => boolean;
+};
+
+const tabs: readonly TabDef[] = [
     DisplayControls,
     DimensionsControls,
     SpacingControls,
@@ -28,33 +44,38 @@ const tabs = [
     PositioningControls
 ];
 
-const EMPTY_ATTRS = Object.freeze({});
+type SidebarTabsProps = {
+    className?: string;
+};
 
-export default function SidebarTabs() {
+const EMPTY_ATTRS: Readonly<Record<string, never>> = Object.freeze({});
+
+export default function SidebarTabs({ className }: SidebarTabsProps) {
     // active breakpoint (read-only)
     const activeBreakpoint = useSelect(selectActiveBreakpoint, []);
 
-    const { attributes, attrsVersion } = useSelect((select) => {
+    const { attributes, attrsVersion } = useSelect((select: any) => {
         const blockEditor = select(blockEditorStore);
-        const id = blockEditor.getSelectedBlockClientId();
+        const id: string | null = blockEditor.getSelectedBlockClientId();
         if (!id) return { attributes: EMPTY_ATTRS, attrsVersion: '0|0', clientId: null };
 
-        const attrs = blockEditor.getBlockAttributes(id) || EMPTY_ATTRS;
+        const attrs = (blockEditor.getBlockAttributes(id) || EMPTY_ATTRS) as Record<string, unknown>;
         // cheap version so re-render when nested styles mutate in-place
-        const cheap = attrs?.costered || {};
-        const version = `${Object.keys(cheap.desktop?.styles || {}).length}`
-            + `|${Object.keys(cheap.tablet?.styles || {}).length}`
-            + `|${Object.keys(cheap.mobile?.styles || {}).length}`;
+        const cheap = (attrs as any)?.costered || {};
+        const version =
+            `${Object.keys(cheap.desktop?.styles || {}).length}` +
+            `|${Object.keys(cheap.tablet?.styles || {}).length}` +
+            `|${Object.keys(cheap.mobile?.styles || {}).length}`;
 
         return { attributes: attrs, attrsVersion: version, clientId: id };
     }, []);
 
-    const augmentedAttributes = useMemo(
-        () => augmentAttributes(attributes, activeBreakpoint),
+    const augmentedAttributes = useMemo<AugmentedAttributes>(
+        () => augmentAttributes(attributes as any, activeBreakpoint as any),
         [attributes, activeBreakpoint, attrsVersion]
     );
 
-    const { parentAttrs } = useParentAttrs();
+    const { parentAttrs } = useParentAttrs(undefined);
 
     const visibleTabs = useMemo(() => {
         return tabs.filter(t => {
@@ -70,7 +91,7 @@ export default function SidebarTabs() {
             }
             return true;
         });
-    }, [augmentedAttributes, augmentedAttributes?.$bp, parentAttrs]);
+    }, [augmentedAttributes, (augmentedAttributes as any)?.$bp, parentAttrs]);
 
     const panelTabs = useMemo(() => {
         return visibleTabs.map(({ name, title, icon }) => ({ name, title, icon }));
@@ -80,15 +101,15 @@ export default function SidebarTabs() {
         return new Map(visibleTabs.map((t) => [t.name, t]));
     }, [visibleTabs]);
 
-    const [activeName, setActiveName] = useState(visibleTabs[0]?.name);
+    const [activeName, setActiveName] = useState<string | undefined>(visibleTabs[0]?.name);
 
     useEffect(() => {
         if (!visibleTabs.length) {
             setActiveName(undefined);
             return;
         }
-        if (!visibleTabs.find((t) => t.name === activeName)) {
-            setActiveName(visibleTabs[0].name);
+        if (!visibleTabs.find((tab) => tab.name === activeName)) {
+            setActiveName(visibleTabs[0]?.name);
         }
     }, [visibleTabs, activeName]);
 
@@ -100,12 +121,12 @@ export default function SidebarTabs() {
     return (
         <TabPanel
             key={signature}
-            className="costered-blocks--tab-panel-outer"
+            className={['costered-blocks--tab-panel-outer', className].filter(Boolean).join(' ')}
             tabs={panelTabs}
             onSelect={setActiveName}
             initialTabName={activeName}
         >
-            {(tab) => {
+            {(tab: { name: string }) => {
                 const def = tabByName.get(tab.name);
                 const Component = def?.render || null;
                 if (Component) return <Component />;

@@ -9,15 +9,17 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 export function useSafeBlockName(
     providedBlockName: string | null,
     providedClientId: string | null
-): string | null {
+): string | undefined {
     return useSelect((select: any) => {
         if (providedBlockName && providedBlockName.trim() !== '') return providedBlockName;
 
         const be = select(blockEditorStore);
         const id: string | undefined =
-            (providedClientId as string | undefined) || be?.getSelectedBlockClientId?.();
-        const block = id ? be?.getBlock?.(id) : null;
+            (providedClientId ?? undefined) || be?.getSelectedBlockClientId?.();
 
-        return (block?.name as string | undefined) ?? null;
+        const block = id ? be?.getBlock?.(id) : undefined;
+        const name = block?.name;
+
+        return typeof name === 'string' && name.trim() !== '' ? name : undefined;
     }, [providedBlockName, providedClientId]);
 }

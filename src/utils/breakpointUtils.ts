@@ -72,7 +72,7 @@ export function augmentAttributes<Token extends Partial<BlockAttributes>>(
 ): Token & {
     $get: (key: string, options?: CascadeOptions) => CSSPrimitive | undefined;
     $getCascade: (key: string) => CSSPrimitive | undefined;
-    $getMany: (keys: string[], options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
+    $getMany: (keys: ReadonlyArray<string>, options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
     $bp: Breakpoint;
 } {
     const source = (baseAttrs as Record<string, unknown>) || EMPTY_ATTRS;
@@ -135,7 +135,7 @@ export function augmentAttributes<Token extends Partial<BlockAttributes>>(
     return clone as Token & {
         $get: (key: string, options?: CascadeOptions) => CSSPrimitive | undefined;
         $getCascade: (key: string) => CSSPrimitive | undefined;
-        $getMany: (keys: string[], options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
+        $getMany: (keys: ReadonlyArray<string>, options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
         $bp: Breakpoint;
     };
 }

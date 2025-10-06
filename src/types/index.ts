@@ -1,3 +1,5 @@
+import type { CSSProperties, ReactNode } from "react";
+
 // Basic primitives
 export type Breakpoint = 'desktop' | 'tablet' | 'mobile';
 export type CSSPrimitive = string | number;
@@ -10,7 +12,6 @@ export interface StyleDeclaration {
     value: CSSPrimitive;
     important?: boolean;
 }
-
 
 // non-readonly tuples
 type RawTuple2 = [property: string, value: CSSPrimitive] | readonly [property: string, value: CSSPrimitive];
@@ -46,7 +47,7 @@ export type CascadeOptions = { cascade?: boolean; raw?: boolean };
 export type AugmentedAttributes = BlockAttributes & {
     $get: (key: string, options?: CascadeOptions) => CSSPrimitive | undefined;
     $getCascade: (key: string) => CSSPrimitive | undefined;
-    $getMany: (keys: string[], options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
+    $getMany: (keys: ReadonlyArray<string>, options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
     $bp: Breakpoint;
 };
 
@@ -81,3 +82,14 @@ export type ParentAttrsResult = {
     parentAugmented: AugmentedAttributes | null;
     parentAttrs: Record<string, CSSPrimitive | undefined> | null;
 };
+
+/* ------------------------- Component Types ------------------------ */
+
+export type Children = { children?: ReactNode };
+export type ClassStyle = { className?: string; style?: CSSProperties };
+
+// event handler types
+export type OnChange<Token = unknown> = (value: Token) => void;
+export type OnToggle = (next: boolean) => void;
+
+export type Option<Value extends string = string> = { label: string; value: Value };
