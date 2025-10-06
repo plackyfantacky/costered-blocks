@@ -9,7 +9,7 @@ import {
     FlexDirectionRowReverse
 } from "@assets/icons";
 
-export default function FlexDirectionControl({ attributes, setFlexDirection }) {
+export default function FlexDirectionControl({ value, setFlexDirection }) {
     const rtl = isRTL();
 
     const RowIcon = rtl ? <FlexDirectionRowReverse /> : <FlexDirectionRow />;
@@ -18,7 +18,7 @@ export default function FlexDirectionControl({ attributes, setFlexDirection }) {
     return (
         <SelectControl
             label={LABELS.flexDirection.label}
-            value={typeof attributes?.flexDirection === "string" ? attributes.flexDirection : ""}
+            value={value}
             onChange={setFlexDirection}
         >
             <SelectControl.Option value="row">{RowIcon} {LABELS.flexDirection.row}</SelectControl.Option>

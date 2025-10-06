@@ -9,7 +9,7 @@ import {
     JustifyGridStretch as JustifyStretch,
 } from "@assets/icons";
 
-export default function JustifySelfControl({ attributes, setJustifySelf }) {
+export default function JustifySelfControl({ value, setJustifySelf }) {
     const rtl = isRTL();
 
     const JustifyStartIcon = rtl ? <JustifyEnd /> : <JustifyStart />;
@@ -18,7 +18,7 @@ export default function JustifySelfControl({ attributes, setJustifySelf }) {
     return (
         <CustomToggleGroup
             label={LABELS.gridItemsControls.justifySelf}
-            value={attributes?.justifySelf ?? ''}
+            value={value}
             onChange={setJustifySelf}
         >
             <CustomToggleGroup.IconOption value="start" icon={JustifyStartIcon} label={LABELS.gridItemsControls.justifySelfStart} />

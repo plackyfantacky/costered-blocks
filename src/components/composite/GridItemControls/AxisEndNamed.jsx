@@ -10,7 +10,7 @@ export default function AxisEndNamed({
     return (
         <ComboboxControl
             label={label}
-            value={!isIntToken(value) && value !== 'auto' ? (value || '') : ''}
+            value={!isIntToken(value) && value !== 'auto' ? (value ?? '') : ''}
             options={options.map((line) => ({ label: line, value: line }))}
             onChange={onChange}
             allowReset

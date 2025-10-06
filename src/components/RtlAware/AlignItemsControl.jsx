@@ -1,5 +1,7 @@
 import { isRTL } from '@wordpress/i18n';
 
+import { useAttrGetter } from '@hooks';
+
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import { LABELS } from "@labels";
 import {
@@ -17,9 +19,10 @@ import {
     MaterialSymbolsAlignSpaceEven as FlexAlignSpaceEven
 } from "@assets/icons";
 
-export default function AlignControl({ attributes, setAlignItems }) {
+export default function AlignControl({ value, setAlignItems, clientId }) {
     const rtl = isRTL();
-    const isRow = attributes?.flexDirection ? attributes.flexDirection.includes('row') : true;
+    const { get } = useAttrGetter(clientId);
+    const isRow = get('flexDirection') ? get('flexDirection').includes('row') : true;
 
     const StartIcon = isRow ? (rtl ? <FlexAlignEnd /> : <FlexAlignStart />) : <FlexJustifyStart />;
     const EndIcon = isRow ? (rtl ? <FlexAlignStart /> : <FlexAlignEnd />) : <FlexJustifyEnd />;
@@ -31,7 +34,7 @@ export default function AlignControl({ attributes, setAlignItems }) {
     return (
         <CustomToggleGroup
             label={LABELS.alignControls.label}
-            value={attributes?.alignItems ?? ''}
+            value={value}
             onChange={setAlignItems}
         >
             <CustomToggleGroup.IconOption value="flex-start" icon={StartIcon} label={LABELS.alignControls.start} />

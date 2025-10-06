@@ -17,7 +17,7 @@ export function CustomSelectControl({
     const rootRef = useRef(null);
 
     useEffect(() => {
-        if(!open) return;
+        if (!open) return;
         const onDocDown = (e) => {
             if (!rootRef.current) return;
             if (!rootRef.current.contains(e.target)) {
@@ -88,7 +88,7 @@ export function CustomSelectControl({
                     <ul
                         role="listbox"
                         tabIndex={-1}
-                        className={`costered-custom-select__list ${className || ''}`}
+                        className={`costered-custom-select__list ${className ?? ''}`}
                         style={listStyle}
                     >
                         {children}

@@ -6,7 +6,8 @@ import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
 
-import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
+import { useAttrGetter, useAttrSetter, useUIPreferences, 
+    useScopedKey, useSafeBlockName } from "@hooks";
 
 /**
  * Renders a pair of input controls for dimension attributes. Will always contain exactly one width and height input,
@@ -20,8 +21,10 @@ import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from 
  * 
  * @returns {JSX.Element} A FlexBox containing the dimension input and toggle controls.
  */
-export function DimensionInputGroup({ groupKey = "", attributes, clientId, updateBlockAttributes, blockName = null, labels = {} }) {
-    const {set, withPrefix } = useAttrSetter(updateBlockAttributes, clientId);
+export function DimensionInputGroup({ groupKey = "", clientId, blockName = null, labels = {} }) {
+    
+    const { get } = useAttrGetter(clientId);
+    const { set, withPrefix } = useAttrSetter(clientId);
 
     const modeKey = groupKey ? `${groupKey}DimensionMode` : 'dimensionMode';
     const safeBlockName = useSafeBlockName(blockName, clientId);
@@ -48,9 +51,9 @@ export function DimensionInputGroup({ groupKey = "", attributes, clientId, updat
     // Prepare the values for width and height based on the groupKey
     // If groupKey is provided, it will use minWidth, minHeight etc.
     const values = useMemo(() => ({
-        width: attributes?.[keyFor('width')] || '',
-        height: attributes?.[keyFor('height')] || ''
-    }), [attributes, groupKey]);
+        width: get(keyFor('width')) ?? '',
+        height: get(keyFor('height')) ?? ''
+    }), [get, groupKey]);
 
     const Input = mode === 'unit' ? UnitControlInput : TextControlInput;
 

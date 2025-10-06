@@ -5,7 +5,7 @@ export default function AxisStartNamed({ label, help, value, options, onChange, 
     return (
         <ComboboxControl
             label={label}
-            value={!isIntToken(value) ? (value || '') : ''}
+            value={!isIntToken(value) ? (value ?? '') : ''}
             options={options.map((line) => ({ label: line, value: line }))}
             onChange={onChange}
             allowReset

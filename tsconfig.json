@@ -1,0 +1,59 @@
+{
+    // Visit https://aka.ms/tsconfig to read more about this file
+    "compilerOptions": {
+        "target": "es2022",        
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM"],
+        "jsx": "react-jsx",
+        "jsxImportSource": "@wordpress/element",
+        "resolveJsonModule": true,
+        "types": ["react"],
+        "allowJs": true,
+        "checkJs": true,
+        "strict": true,
+        "baseUrl": ".",
+        "paths": {
+            "@assets/*": ["src/assets/*"],
+            "@components/*": ["src/components/*"],
+            "@config": ["src/config.ts"],
+            "@debug": ["src/utils/debug.ts"],
+            "@filters/*": ["src/filters/*"],
+            "@hooks": ["src/hooks"],
+            "@hooks/*": ["src/hooks/*"],
+            "@icons/*": ["src/icons/*"],
+            "@labels": ["src/labels"],
+            "@panels/*": ["src/panels/*"],
+            "@stores/*": ["src/stores/*"],
+            "@tabs/*": ["src/tabs/*"],
+            "@types": ["src/types/index.ts"],
+            "@types/*": ["src/types/*"],
+            "@utils/*": ["src/utils/*"],
+            "@wordpress/*": ["types/wp/*"],
+            "@wordpress/element/jsx-runtime": ["types/wp/element-jsx-runtime.d.ts"]
+        },
+        "noEmit": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "noUncheckedSideEffectImports": true,
+        "noImplicitAny": true,
+        "moduleDetection": "force",
+        "skipLibCheck": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true
+    },
+    "include": [
+        "config",
+        "src",
+        "types"
+    ],
+    "exclude": [
+        "node_modules",
+        "js",
+        "css",
+        "node",
+        "php",
+        "svgr.config.cjs",
+        "src/css"
+    ]
+}

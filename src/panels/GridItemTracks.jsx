@@ -4,8 +4,8 @@ import { Notice, Flex, FlexItem, FlexBlock, ComboboxControl } from '@wordpress/c
 
 import { LABELS } from '@labels';
 import {
-    useAttrSetter, useParentGridMeta, useGridItemTracksController,
-    useScopedKey, useUIPreferences, useSafeBlockName
+    useAttrGetter, useAttrSetter, useParentGridMeta, useGridItemTracksController,
+    useScopedKey, useUIPreferences
 } from '@hooks';
 import { isIntToken, toInt } from "@utils/gridPlacement";
 
@@ -14,13 +14,13 @@ import { AxisStartNumber, AxisStartNamed, AxisSpan, AxisEndNumber, AxisEndNamed 
 import CustomToggleGroup from '@components/CustomToggleGroup';
 import { CustomSelectControl as SelectControl } from '@components/CustomSelectControl';
 
-export function GridItemTracks({ clientId, attributes, parentAttrs, safeBlockName }) {
+export function GridItemTracks({ clientId, safeBlockName }) {
     if (!clientId) return null;
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { setMany } = useAttrSetter(updateBlockAttributes, clientId);
-    const parentMeta = useParentGridMeta();
 
-    const ctrl = useGridItemTracksController({ attributes, setMany, parentMeta });
+    const { setMany } = useAttrSetter(clientId);
+    const parentMeta = useParentGridMeta(clientId);
+
+    const ctrl = useGridItemTracksController({ clientId, setMany, parentMeta });
 
     const gridColStartModeKey = useScopedKey('gridColStartMode', { blockName: safeBlockName });
     const gridColEndModeKey = useScopedKey('gridColEndMode', { blockName: safeBlockName });
@@ -42,7 +42,7 @@ export function GridItemTracks({ clientId, attributes, parentAttrs, safeBlockNam
             onStartNumber(fallback);
         } else if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(colStart) && colStart) || lines[0] || '';
+                const fallback = (!isIntToken(colStart) && colStart) ?? lines[0] ?? '';
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
@@ -65,7 +65,7 @@ export function GridItemTracks({ clientId, attributes, parentAttrs, safeBlockNam
         }
         if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) || lines[0] || '';
+                const fallback = (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) ?? lines[0] ?? '';
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);
@@ -85,7 +85,7 @@ export function GridItemTracks({ clientId, attributes, parentAttrs, safeBlockNam
             onStartNumber(fallback);
         } else if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(rowStart) && rowStart) || lines[0] || '';
+                const fallback = (!isIntToken(rowStart) && rowStart) ?? lines[0] ?? '';
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
@@ -106,7 +106,7 @@ export function GridItemTracks({ clientId, attributes, parentAttrs, safeBlockNam
         }
         if (mode === 'named') {
             if (hasLines) {
-                const fallback = (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) || lines[0] || '';
+                const fallback = (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) ?? lines[0] ?? '';
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);

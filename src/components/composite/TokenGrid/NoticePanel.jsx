@@ -50,8 +50,8 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
     const needGrowRows = areaRows > trackRows;
 
     const growTracksToAreas = useCallback(() => {
-        const curCols = model?.columns?.template || '';
-        const curRows = model?.rows?.template || '';
+        const curCols = model?.columns?.template ?? '';
+        const curRows = model?.rows?.template ?? '';
 
         const nextColumns = needGrowCols
             ? extendTrackTemplate(curCols, areaCols, colUnit)
@@ -72,16 +72,16 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
     }, [areaCols, areaRows, colUnit, rowUnit, model, set]);
 
     const performShrink = useCallback(() => {
-        const nextColumns = shrinkTrackTemplate(model?.columns?.template || '', areaCols);
-        const nextRows = shrinkTrackTemplate(model?.rows?.template || '', areaRows);
+        const nextColumns = shrinkTrackTemplate(model?.columns?.template ?? '', areaCols);
+        const nextRows = shrinkTrackTemplate(model?.rows?.template ?? '', areaRows);
         set('gridTemplateColumns', nextColumns);
         set('gridTemplateRows', nextRows);
     }, [areaCols, areaRows, model, set]);
 
     const requestShrink = useCallback(() => {
         const hasLineNames =
-            /\[[^\]]+]/.test(model?.columns?.template || '') ||
-            /\[[^\]]+]/.test(model?.rows?.template || '');
+            /\[[^\]]+]/.test(model?.columns?.template ?? '') ||
+            /\[[^\]]+]/.test(model?.rows?.template ?? '');
 
         if (hasLineNames) {
             setConfirmOpen(true);
@@ -100,7 +100,7 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
                     <FlexBlock>
                         <Button variant="secondary" onClick={resizeAreasToTracks}>{labels.resizeToTracks}</Button>
                     </FlexBlock>
-                    {needGrowCols || needGrowRows && (
+                    {(needGrowCols || needGrowRows) && (
                         <FlexBlock>
                             <Button variant="secondary" onClick={growTracksToAreas} disabled={!needGrowCols && !needGrowRows}>{labels.growTracksToAreas}</Button>
                         </FlexBlock>

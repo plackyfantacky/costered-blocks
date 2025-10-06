@@ -1,0 +1,48 @@
+// src/utils/blockUtils.ts
+
+/** True when value is a non-empty string. */
+export function isValidCosteredId(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
+}
+
+
+/** Generate a stable id (crypto.randomUUID when available, else timestamp+rand). */
+export function generateCosteredId(): string {
+    const rnd = (globalThis as any)?.crypto?.randomUUID;
+    if (typeof rnd === 'function') return rnd.call((globalThis as any).crypto);
+    //fallback for older environments
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).slice(2, 10);
+    return `${timestamp}-${random}`;
+};
+
+
+/**
+ * Ensure the attributes object has a stable costeredId.
+ * Mutates the given attrs object (your updaters already clone before calling).
+ */
+export function seedCosteredId<Token extends { costeredId?: unknown }>(
+    attrs: Token | null | undefined
+): asserts attrs is Token & { costeredId: string } {
+    if (!attrs) return;
+    if (!isValidCosteredId(attrs.costeredId)) {
+        (attrs as { costeredId: string }).costeredId = generateCosteredId();
+    }
+};
+
+
+/**
+ * Non-mutating variant: return a new object guaranteed to have costeredId.
+ * Useful if a caller prefers immutability inside its updater.
+ */
+export function withCosteredId<Token extends { costeredId?: unknown }>(
+    attrs: Token | null | undefined
+): (Token & { costeredId: string }) {
+    const base = (attrs ?? {}) as Token;
+    const next: Token & { costeredId?: unknown } = { ...base };
+    
+    if (!isValidCosteredId(next.costeredId)) {
+        (next as { costeredId: string }).costeredId = generateCosteredId();
+    }
+    return next as Token & { costeredId: string };
+}

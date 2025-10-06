@@ -1,8 +1,7 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter } from "@hooks";
+import { useSelectedBlockInfo, useAttrGetter, useAttrSetter } from "@hooks";
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import { LABELS } from "@labels";
 import {
@@ -19,23 +18,17 @@ import {
 } from "@assets/icons";
 
 const DisplayControls = () => {
-    const { selectedBlock, clientId } = useSelectedBlockInfo();
-    if (!selectedBlock) return null;
+    const { clientId } = useSelectedBlockInfo();
+    if (!clientId) return null;
 
-    return (
-        <DisplayControlsInner
-            clientId={clientId}
-            attributes={selectedBlock.attributes}
-        />
-    );
-}
+    const { get } = useAttrGetter(clientId);
+    const { set } = useAttrSetter(clientId);
 
-const DisplayControlsInner = ({clientId, attributes }) => {
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+    const display = get('display') ?? '';
+    const setDisplay = useCallback((value) => set('display', value), [set]);
 
-    const setDisplay = useCallback((v) => set('display', v), [set]);
-    const setVisibility = useCallback((v) => set('visibility', v), [set]);
+    const visibility = get('visibility') ?? '';
+    const setVisibility = useCallback((value) => set('visibility', value), [set]);
 
     return (
         <Panel className="costered-blocks--tab--display-controls">
@@ -44,7 +37,7 @@ const DisplayControlsInner = ({clientId, attributes }) => {
                     <FlexItem className="costered-blocks--display-controls--display">
                         <SelectControl
                             label={LABELS.displayControls.displayLabel}
-                            value={typeof attributes?.display === "string" ? attributes.display : ""}
+                            value={display}
                             onChange={setDisplay}
                         >
                             <SelectControl.Option value=""><DefaultIcon />{LABELS.displayControls.display.unset}</SelectControl.Option>
@@ -58,7 +51,7 @@ const DisplayControlsInner = ({clientId, attributes }) => {
                     <FlexItem className="costered-blocks--display-controls--visibility">
                         <SelectControl
                             label={LABELS.displayControls.visibilityLabel}
-                            value={typeof attributes?.visibility === "string" ? attributes.visibility : ""}
+                            value={visibility}
                             onChange={setVisibility}
                         >
                             <SelectControl.Option value=""><DefaultIcon />{LABELS.displayControls.visibility.unset}</SelectControl.Option>
@@ -71,7 +64,7 @@ const DisplayControlsInner = ({clientId, attributes }) => {
             </PanelBody>
         </Panel>
     );
-};
+}
 
 export default {
     name: "display-controls",

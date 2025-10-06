@@ -1,10 +1,10 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter, useParentAttrs } from "@hooks";
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, useParentAttrs } from "@hooks";
 import { FluentRowChild16Regular as FlexChildItem } from "@assets/icons";
 import { LABELS } from "@labels";
+
 import NumberControlInput from '@components/NumberControlInput';
 import UnitControlInput from '@components/UnitControlInput';
 import AlignSelfControl from "@components/RtlAware/AlignSelfControl";
@@ -13,21 +13,29 @@ const maxInteger = Number.MAX_SAFE_INTEGER;
 const minInteger = -maxInteger;
 
 const FlexItemControls = () => {
-    const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    if (!selectedBlock) return null;
+    const { clientId } = useSelectedBlockInfo();
+    const { parentAttrs } = useParentAttrs(clientId);
 
-    const { parentAttrs } = useParentAttrs();
-    const { attributes } = selectedBlock;
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+    const { get } = useAttrGetter(clientId);
+    const { set } = useAttrSetter(clientId);
 
     const isRow = parentAttrs?.flexDirection ? parentAttrs.flexDirection.includes('row') : true;
 
-    const setFlexGrow = useCallback((v) => set('flexGrow', v), [set]);
-    const setFlexShrink = useCallback((v) => set('flexShrink', v), [set]);
-    const setFlexBasis = useCallback((v) => set('flexBasis', v), [set]);
-    const setOrder = useCallback((v) => set('order', v), [set]);
-    const setAlignSelf = useCallback((v) => set('alignSelf', v), [set]);
+
+    const flexGrow = get('flexGrow') || 0;
+    const setFlexGrow = useCallback((value) => set('flexGrow', value), [set]);
+
+    const flexShrink = get('flexShrink') || 0;
+    const setFlexShrink = useCallback((value) => set('flexShrink', value), [set]);
+
+    const flexBasis = get('flexBasis') ?? '';
+    const setFlexBasis = useCallback((value) => set('flexBasis', value), [set]);
+
+    const order = get('order') || 0;
+    const setOrder = useCallback((value) => set('order', value), [set]);
+
+    const alignSelf = get('alignSelf') || 'auto';
+    const setAlignSelf = useCallback((value) => set('alignSelf', value), [set]);
 
     return (
         <Panel className="costered-blocks--tab--flexitem-controls">
@@ -38,7 +46,7 @@ const FlexItemControls = () => {
                             <FlexItem>
                                 <NumberControlInput
                                     label={LABELS.flexItemControls.flexGrow}
-                                    value={attributes?.flexGrow || 0}
+                                    value={flexGrow}
                                     onChange={setFlexGrow}
                                     step={0.1} min={0} max={10}
                                 />
@@ -46,7 +54,7 @@ const FlexItemControls = () => {
                             <FlexItem>
                                 <NumberControlInput
                                     label={LABELS.flexItemControls.flexShrink}
-                                    value={attributes?.flexShrink || 0}
+                                    value={flexShrink}
                                     onChange={setFlexShrink}
                                     step={0.1} min={0} max={10}
                                 />
@@ -54,7 +62,7 @@ const FlexItemControls = () => {
                             <FlexBlock>
                                 <UnitControlInput
                                     label={LABELS.flexItemControls.flexBasis}
-                                    value={attributes?.flexBasis || ''}
+                                    value={flexBasis}
                                     onChange={setFlexBasis}
                                     placeholder={LABELS.flexItemControls.flexBasisPlaceholder}
                                 />
@@ -64,7 +72,7 @@ const FlexItemControls = () => {
                     <FlexBlock className="costered-blocks--flexitem-controls--order">
                         <NumberControlInput
                             label={LABELS.flexItemControls.order}
-                            value={attributes?.order || 0}
+                            value={order}
                             onChange={setOrder}
                             step={1} min={minInteger} max={maxInteger}
                         />
@@ -72,7 +80,7 @@ const FlexItemControls = () => {
                     {isRow && (
                         <FlexBlock className="costered-blocks--flexitem-controls--alignself">
                             <AlignSelfControl
-                                attributes={attributes}
+                                value={alignSelf}
                                 setAlignSelf={setAlignSelf}
                                 includeBaseline={true}
                             />
@@ -88,6 +96,12 @@ export default {
     name: 'flex-item-controls',
     title: LABELS.flexItemControls.panelTitle,
     icon: <FlexChildItem />,
-    isVisible: ({ parentAttrs } = {}) => ['flex', 'inline-flex'].includes(parentAttrs?.display),
+    isVisible: ({ parentAttrs } = {}) => {
+        // Prefer responsive-aware read; fallback to legacy top-level
+        const value = (typeof parentAttrs?.$get === 'function'
+            ? parentAttrs.$get('display', { cascade: true })
+            : parentAttrs?.display) ?? '';
+        return /^(flex|inline-flex)$/i.test(String(value).trim());
+    },
     render: () => <FlexItemControls />,
 };

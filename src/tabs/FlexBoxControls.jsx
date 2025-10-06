@@ -1,15 +1,15 @@
-import { useDispatch } from '@wordpress/data';
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrSetter, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
-import {
-    MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded, 
-    FlexWrapNone,
-    FlexWrapWrap, 
-    FlexWrapReverse
-} from "@assets/icons";
 import { LABELS } from "@labels";
+import {
+    useAttrGetter, useAttrSetter, useSelectedBlockInfo,
+    useSafeBlockName, useScopedKey, useUIPreferences
+} from "@hooks";
+import {
+    MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded,
+    FlexWrapNone, FlexWrapWrap, FlexWrapReverse
+} from "@assets/icons";
 
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import FlexDirectionControl from '@components/RtlAware/FlexDirectionControl';
@@ -17,15 +17,14 @@ import JustifyControl from '@components/RtlAware/JustifyContentControl';
 import AlignControl from '@components/RtlAware/AlignItemsControl';
 import GapControls from '@components/composite/GapControls';
 
-const isFlexValue = (v) => /^(flex|inline-flex)$/i.test(v);
+const isFlexValue = (value) => /^(flex|inline-flex)$/i.test(value);
 
 const FlexBoxControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    if (!selectedBlock) return null;
+    const { name } = selectedBlock;
 
-    const { attributes, name } = selectedBlock;
-    const { set, setMany } = useAttrSetter(updateBlockAttributes, clientId);
+    const { get } = useAttrGetter(clientId);
+    const { set, setMany } = useAttrSetter(clientId);
 
     // user preferences (panel open/close state)
     const safeBlockName = useSafeBlockName(name, clientId);
@@ -33,9 +32,9 @@ const FlexBoxControls = () => {
     const [flexBoxPanelOpen, setFlexBoxPanelOpen] = useUIPreferences(flexBoxKey, true);
 
     // Normaliser: respond to 'display' and 'flexDirection' attribute changes
-    const prevDisplayRef = useRef(attributes?.display ?? '');
+    const prevDisplayRef = useRef(get('display') ?? '');
     useEffect(() => {
-        const display = attributes?.display ?? '';
+        const display = get('display') ?? '';
         const was = prevDisplayRef.current;
         if (display === was) return;
 
@@ -50,12 +49,21 @@ const FlexBoxControls = () => {
         }
 
         prevDisplayRef.current = display;
-    }, [attributes.display, attributes.flexDirection, set, setMany]);
+    }, [get, set, setMany]);
 
-    const setFlexDirection = useCallback((v) => set('flexDirection', v), [set]);
-    const setFlexWrap = useCallback((v) => set('flexWrap', v), [set]);
-    const setJustifyContent = useCallback((v) => set('justifyContent', v), [set]);
-    const setAlignItems = useCallback((v) => set('alignItems', v), [set]);
+
+    const flexDirection = get('flexDirection') ?? '';
+    const setFlexDirection = useCallback((value) => set('flexDirection', value), [set]);
+
+    const flexWrap = get('flexWrap') ?? '';
+    const setFlexWrap = useCallback((value) => set('flexWrap', value), [set]);
+
+    const justifyContent = get('justifyContent') ?? '';
+    const setJustifyContent = useCallback((value) => set('justifyContent', value), [set]);
+
+    const alignItems = get('alignItems') ?? '';
+    const setAlignItems = useCallback((value) => set('alignItems', value), [set]);
+
     return (
         <Panel className="costered-blocks--tab--flexbox-controls">
             <PanelBody title={LABELS.flexBoxControls.panelTitle} className="costered-blocks--flexbox-controls--inner" initialOpen={flexBoxPanelOpen} onToggle={setFlexBoxPanelOpen}>
@@ -63,14 +71,14 @@ const FlexBoxControls = () => {
                     <FlexItem>
                         { /* RTL aware */}
                         <FlexDirectionControl
-                            attributes={attributes}
+                            value={flexDirection}
                             setFlexDirection={setFlexDirection}
                         />
                     </FlexItem>
                     <FlexItem>
                         <CustomToggleGroup
                             label={LABELS.flexBoxControls.flexWrapLabel}
-                            value={attributes?.flexWrap ?? ''}
+                            value={flexWrap}
                             onChange={setFlexWrap}
                         >
                             <CustomToggleGroup.CombinedOption value="nowrap" icon={<FlexWrapNone />} label={LABELS.flexBoxControls.flexWrapNone} />
@@ -79,24 +87,25 @@ const FlexBoxControls = () => {
                         </CustomToggleGroup>
                     </FlexItem>
                     <FlexItem>
-                        { /* RTL aware */ }
+                        { /* RTL aware */}
                         <JustifyControl
-                            attributes={attributes}
+                            value={justifyContent}
                             setJustifyContent={setJustifyContent}
+                            clientId={clientId}
                         />
                     </FlexItem>
                     <FlexItem>
-                        { /* RTL aware */ }
+                        { /* RTL aware */}
                         <AlignControl
-                            attributes={attributes}
+                            value={alignItems}
                             setAlignItems={setAlignItems}
+                            clientId={clientId}
                         />
                     </FlexItem>
                     <FlexItem>
                         <GapControls
-                            attributes={attributes}
+                            // getter/setter inside GapControls
                             clientId={clientId}
-                            updateBlockAttributes={updateBlockAttributes}
                             blockName={name}
                         />
                     </FlexItem>
@@ -106,15 +115,16 @@ const FlexBoxControls = () => {
     );
 };
 
-const isFlex = (attributes = {}) => {
-    const value = attributes?.display ?? '';
-    return /^(flex|inline-flex)$/.test(value);
-};
-
 export default {
     name: 'flexbox-controls',
     title: LABELS.flexBoxControls.panelTitle,
     icon: <FlexNoWrapRounded />,
-    isVisible: ({ attributes }) => isFlex(attributes),
+    isVisible: ({ attributes }) => {
+        // Prefer responsive-aware read; fallback to legacy top-level
+        const value = (typeof attributes?.$get === 'function'
+            ? attributes.$get('display')
+            : attributes?.display) ?? '';
+        return /^(flex|inline-flex)$/i.test(String(value));
+    },
     render: () => <FlexBoxControls />,
 };

@@ -10,7 +10,7 @@ import {
     EntypoAlignBottom as AlignEnd,
 } from "@assets/icons";
 
-export default function AlignSelfControl({ attributes, setAlignSelf, includeBaseline = false }) {
+export default function AlignSelfControl({ value, setAlignSelf, includeBaseline = false }) {
     const rtl = isRTL();
 
     const AlignStartIcon = rtl ? <AlignEnd /> : <AlignStart />;
@@ -19,7 +19,7 @@ export default function AlignSelfControl({ attributes, setAlignSelf, includeBase
     return (
         <CustomToggleGroup
             label={LABELS.alignControls.label}
-            value={attributes?.alignSelf ?? ''}
+            value={value}
             onChange={setAlignSelf}
         >
             <CustomToggleGroup.IconOption value="start" icon={AlignStartIcon} label={LABELS.alignControls.start} />

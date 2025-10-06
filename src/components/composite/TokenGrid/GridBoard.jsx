@@ -1,25 +1,40 @@
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
+import { toCount } from '@utils/gridUtils';
 import Token from '@components/composite/Token';
 
-export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', labels, setCell, resize, onEditingChange }) {
+export function GridBoard(props) {
+    const { 
+        matrix,
+        columnData,
+        rowData,
+        setCell,
+        resize,
+        clear,
+        emptyToken = '.',
+        labels = {},
+        onEditingChange
+    } = props;
 
-    const numericColumns = Number(matrix?.[0]?.length ?? columnData ?? 0);
-    // Ensure we never compute with 0/NaN
-    // tolerate "3" (string), NaN, etc.
-    const safeColumnData = Math.max(1, Number.isFinite(columnData) ? numericColumns : parseInt(columnData, 10) || 0);
-    const safeRowData = Math.max(1, Number.isFinite(rowData) ? rowData : parseInt(rowData, 10) || 0);
+    const rowsArray = Array.isArray(matrix) ? matrix : [];
+
+    const cols = toCount(columnData?.count ?? columnData) || (rowsArray[0]?.length || 0);
+    const rows = toCount(rowData?.count ?? rowData) || rowsArray.length || 0;
+
+    const safeCols = Math.max(1, cols);
+    const safeRows = Math.max(1, rows);
 
     const [expandedIndex, setExpandedIndex] = useState(null);
     const gridRef = useRef(null);
 
-    const indexFromXY = useCallback((x, y) => (y * safeColumnData) + x, [safeColumnData]);
+    const indexFromXY = useCallback((x, y) => (y * safeCols) + x, [safeCols]);
+
     const xyFromIndex = useCallback((index) => {
-        const columnIndex = index % safeColumnData;
-        const rowIndex = Math.floor(index / safeColumnData);
+        const columnIndex = index % safeCols;
+        const rowIndex = Math.floor(index / safeCols);
         return [columnIndex, rowIndex];
-    }, [safeColumnData]);
+    }, [safeCols]);
 
     useEffect(() => {
         onEditingChange?.(expandedIndex != null);
@@ -29,15 +44,13 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
         setExpandedIndex((current) => {
             if (current == null) return current;
             const [x, y] = xyFromIndex(current);
-            const inBounds = x < safeColumnData && y < safeRowData;
+            const inBounds = x < safeCols && y < safeRows;
             return inBounds ? current : null;
         });
-    }, [safeColumnData, safeRowData, xyFromIndex]);
+    }, [safeCols, safeRows, xyFromIndex]);
 
     const handleToggle = useCallback((index, openMaybe) => {
-        const shouldOpen = (typeof openMaybe === 'boolean')
-            ? openMaybe
-            : (expandedIndex !== index);
+        const shouldOpen = (typeof openMaybe === 'boolean') ? openMaybe : (expandedIndex !== index);
         setExpandedIndex(shouldOpen ? index : null);
     }, [expandedIndex]);
 
@@ -49,25 +62,22 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
 
     const moveRightFromIndex = useCallback((index) => {
         const [x, y] = xyFromIndex(index);
-        if (x >= safeColumnData - 1) return;
+        if (x >= safeCols - 1) return;
         setExpandedIndex(indexFromXY(x + 1, y));
-    }, [xyFromIndex, indexFromXY, safeColumnData]);
-
-    const areaCols = Number(columnData) || 0;
-    const areaRows = Number(rowData) || 0;
+    }, [xyFromIndex, indexFromXY, safeCols]);
 
     // Column/row controls
-    const addColumn = useCallback(() => resize(columnData + 1, rowData), [resize, columnData, rowData]);
-    const removeColumn = useCallback(() => resize(Math.max(1, columnData - 1), rowData), [resize, columnData, rowData]);
-    const addRow = useCallback(() => resize(columnData, rowData + 1), [resize, columnData, rowData]);
-    const removeRow = useCallback(() => resize(columnData, Math.max(1, rowData - 1)), [resize, columnData, rowData]);
+    const addColumn = useCallback(() => resize({cols: cols + 1, rows}), [resize, cols, rows]);
+    const removeColumn = useCallback(() => resize({cols: Math.max(1, cols - 1), rows}), [resize, cols, rows]);
+    const addRow = useCallback(() => resize({cols, rows: rows + 1}), [resize, cols, rows]);
+    const removeRow = useCallback(() => resize({cols, rows: Math.max(1, rows - 1)}), [resize, cols, rows]);
 
     return (
         <div className="costered-blocks--token-grid--area" ref={gridRef}>
             {/* header row: column controls */}
             <div className="costered-blocks--token-grid--row costered-blocks--token-grid--row-head">
                 <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-corner" /> { /* corner cell. usually empty */}
-                {Array.from({ length: safeColumnData }).map((_, x) => (
+                {Array.from({ length: safeCols }).map((_, x) => (
                     <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-head" key={`col-${x}`}>
                         <div
                             key={`header-col-${x}`}
@@ -75,8 +85,9 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
                         >
                             <Button
                                 onClick={removeColumn}
-                                disabled={areaCols <= 1}
-                                variant="tertiary" icon="minus"
+                                disabled={cols <= 1}
+                                variant="tertiary"
+                                icon="minus"
                                 label={labels.removeColumn}
                             />
                             <Button
@@ -90,14 +101,14 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
                 ))}
             </div>
             {/* body */}
-            {matrix.map((row, y) => (
+            {rowsArray.map((row, y) => (
                 <div key={`row-${y}`} className="costered-blocks--token-grid--row">
                     {/* row controls (left gutter) */}
                     <div className="costered-blocks--token-grid--cell costered-blocks--token-grid--cell-head">
                         <div className="costered-blocks--token-grid--controls">
                             <Button
                                 onClick={removeRow}
-                                disabled={areaRows <= 1}
+                                disabled={rows <= 1}
                                 variant="tertiary"
                                 icon="minus"
                                 label={labels.removeRow}
@@ -121,8 +132,16 @@ export function GridBoard({ matrix, columnData, rowData, emptyToken = '.', label
                                     value={inputValue}
                                     isExpanded={expandedIndex === index}
                                     onToggle={handleToggle}
-                                    onRemove={(i) => { const [cx, cy] = xyFromIndex(i); setCell(cx, cy, ''); setExpandedIndex(null); }}
-                                    onChange={(i, next) => { const [cx, cy] = xyFromIndex(i); setCell(cx, cy, next); }}
+                                    onRemove={(remove_index) => {
+                                        const [cellX, cellY] = xyFromIndex(remove_index);
+                                        setCell(cellX, cellY, emptyToken);
+                                        setExpandedIndex(null);
+                                    }}
+                                    onChange={(change_index, next) => { 
+                                        const [cellX, cellY] = xyFromIndex(change_index);
+                                        setCell(cellX, cellY, next);
+                                        console.log({change_index, cellX, cellY, next});
+                                     }}
                                     onMoveLeft={moveLeftFromIndex}
                                     onMoveRight={moveRightFromIndex}
                                     emptyPlaceholder={emptyToken}

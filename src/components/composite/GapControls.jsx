@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, useEffect } from '@wordpress/element';
 import { Button, Flex, FlexBlock, FlexItem, ToggleControl } from '@wordpress/components';
 
 import { SplitInput, JoinInput } from "@assets/icons";
-import { useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
+import { useAttrGetter, useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
 import { splitGap, joinGap, normalize } from '@utils/gapUtils';
 import { LABELS } from '@labels';
 import UnitControlInput from "@components/UnitControlInput";
@@ -19,8 +19,10 @@ import TextControlInput from "@components/TextControlInput";
  * 
  * @returns {JSX.Element} A FlexBox containing the gap input and toggle controls.
  */
-export default function GapControls({ attributes, clientId, updateBlockAttributes, blockName = null }) {
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+export default function GapControls({ clientId, blockName = null }) {
+
+    const { get } = useAttrGetter(clientId);
+    const { set } = useAttrSetter(clientId);
 
     //user preferences for unit/text mode
     const safeBlockName = useSafeBlockName(blockName, clientId);
@@ -31,7 +33,7 @@ export default function GapControls({ attributes, clientId, updateBlockAttribute
     const [inputMode, setInputMode] = useUIPreferences(inputModePrefKey, 'single');
 
     //initial values
-    const initialValue = attributes?.gap || '';
+    const initialValue = get('gap') ?? '';
 
     //control mode state (either 'single' or 'dual'). if not defined, determine from initial value
 
@@ -44,7 +46,7 @@ export default function GapControls({ attributes, clientId, updateBlockAttribute
     //split initial value into row and column parts
     const [row, col] = useMemo(() => {
         const parts = splitGap(initialValue);
-        return [parts[0] || '', parts[1] || ''];
+        return [parts[0] ?? '', parts[1] ?? ''];
     }, [initialValue]);
 
     //actually setting the values
@@ -68,7 +70,6 @@ export default function GapControls({ attributes, clientId, updateBlockAttribute
     const labelText = inputMode === 'single'
         ? LABELS.gapControls.label
         : LABELS.gapControls.columnLabel;
-
 
     //toggle between single and dual input modes
     const onToggleInputMode = useCallback(() => {

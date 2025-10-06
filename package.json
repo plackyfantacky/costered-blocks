@@ -11,6 +11,8 @@
     "devDependencies": {
         "@svgr/core": "^8.1.0",
         "@svgr/plugin-svgo": "^8.1.0",
+        "@types/react": "^19.2.0",
+        "@types/react-dom": "^19.2.0",
         "cross-env": "^10.0.0",
         "esbuild": "^0.25.5",
         "esbuild-plugin-path-alias": "^1.0.7",
@@ -34,6 +36,7 @@
     "homepage": "https://github.com/plackyfantacky/costered-blocks#readme",
     "dependencies": {
         "@svgr/plugin-jsx": "^8.1.0",
-        "@svgr/plugin-prettier": "^8.1.0"
+        "@svgr/plugin-prettier": "^8.1.0",
+        "typescript": "^5.9.3"
     }
 }
