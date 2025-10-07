@@ -1,41 +1,81 @@
+import type { ComponentProps } from 'react';
 import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
-import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, useParentAttrs } from "@hooks";
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, useParentAttrs, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { FluentRowChild16Regular as FlexChildItem } from "@assets/icons";
-import { LABELS } from "@labels";
+import { LABELS } from "@labels";   
 
 import NumberControlInput from '@components/NumberControlInput';
 import UnitControlInput from '@components/UnitControlInput';
 import AlignSelfControl from "@components/RtlAware/AlignSelfControl";
+import type { VisibilityCtx } from '@types';
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 const minInteger = -maxInteger;
 
+
 const FlexItemControls = () => {
     const { clientId } = useSelectedBlockInfo();
-    const { parentAttrs } = useParentAttrs(clientId);
+    const { parentAugmented, parentAttrs } = useParentAttrs(clientId);
 
-    const { get } = useAttrGetter(clientId);
+    const { getNumber, getString } = useAttrGetter(clientId);
     const { set } = useAttrSetter(clientId);
 
-    const isRow = parentAttrs?.flexDirection ? parentAttrs.flexDirection.includes('row') : true;
+    const parentGet =
+        (parentAugmented as { $get?: (key: string, options?: unknown) => unknown } | null | undefined | undefined)?.$get;
+    const parentFlexDirection =
+        (typeof parentGet === 'function'
+            ? (parentGet('flexDirection', { cascade: true }) as string | undefined)
+            : (parentAttrs?.flexDirection as string | undefined) || ''
+        );
+            
+    const isRow = String(parentFlexDirection).includes('row') || parentFlexDirection === '';
 
+    // Preference for flex-basis input mode (unit/text), scoped to this block
+    const safeBlockName = useSafeBlockName(undefined, clientId ?? undefined);
+    const basisModeKey = useScopedKey('flexBasisMode', { blockName: safeBlockName });
+    const [basisMode] = useUIPreferences<'unit' | 'text'>(basisModeKey, 'unit');
 
-    const flexGrow = get('flexGrow') || 0;
-    const setFlexGrow = useCallback((value) => set('flexGrow', value), [set]);
+    const flexGrow = getNumber('flexGrow', 0) ?? 0;
+    const setFlexGrow = useCallback(
+        (value: number | '') => {
+            set('flexGrow', value === '' ? undefined : value);
+        },
+        [set]
+    );
 
-    const flexShrink = get('flexShrink') || 0;
-    const setFlexShrink = useCallback((value) => set('flexShrink', value), [set]);
+    const flexShrink = getNumber('flexShrink', 0) ?? 0;
+    const setFlexShrink = useCallback(
+        (value: number | '') => {
+            set('flexShrink', value === '' ? undefined : value);
+        },
+        [set]
+    );
 
-    const flexBasis = get('flexBasis') ?? '';
-    const setFlexBasis = useCallback((value) => set('flexBasis', value), [set]);
+    type UnitOnChange = ComponentProps<typeof UnitControlInput>['onChange'];
 
-    const order = get('order') || 0;
-    const setOrder = useCallback((value) => set('order', value), [set]);
+    const flexBasis = getString('flexBasis', '') ?? '';
+    const setFlexBasis: UnitOnChange = (val) => {
+        const s = typeof val === 'number' ? String(val) : (val ?? '');
+        set('flexBasis', s === '' ? undefined : s);
+    }
 
-    const alignSelf = get('alignSelf') || 'auto';
-    const setAlignSelf = useCallback((value) => set('alignSelf', value), [set]);
+    const order = getNumber('order', 0) ?? 0;
+    const setOrder = useCallback(
+        (value: number | '') => {
+            set('order', value === '' ? undefined : value);
+        },
+        [set]
+    );
+
+    const alignSelf = getString('alignSelf', 'auto') ?? 'auto';
+    const setAlignSelf = useCallback(
+        (value: string) => {
+            set('alignSelf', value === '' ? undefined : value);
+        },
+        [set]
+    );
 
     return (
         <Panel className="costered-blocks--tab--flexitem-controls">
@@ -96,7 +136,7 @@ export default {
     name: 'flex-item-controls',
     title: LABELS.flexItemControls.panelTitle,
     icon: <FlexChildItem />,
-    isVisible: ({ parentAttrs } = {}) => {
+    isVisible: ({ parentAttrs }: VisibilityCtx = {}) => {
         // Prefer responsive-aware read; fallback to legacy top-level
         const value = (typeof parentAttrs?.$get === 'function'
             ? parentAttrs.$get('display', { cascade: true })

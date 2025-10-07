@@ -9,20 +9,24 @@ import { augmentAttributes } from '@utils/breakpointUtils';
 
 type AttributesMap = Record<string, unknown>;
 
-export function useAttrGetter(clientId: string) {
+export function useAttrGetter(clientId: string | null) {
+    const id: string | undefined = clientId ?? undefined;
     const breakpoint = useSelect(
         (select: any) => select(BP_STORE)?.getBreakpoint?.() || ('desktop' as Breakpoint),
         []
     ) as Breakpoint;
 
     const rawAttributes = useSelect((select: any) => {
-        if (!clientId) return undefined as AttributesMap | undefined;
+        if (!id) return undefined as AttributesMap | undefined;
         const blockEditor = select(blockEditorStore);
-        return blockEditor?.getBlockAttributes?.(clientId) as AttributesMap | undefined;
-    }, [clientId]);
+        return blockEditor?.getBlockAttributes?.(id) as AttributesMap | undefined;
+    }, [id]);
 
     const attributes = useMemo<AugmentedAttributes | undefined>(
-        () => (rawAttributes ? augmentAttributes(rawAttributes as BlockAttributes, breakpoint) : undefined),
+        () => 
+            rawAttributes
+                ? augmentAttributes(rawAttributes as BlockAttributes, breakpoint)
+                : undefined,
         [rawAttributes, breakpoint]
     );
 

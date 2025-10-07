@@ -55,10 +55,10 @@ type ReturnType = {
  * - useAttrSetter(writer, clientId, options?)
  * - useAttrSetter(compatWriter, options?)  // already wrapped writer returns (next) => void
  */
-export function useAttrSetter(clientId: string, options?: SetterOptions): ReturnType;
+export function useAttrSetter(clientId?: string | null, options?: SetterOptions): ReturnType;
 export function useAttrSetter(
     writer: (clientId: string, next: AttributesMap) => void, 
-    clientId: string, 
+    clientId: string | null,
     options?: SetterOptions): ReturnType;
 export function useAttrSetter(
     writer: (next: AttributesMap) => void, 
@@ -66,8 +66,8 @@ export function useAttrSetter(
 ): ReturnType;
 
 export function useAttrSetter(
-    arg1: string | WriterWithClientId | CompatWriter,
-    arg2?: string | SetterOptions,
+    arg1: string | null | undefined | WriterWithClientId | CompatWriter,
+    arg2?: string | null | undefined | SetterOptions,
     maybeOptions: SetterOptions = { trim: true, emptyUnsets: true }
 ): ReturnType {
     const options: SetterOptions = (typeof arg2 === 'object' ? arg2 : maybeOptions) || {};
@@ -81,12 +81,11 @@ export function useAttrSetter(
     };
 
     const updateFn: InternalWriter = useMemo(() => {
-        
         // called as useAttrSetter(clientId)
-        if (typeof arg1 === 'string') {
-            const clientId = arg1;
+        if (typeof arg1 === 'string' || arg1 === null) {
+            const clientId = (arg1 as string | null | undefined) ?? undefined;
             return (updaterOrObject: UpdateInput) => {
-                if (!clientId) return;
+                if (!clientId) return; // no target, no-op
 
                 if (typeof updaterOrObject === 'function') {
                     const prev = (dataSelect('core/block-editor') as any)?.getBlockAttributes(clientId) || {};
@@ -99,12 +98,12 @@ export function useAttrSetter(
         }
 
         // called as useAttrSetter(updateBlockAttributes, clientId)
-        if (typeof arg1 === 'function' && typeof arg2 === 'string') {
+        if (typeof arg1 === 'function' && (typeof arg2 === 'string' || arg2 == null)) {
             const writer = arg1 as WriterWithClientId | CompatWriter;
-            const clientId = arg2;
+            const clientId = (arg2 as string | null | undefined) ?? undefined;
 
             return (updaterOrObject: UpdateInput) => {
-                if (!clientId) return;
+                if (!clientId) return; // no target, no-op
 
                 if (typeof updaterOrObject === 'function') {
                     const prev = (dataSelect('core/block-editor') as any)?.getBlockAttributes(clientId) || {};
@@ -129,7 +128,7 @@ export function useAttrSetter(
         }
 
         // already a compat function writer `(next) => void`
-        if(typeof arg1 === 'function' ) {
+        if (typeof arg1 === 'function') {
             const compat = arg1 as CompatWriter;
             return (updaterOrObject: UpdateInput) => {
                 if (typeof updaterOrObject === 'function') {

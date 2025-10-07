@@ -1,18 +1,34 @@
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import type { CSSProperties } from 'react';
+import type { ComponentProps, CSSProperties } from 'react';
 
 import { maybeFormat } from "@utils/componentUtils";
 
-type Props = {
-    id?: string | null;
+type BaseProps = {
+    label?: string;
     value: string | number;
     onChange: (value: string | number) => void;
-    label?: string;
-    className?: string;
-    style?: CSSProperties;
-};
+    id?: string | null;
+    placeholder?: string;
+    className?: string;  
+} & Record<string, unknown>;
 
-export default function UnitControlInput({ id = null, value, onChange, label, className, style }: Props) {
+type UnderlyingOnChange = (next: string | number | undefined) => void;
+
+export default function UnitControlInput({
+    label, 
+    value, 
+    onChange, 
+    id = null,
+    placeholder = '',
+    allowReset,
+    className,
+    ...rest
+}: BaseProps) {
+    const handleChange: UnderlyingOnChange = (next) => {
+        const s = next == null ? '' : String(next);
+        onChange(s);
+    }
+
     const formattedLabel = maybeFormat(label, { toCapitalFirst: true, trim: true, toSpaces: true });
 
     const allowedUnits = [
@@ -31,13 +47,13 @@ export default function UnitControlInput({ id = null, value, onChange, label, cl
             id={id || undefined}
             label={formattedLabel}
             value={value as any}
-            onChange={(next: unknown) => onChange?.(String(next ?? ''))}
-            placeholder="0"
-            style={{ padding: '0 2px', ...(style || {}) }}
+            onChange={handleChange}
+            placeholder={placeholder}
             className={className}
-            units={allowedUnits as unknown as any}
-            isResettable
-            allowReset
+            units={allowedUnits as unknown as ComponentProps<typeof UnitControl>['units']}
+            isResettable={allowReset}
+            onReset={allowReset ? () => onChange('') : undefined}
+            {...rest}
         />
     );
 }

@@ -16,6 +16,7 @@ import FlexDirectionControl from '@components/RtlAware/FlexDirectionControl';
 import JustifyControl from '@components/RtlAware/JustifyContentControl';
 import AlignControl from '@components/RtlAware/AlignItemsControl';
 import GapControls from '@components/composite/GapControls';
+import type { VisibilityCtx } from '@types';
 
 const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
 const isFlexValue = (value: unknown): boolean => /^(flex|inline-flex)$/i.test(String(value));
@@ -124,13 +125,6 @@ const FlexBoxControls = () => {
             </PanelBody>
         </Panel>
     );
-};
-
-type VisibilityCtx = {
-    attributes?: {
-        $get?: (key: string) => unknown;
-        display?: unknown;
-    };
 };
 
 export default {

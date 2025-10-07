@@ -20,6 +20,17 @@ export interface BlockAttributes {
     [key: string]: unknown;
 }
 
+// UI context
+
+export type GetterLike = {
+    $get?: (key: string, options?: unknown) => unknown;
+} & Record<string, unknown>;
+
+export type VisibilityCtx = {
+    attributes?: GetterLike | null | undefined;
+    parentAttrs?: GetterLike | null | undefined;
+};
+
 // Reader options shared across hooks
 export type CascadeOptions = { cascade?: boolean; raw?: boolean };
 
