@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 // Basic primitives
 export type Breakpoint = 'desktop' | 'tablet' | 'mobile';
 export type CSSPrimitive = string | number;
+export type MeasurementMode = 'unit' | 'text';
 
 // cannonical shape for styles
 export type StyleMap = Record<string, string>;

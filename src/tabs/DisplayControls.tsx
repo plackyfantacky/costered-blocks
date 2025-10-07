@@ -7,7 +7,7 @@ import { LABELS } from "@labels";
 import {
     LucideBox as BoxIcon,
     MaterialSymbolsRemoveSelectionRounded as DefaultIcon,
-    MaterialSymbolsBrickOutlineRounded as BrickOulineRounded,
+    MaterialSymbolsBrickOutlineRounded as BrickOutlineRounded,
     MaterialSymbolsMatchWordRounded as MatchWordRounded,
     MaterialSymbolsFlexNoWrapRounded as FlexNoWrapRounded,
     MaterialSymbolsGridViewRounded as GridViewRounded,
@@ -24,11 +24,15 @@ const DisplayControls = () => {
     const { get } = useAttrGetter(clientId);
     const { set } = useAttrSetter(clientId);
 
-    const display = get('display') ?? '';
-    const setDisplay = useCallback((value) => set('display', value), [set]);
+    const display: string = typeof get('display') === 'string' ? (get('display') as string) : '';
+    const setDisplay = useCallback((value: string) => {
+        set('display', value === '' ? undefined : value);
+    }, [set]);
 
-    const visibility = get('visibility') ?? '';
-    const setVisibility = useCallback((value) => set('visibility', value), [set]);
+    const visibility: string = typeof get('visibility') === 'string' ? (get('visibility') as string) : '';
+    const setVisibility = useCallback((value: string) => {
+        set('visibility', value === '' ? undefined : value);
+    }, [set]);
 
     return (
         <Panel className="costered-blocks--tab--display-controls">
@@ -41,7 +45,7 @@ const DisplayControls = () => {
                             onChange={setDisplay}
                         >
                             <SelectControl.Option value=""><DefaultIcon />{LABELS.displayControls.display.unset}</SelectControl.Option>
-                            <SelectControl.Option value="block"><BrickOulineRounded />{LABELS.displayControls.display.block}</SelectControl.Option>
+                            <SelectControl.Option value="block"><BrickOutlineRounded />{LABELS.displayControls.display.block}</SelectControl.Option>
                             <SelectControl.Option value="inline"><MatchWordRounded />{LABELS.displayControls.display.inline}</SelectControl.Option>
                             <SelectControl.Option value="flex"><FlexNoWrapRounded />{LABELS.displayControls.display.flex}</SelectControl.Option>
                             <SelectControl.Option value="grid"><GridViewRounded />{LABELS.displayControls.display.grid}</SelectControl.Option>

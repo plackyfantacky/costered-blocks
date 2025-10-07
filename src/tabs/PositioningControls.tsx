@@ -42,8 +42,6 @@ const PositioningControls = () => {
         set("zIndex", value === '' ? undefined : value);
     }, [set]);
 
-    const showOffsets = position !== '' && position.toLowerCase() !== 'static';
-
     return (
         <Panel className="costered-blocks--tab--positioning-controls">
             <PanelBody title={LABELS.positioningControls.panelTitle} className="costered-blocks--positioning-controls--inner" initialOpen={true}>

@@ -17,13 +17,16 @@ import JustifyControl from '@components/RtlAware/JustifyContentControl';
 import AlignControl from '@components/RtlAware/AlignItemsControl';
 import GapControls from '@components/composite/GapControls';
 
-const isFlexValue = (value) => /^(flex|inline-flex)$/i.test(value);
+const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
+const isFlexValue = (value: unknown): boolean => /^(flex|inline-flex)$/i.test(String(value));
 
 const FlexBoxControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { name } = selectedBlock;
+    if (!clientId || !selectedBlock) return null;
+    
+    const name: string = asString((selectedBlock as any).name);
 
-    const { get } = useAttrGetter(clientId);
+    const { getString } = useAttrGetter(clientId);
     const { set, setMany } = useAttrSetter(clientId);
 
     // user preferences (panel open/close state)
@@ -32,9 +35,9 @@ const FlexBoxControls = () => {
     const [flexBoxPanelOpen, setFlexBoxPanelOpen] = useUIPreferences(flexBoxKey, true);
 
     // Normaliser: respond to 'display' and 'flexDirection' attribute changes
-    const prevDisplayRef = useRef(get('display') ?? '');
+    const prevDisplayRef = useRef(getString('display'));
     useEffect(() => {
-        const display = get('display') ?? '';
+        const display = getString('display');
         const was = prevDisplayRef.current;
         if (display === was) return;
 
@@ -49,20 +52,28 @@ const FlexBoxControls = () => {
         }
 
         prevDisplayRef.current = display;
-    }, [get, set, setMany]);
+    }, [set, setMany]);
 
 
-    const flexDirection = get('flexDirection') ?? '';
-    const setFlexDirection = useCallback((value) => set('flexDirection', value), [set]);
+    const flexDirection = getString('flexDirection') ?? '';
+    const setFlexDirection = useCallback((value: string) => {
+        set('flexDirection', value === '' ? undefined : value);
+    }, [set]);
 
-    const flexWrap = get('flexWrap') ?? '';
-    const setFlexWrap = useCallback((value) => set('flexWrap', value), [set]);
+    const flexWrap = getString('flexWrap') ?? '';
+    const setFlexWrap = useCallback((value: string) => {
+        set('flexWrap', value === '' ? undefined : value);
+    }, [set]);
 
-    const justifyContent = get('justifyContent') ?? '';
-    const setJustifyContent = useCallback((value) => set('justifyContent', value), [set]);
+    const justifyContent = getString('justifyContent') ?? '';
+    const setJustifyContent = useCallback((value: string) => {
+        set('justifyContent', value === '' ? undefined : value);
+    }, [set]);
 
-    const alignItems = get('alignItems') ?? '';
-    const setAlignItems = useCallback((value) => set('alignItems', value), [set]);
+    const alignItems = getString('alignItems') ?? '';
+    const setAlignItems = useCallback((value: string) => {
+        set('alignItems', value === '' ? undefined : value);
+    }, [set]);
 
     return (
         <Panel className="costered-blocks--tab--flexbox-controls">
@@ -115,15 +126,23 @@ const FlexBoxControls = () => {
     );
 };
 
+type VisibilityCtx = {
+    attributes?: {
+        $get?: (key: string) => unknown;
+        display?: unknown;
+    };
+};
+
 export default {
     name: 'flexbox-controls',
     title: LABELS.flexBoxControls.panelTitle,
     icon: <FlexNoWrapRounded />,
-    isVisible: ({ attributes }) => {
+    isVisible: ({ attributes }: VisibilityCtx) => {
         // Prefer responsive-aware read; fallback to legacy top-level
-        const value = (typeof attributes?.$get === 'function'
-            ? attributes.$get('display')
-            : attributes?.display) ?? '';
+        const value = 
+            (typeof attributes?.$get === 'function'
+                ? attributes.$get('display')
+                : attributes?.display) ?? '';
         return /^(flex|inline-flex)$/i.test(String(value));
     },
     render: () => <FlexBoxControls />,

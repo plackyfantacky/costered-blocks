@@ -5,8 +5,48 @@ import { Flex, FlexItem,
     __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon
 } from '@wordpress/components';
 
-function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, children, ...rest }) {
-    const handleChange = useCallback((next) => onChange(next), [onChange]);
+type ToggleValue = string;
+
+export interface CustomToggleGroupProps {
+    value: ToggleValue;
+    onChange: (value: ToggleValue) => void;
+    label?: React.ReactNode | string;
+    isBlock?: boolean;
+    isDeselectable?: boolean;
+    children: React.ReactNode;
+    [extraProps: string]: unknown;
+}
+
+export interface TextOptionProps {
+    value: ToggleValue;
+    label: string;
+    disabled?: boolean;
+}
+
+export interface IconOptionProps {
+    value: ToggleValue;
+    icon: React.ReactNode;
+    label: string;
+    showTooltip?: boolean;
+    disabled?: boolean;
+}
+
+export interface CombinedOptionProps {
+    value: ToggleValue;
+    icon: React.ReactNode;
+    label: string;
+    disabled?: boolean;
+}
+
+export interface CompositeOptionProps {
+    value: ToggleValue;
+    children: React.ReactNode;
+    label: string;
+    disabled?: boolean;
+}
+
+function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, children, ...rest }: CustomToggleGroupProps) {
+    const handleChange = useCallback((next: ToggleValue) => onChange(next), [onChange]);
 
     return (
             <ToggleGroupControl
@@ -25,7 +65,7 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
     );
 }
 
-function TextOption({ value, label, disabled }) {
+function TextOption({ value, label, disabled }: TextOptionProps) {
     return (
         <ToggleGroupControlOption
             className={`costered-blocks--custom-toggle-group--text-option`}
@@ -36,7 +76,7 @@ function TextOption({ value, label, disabled }) {
     );
 }
 
-function IconOption({ value, icon, label, showTooltip = true, disabled }) {
+function IconOption({ value, icon, label, showTooltip = true, disabled }: IconOptionProps) {
     return (
         <ToggleGroupControlOptionIcon
             className={`costered-blocks--custom-toggle-group--icon-option`}
@@ -50,7 +90,7 @@ function IconOption({ value, icon, label, showTooltip = true, disabled }) {
     );
 }
 
-function CombinedOption({ value, icon, label, disabled }) {
+function CombinedOption({ value, icon, label, disabled }: CombinedOptionProps) {
     return (
         <ToggleGroupControlOption
             className={`costered-blocks--custom-toggle-group--combined-option`}
@@ -67,7 +107,7 @@ function CombinedOption({ value, icon, label, disabled }) {
     );
 }
 
-function CompositeOption({ value, children, label, disabled }) {
+function CompositeOption({ value, children, label, disabled }: CompositeOptionProps) {
     return (
         <ToggleGroupControlOption
             className={`costered-blocks--custom-toggle-group--composite-option`}
@@ -79,9 +119,18 @@ function CompositeOption({ value, children, label, disabled }) {
     );
 }
 
-const CustomToggleGroup = memo(CustomToggleGroupBase);
+type CustomToggleGroupCompound =
+    React.MemoExoticComponent<React.FC<CustomToggleGroupProps>> & {
+        TextOption: React.FC<TextOptionProps>;
+        IconOption: React.FC<IconOptionProps>;
+        CombinedOption: React.FC<CombinedOptionProps>;
+        CompositeOption: React.FC<CompositeOptionProps>;
+    };
+
+const CustomToggleGroup = memo(CustomToggleGroupBase) as CustomToggleGroupCompound;
 CustomToggleGroup.TextOption = TextOption;
 CustomToggleGroup.IconOption = IconOption;
 CustomToggleGroup.CombinedOption = CombinedOption;
+CustomToggleGroup.CompositeOption = CompositeOption;
 
 export default CustomToggleGroup;

@@ -3,11 +3,10 @@ import { ToggleControl } from '@wordpress/components';
 import { __experimentalGrid as Grid } from "@wordpress/components";
 
 import { LABELS } from '@labels';
-import UnitControlInput from "@components/UnitControlInput";
-import TextControlInput from "@components/TextControlInput";
+import CSSMeasurementControl from '@components/CSSMeasurementControl';
 
-import { useAttrGetter, useAttrSetter, useUIPreferences, 
-    useScopedKey, useSafeBlockName } from "@hooks";
+import { useAttrGetter, useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
+import type { MeasurementMode } from '@types';
 
 type Direction = 'Top' | 'Left' | 'Right' | 'Bottom';
 
@@ -18,13 +17,6 @@ type Props = {
     prefixed?: boolean;
 }
 
-type CommonInputProps = {
-    id?: string;
-    label?: React.ReactNode;
-    value: string;
-    onChange: (value: string | number) => void;
-}
-
 const GRID_MAP: Record<Direction, { col: string; row: string }> = {
     Top: { col: '4 / span 4', row: '1' },
     Left: { col: '1 / span 4', row: '2' },
@@ -32,7 +24,13 @@ const GRID_MAP: Record<Direction, { col: string; row: string }> = {
     Bottom: { col: '4 / span 4', row: '3' },
 };
 
-const FieldSlot = memo(function FieldSlot({ area, children }: { area: Direction; children: React.ReactNode }) {
+const FieldSlot = memo(function FieldSlot({ 
+    area, 
+    children
+}: { 
+    area: Direction; 
+    children: React.ReactNode 
+}) {
     const grid = GRID_MAP[area];
     return (
         <div style={{ gridColumn: grid.col, gridRow: grid.row, zIndex: 2 }}>
@@ -43,9 +41,9 @@ const FieldSlot = memo(function FieldSlot({ area, children }: { area: Direction;
 
 function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } : Props) {
     //prefixed by default so marginTop, paddingTop, etc are used. if false, just top, left for positioning, etc.
-
-    const { get } = useAttrGetter(clientId);
+    const { getString } = useAttrGetter(clientId);
     const { set, withPrefix } = useAttrSetter(clientId);
+
     const isPrefixed = typeof prefixed === 'boolean' ? prefixed : Boolean(prefix);
     
     const ns = useMemo(
@@ -60,12 +58,12 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
 
     const values = useMemo(
         () => ({
-            Top: get(resolveKey('Top')) ?? '',
-            Left: get(resolveKey('Left')) ?? '',
-            Right: get(resolveKey('Right')) ?? '',
-            Bottom: get(resolveKey('Bottom')) ?? '',
+            Top: getString(resolveKey('Top')) ?? '',
+            Left: getString(resolveKey('Left')) ?? '',
+            Right: getString(resolveKey('Right')) ?? '',
+            Bottom: getString(resolveKey('Bottom')) ?? '',
         }),
-        [get, resolveKey]
+        [getString, resolveKey]
     );
 
     const safeBlockName = useSafeBlockName(blockName, clientId);
@@ -75,25 +73,16 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
     // Preference key: `${prefix}Mode` when prefixed, else shared `positionCoordinatesMode`
     const modeKey = isPrefixed && prefix ? `${prefix}Mode` : `positionCoordinatesMode`;
     const scopeKey = useScopedKey(modeKey, safeBlockName ? { blockName: safeBlockName } : undefined);
-    const [mode, setMode] = useUIPreferences(scopeKey, 'unit');
+    const [mode, setMode] = useUIPreferences<MeasurementMode>(scopeKey, 'unit');
     
-    const Input = (mode === 'unit' ? UnitControlInput : TextControlInput) as React.ComponentType<CommonInputProps>;
-
-    const onChangeText = useCallback(
+    const handleChange = useCallback(
         (direction: Direction) => (next: string) => {
-            const nextStr = next ?? '';
-            if (ns) ns.set(direction, nextStr);
-            else set(resolveKey(direction), nextStr);
+            const nextValue = next ?? '';
+            const payload = nextValue === '' ? undefined : nextValue;
+            if (ns) ns.set(direction, payload);
+            else set(resolveKey(direction), payload);
         },
         [ns, set, resolveKey]
-    );
-    
-    const onChangeUnit = useCallback(
-        (direction: Direction) => (next: string | number) => {
-            const nextStr = typeof next === 'number' ? String(next) : next;
-            if (ns) ns.set(direction, nextStr);
-            else set(resolveKey(direction), nextStr);
-        }, [ns, set, resolveKey]
     );
 
     const renderField = useCallback(
@@ -101,23 +90,21 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
             const id: string = `${idBase}-${idSuffix}`;
             const value = values[direction]; // likely CSSPrimitive (string|number|'')
 
-            return mode === 'unit' ? (
-                <UnitControlInput
-                    id={id}
+            return (
+                <CSSMeasurementControl
+                    mode={mode}
                     label={label}
-                    value={value ?? ''}
-                    onChange={onChangeUnit(direction)}
+                    value={value}
+                    onChange={handleChange(direction)}
+                    allowReset
+                    // pass through id to underlying inputs
+                    // (both UnitControlInput/TextControlInput accept an id prop in your codebase)
+                    textProps={{ id }}
+                    unitProps={{ id }}
                 />
-            ) : (
-                <TextControlInput
-                    id={id}
-                    label={label}
-                    value={value ?? ''}
-                    onChange={onChangeText(direction)}
-                />
-            );
+            )
         },
-        [mode, values, onChangeText, onChangeUnit, idBase]
+        [mode, values, handleChange, idBase]
     );
 
     return (

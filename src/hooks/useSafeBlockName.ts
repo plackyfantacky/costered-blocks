@@ -7,11 +7,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * - Else, uses `providedClientId` or the currently selected block.
  */
 export function useSafeBlockName(
-    providedBlockName: string | null,
-    providedClientId: string | null
+    providedBlockName: string | null | undefined,
+    providedClientId: string | null | undefined
 ): string | undefined {
     return useSelect((select: any) => {
-        if (providedBlockName && providedBlockName.trim() !== '') return providedBlockName;
+        if (typeof providedBlockName === 'string' && providedBlockName.trim() !== '') {
+            return providedBlockName;
+        }
 
         const be = select(blockEditorStore);
         const id: string | undefined =

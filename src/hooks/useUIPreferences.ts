@@ -39,18 +39,17 @@ export function useUIPreferences<Token>(
     return [value, setValue, reset];
 }
 
+type ScopedKeyOptions = {
+    blockName?: string | null | undefined;
+    variant?: string | null | undefined;
+};
+
 /**
  * Generate a namespaced preference key.
- *
- * @param {string} base The base key.
- * @param {Object} options Options for namespacing.
- * @param {string} [options.blockName] The block name to namespace by.
- * @param {string} [options.variant] An additional variant to namespace by.
- * @returns {string} The namespaced key.
  */
 export function useScopedKey(
     base: string,
-    opts: { blockName?: string | null; variant?: string | null } = {}
+    opts: ScopedKeyOptions = {}
 ): string {
     const normalise = (value?: string | null): string | undefined => {
         if (value === null) return undefined;

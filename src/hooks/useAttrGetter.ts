@@ -7,7 +7,6 @@ import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, Augment
 import { REDUX_STORE_KEY as BP_STORE } from '@config';
 import { augmentAttributes } from '@utils/breakpointUtils';
 
-
 type AttributesMap = Record<string, unknown>;
 
 export function useAttrGetter(clientId: string) {
@@ -28,7 +27,7 @@ export function useAttrGetter(clientId: string) {
     );
 
     const get = useCallback(
-        (key: string, options?: CascadeOptions) => {
+        (key: string, options?: CascadeOptions) : CSSPrimitive | undefined => {
             if (!attributes?.$get) return undefined;
             return attributes.$get(key, options);
         },
@@ -51,8 +50,35 @@ export function useAttrGetter(clientId: string) {
         [attributes]
     );
 
+    // sugar
+
+    const getString = useCallback(
+        (key: string, fallback: string = ''): string => {
+            const val = get(key);
+            return typeof val === 'string' ? val : fallback;
+        },
+        [get]
+    );
+
+    const getNumber = useCallback(
+        (key: string, fallback: number = 0): number => {
+            const val = get(key);
+            return typeof val === 'number' ? val : fallback;
+        },
+        [get]
+    );
+
+    function getEnum<Token extends string>(
+        key: string,
+        allowed: readonly Token[],
+        fallback: Token
+    ): Token | undefined {
+        const val = get(key);
+        return typeof val === 'string' && (allowed as readonly string[]).includes(val) ? (val as Token) : fallback;
+    }
+
     return useMemo(
-        () => ({ get, getAs, getMany, bp: breakpoint, attributes }),
-        [get, getAs, getMany, breakpoint, attributes]
+        () => ({ get, getAs, getMany, getString, getNumber, getEnum, bp: breakpoint, attributes }),
+        [get, getAs, getMany, getString, getNumber, getEnum, breakpoint, attributes]
     );
 }

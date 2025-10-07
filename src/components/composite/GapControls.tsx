@@ -5,35 +5,37 @@ import { SplitInput, JoinInput } from "@assets/icons";
 import { useAttrGetter, useAttrSetter, useUIPreferences, useScopedKey, useSafeBlockName } from "@hooks";
 import { splitGap, joinGap, normalize } from '@utils/gapUtils';
 import { LABELS } from '@labels';
+
+import CSSMeasurementControl from '@components/CSSMeasurementControl';
 import UnitControlInput from "@components/UnitControlInput";
 import TextControlInput from "@components/TextControlInput";
+
+type Props = {
+    clientId: string;
+    blockName?: string | null;
+};
 
 /**
  * Renders a pair of input controls for gap attributes (rowGap and columnGap).
  * Allows toggling between single and dual gap controls.
  * Will also render a toggle control to switch between unit and text input modes.
  * 
- * @param {Object} attributes - The block attributes containing the values to edit.
- * @param {string} clientId - The client ID of the block being edited.
- * @param {Function} updateBlockAttributes - Function to update block attributes.
- * 
- * @returns {JSX.Element} A FlexBox containing the gap input and toggle controls.
  */
-export default function GapControls({ clientId, blockName = null }) {
+export default function GapControls({ clientId, blockName = null }: Props) {
 
-    const { get } = useAttrGetter(clientId);
+    const { getString } = useAttrGetter(clientId);
     const { set } = useAttrSetter(clientId);
 
     //user preferences for unit/text mode
-    const safeBlockName = useSafeBlockName(blockName, clientId);
+    const safeBlockName = useSafeBlockName(blockName ?? undefined, clientId);
     const unitModePrefKey = useScopedKey('gapMode', { blockName: safeBlockName });
-    const [unitMode, setUnitMode] = useUIPreferences(unitModePrefKey, 'unit');
+    const [unitMode, setUnitMode] = useUIPreferences<'unit' | 'text'>(unitModePrefKey, 'unit');
 
     const inputModePrefKey = useScopedKey('gapInputMode', { blockName: safeBlockName });
-    const [inputMode, setInputMode] = useUIPreferences(inputModePrefKey, 'single');
+    const [inputMode, setInputMode] = useUIPreferences<'single' | 'dual'>(inputModePrefKey, 'single');
 
     //initial values
-    const initialValue = get('gap') ?? '';
+    const initialValue: string = getString('gap');
 
     //control mode state (either 'single' or 'dual'). if not defined, determine from initial value
 
@@ -44,32 +46,30 @@ export default function GapControls({ clientId, blockName = null }) {
     }, [inputMode, initialValue]);
 
     //split initial value into row and column parts
-    const [row, col] = useMemo(() => {
+    const [rowPart, colPart] = useMemo(() => {
         const parts = splitGap(initialValue);
         return [parts[0] ?? '', parts[1] ?? ''];
     }, [initialValue]);
 
     //actually setting the values
-    const setRow = useCallback((next) => {
-        const n = normalize(next);
-        if (inputMode === 'single') {
-            set('gap', n ? n : undefined);
-        } else {
-            const joined = joinGap(n, col);
-            set('gap', joined ? joined : undefined);
-        }
-    }, [inputMode, set, col]);
+    const setRow = useCallback(
+        (next: string) => {
+            const n = normalize(next);
+            if (inputMode === 'single') {
+                set('gap', n ? n : undefined);
+            } else {
+                const joined = joinGap(n, colPart);
+                set('gap', joined ? joined : undefined);
+            }
+        },
+        [inputMode, set, colPart]
+    );
 
-    const setCol = useCallback((next) => {
+    const setCol = useCallback((next: string) => {
         const n = normalize(next);
-        const joined = joinGap(row, n);
+        const joined = joinGap(rowPart, n);
         set('gap', joined ? joined : undefined);
-    }, [set, row]);
-
-    const Input = unitMode === 'unit' ? UnitControlInput : TextControlInput;
-    const labelText = inputMode === 'single'
-        ? LABELS.gapControls.label
-        : LABELS.gapControls.columnLabel;
+    }, [set, rowPart]);
 
     //toggle between single and dual input modes
     const onToggleInputMode = useCallback(() => {
@@ -81,6 +81,8 @@ export default function GapControls({ clientId, blockName = null }) {
         setUnitMode(unitMode === 'unit' ? 'text' : 'unit');
     }, [unitMode, setUnitMode]);
 
+    const labelText = inputMode === 'single' ? LABELS.gapControls.label : LABELS.gapControls.columnLabel;
+
     return (
         <Flex direction={"column"} className="gap-controls">
             <FlexBlock>
@@ -88,11 +90,23 @@ export default function GapControls({ clientId, blockName = null }) {
                     <FlexBlock>
                         <Flex gap={0} direction="row" align="flex-end">
                             <FlexItem>
-                                <Input label={labelText} value={inputMode === 'single' ? initialValue : row} onChange={setRow} allowReset={true} />
+                                <CSSMeasurementControl
+                                    mode={unitMode}
+                                    label={labelText}
+                                    value={inputMode === 'single' ? initialValue : rowPart}
+                                    onChange={setRow}
+                                    allowReset
+                                />
                             </FlexItem>
                             {inputMode === 'dual' && (
                                 <FlexItem>
-                                    <Input label={LABELS.gapControls.rowLabel} value={col} onChange={setCol} allowReset={true} />
+                                    <CSSMeasurementControl
+                                        mode={unitMode}
+                                        label={LABELS.gapControls.rowLabel}
+                                        value={colPart}
+                                        onChange={setCol}
+                                        allowReset
+                                    />
                                 </FlexItem>
                             )}
                         </Flex>
@@ -100,9 +114,11 @@ export default function GapControls({ clientId, blockName = null }) {
                     <FlexItem>
                         <Button
                             icon={inputMode === 'single' ? SplitInput : JoinInput}
-                            label={inputMode === 'single'
-                                ? LABELS.gapControls.switchToDual
-                                : LABELS.gapControls.switchToSingle}
+                            label={
+                                inputMode === 'single'
+                                    ? LABELS.gapControls.switchToDual
+                                    : LABELS.gapControls.switchToSingle
+                            }
                             onClick={onToggleInputMode}
                             style={{ marginBottom: '2px' }}
                             aria-pressed={inputMode === 'dual'}

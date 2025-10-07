@@ -93,13 +93,6 @@ const GRID_ROW_ATTR = PLACEMENT.gridRow.attr;
  * Iterates over dimension, spacing, and layout keys, converting attribute values into valid 
  * inline styles. Also sets logical margin properties to override blockGap and returns flags 
  * for which sides are set.
- * 
-* @param {Object} attributes - The block attributes to build the style from.
-* @returns {Object} An object containing:
-* - style: The constructed style object.
-* - any: Boolean indicating if any styles were set.
-* - hasMt, hasMb, hasMl, hasMr: Booleans indicating if respective margins are set.
-* - haveFlexDir: Boolean indicating if flexDirection is set.
  */
 function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
     // prefer responsive-aware reads (raw per active breakpoint); fallback to legacy props (if any left)
@@ -211,9 +204,6 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
  * Reads the block’s attributes via useSelect, runs them through buildMirror, and merges the
  * resulting styles/class flags into wrapperProps. Ensures editor reflects frontend layout 
  * instantly.
- * 
- * @param {Function} BlockListBlock - The original BlockListBlock component.
- * @returns {Function} A memoized component that applies the style mirror.
  */
 function withEditorStyleMirror(BlockListBlock: any) {
     const Wrapped = memo((props: any) => {
