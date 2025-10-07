@@ -1,8 +1,8 @@
 // src/utils/breakpointUtils.ts
 
 import { ensureShape, isUnsetLike } from '@utils/attributeUtils';
-import { normaliseStyleList } from "@utils/costeredStyles";
-import type { Breakpoint, BlockAttributes, RawStyle, CSSPrimitive, CascadeOptions } from '@types';
+import { getStylesForBreakpoint } from '@utils/costeredStyles';
+import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, StyleMap } from '@types';
 
 const BP_DESKTOP: Breakpoint = 'desktop';
 const EMPTY_ATTRS = Object.freeze({}) as Record<string, unknown>;
@@ -17,13 +17,9 @@ export const mapDeviceToBp = (device: unknown): Breakpoint => {
 /**
  * Internal: read bucket for a breakpoint; always returns an object with desktop/tablet/mobile keys
  */
-function readBucket(styles: RawStyle[] | undefined, property: string): CSSPrimitive | undefined {
-    const list = normaliseStyleList(styles);
-    for (let i = 0; i < list.length; i++) {
-        const d = list[i]!;
-        if (d.property === property) return d.value;
-    }
-    return undefined;
+function readBucket(map: StyleMap | undefined, property: string): CSSPrimitive | undefined {
+    const value = map ? map[property] : undefined;
+    return (typeof value === 'string' || typeof value === 'number') ? value : undefined;
 };
 
 type ReaderOptions = {
@@ -47,15 +43,16 @@ export function makeBreakpointReader(bp: Breakpoint) {
             const shaped = ensureShape(attributes?.costered);
 
             if (raw) {
-                const value = readBucket(shaped?.[useBp]?.styles, key);
+                const map = (shaped?.[useBp]?.styles as StyleMap) || {};
+                const value = readBucket(map, key);
                 return isUnsetLike(value) ? (fallback as CSSPrimitive | undefined) : value;
             }
         
             //cascade: active breakpoint -> desktop
-            const primary = readBucket(shaped?.[useBp]?.styles, key);
+            const primary = readBucket((shaped?.[useBp]?.styles as StyleMap) || {}, key);
             if (!isUnsetLike(primary)) return primary;
 
-            const base = readBucket(shaped?.[BP_DESKTOP]?.styles, key);
+            const base = readBucket((shaped?.[BP_DESKTOP]?.styles as StyleMap) || {}, key);
             return isUnsetLike(base) ? (fallback as CSSPrimitive | undefined) : base;
         };
     }
@@ -100,14 +97,14 @@ export function augmentAttributes<Token extends Partial<BlockAttributes>>(
         const active: Breakpoint = bp || BP_DESKTOP;
         
         if (raw) {
-            const value = readBucket(shaped?.[active]?.styles, key);
+            const value = readBucket((shaped?.[active]?.styles as StyleMap) || {}, key);
             return isUnsetLike(value) ? undefined : value;
         }
 
         //cascade upwards
         const order = orderForm(active);
         for (const bpKey of order) {
-            const value = readBucket(shaped?.[bpKey]?.styles, key);
+            const value = readBucket((shaped?.[bpKey]?.styles as StyleMap) || {}, key);
             if (!isUnsetLike(value)) return value;
         }
 

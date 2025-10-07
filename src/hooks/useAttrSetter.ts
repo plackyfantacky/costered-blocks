@@ -10,9 +10,8 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect, select as dataSelect } from '@wordpress/data';
 
-import type { Breakpoint, BlockAttributes, CSSPrimitive } from "@types";
-import { upsertStyle, removeStyle } from '@utils/costeredStyles';
-import type { RawStyle } from '@types';
+import type { Breakpoint, BlockAttributes, CSSPrimitive, StyleMap } from "@types";
+import { getStylesForBreakpoint, withBreakpointStyles } from '@utils/costeredStyles';
 
 import { ensureShape } from '@utils/attributeUtils';
 import { seedCosteredId } from '@utils/blockUtils';
@@ -210,18 +209,19 @@ export function useAttrSetter(
                 seedCosteredId(next); // ensure a stable costeredId
                 next.costered = ensureShape(next.costered);
 
-                const currentList = next.costered![activeBreakpoint]!.styles as RawStyle[] | undefined;
-                const value = normalise(input, keyName); //only run once
-                const nextList = 
-                    value === undefined
-                    ? removeStyle(currentList, keyName)
-                    : upsertStyle(currentList, keyName, value);
-
-                next.costered![activeBreakpoint] = {
-                    ...next.costered![activeBreakpoint]!,
-                    styles: nextList
-                };
-                return next as unknown as AttributesMap;
+                const value = normalise(input, keyName); // only run once
+                const currentMap: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+                const edited: StyleMap = { ...currentMap };
+                if (value === undefined) {
+                    if (Object.prototype.hasOwnProperty.call(edited, keyName)) {
+                        delete edited[keyName];
+                    } else {
+                        return prev; // nothing to remove, avoid write
+                    }
+                } else {
+                    edited[keyName] = String(value);
+                }
+                return withBreakpointStyles(next, activeBreakpoint, edited) as unknown as AttributesMap;
             });
     }, [updateFn, activeBreakpoint, normalise]);
 
@@ -234,21 +234,17 @@ export function useAttrSetter(
             seedCosteredId(next); // ensure a stable costeredId
             next.costered = ensureShape(next.costered);
 
-            const currentList = next.costered![activeBreakpoint]!.styles as RawStyle[] | undefined;
-
-            let list = currentList;
+            const base: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+            const edited: StyleMap = { ...base };
             for (const [keyName, input] of Object.entries(partial)) {
-                const value = normalise(input, keyName); //only run once per key
-                list = value === undefined
-                    ? removeStyle(list, keyName)
-                    : upsertStyle(list, keyName, value);
+                const value = normalise(input, keyName); // only run once per key
+                if (value === undefined) {
+                    if (Object.prototype.hasOwnProperty.call(edited, keyName)) delete edited[keyName];
+                } else {
+                    edited[keyName] = String(value);
+                }
             }
-
-            next.costered![activeBreakpoint] = {
-                ...next.costered![activeBreakpoint]!,
-                styles: list || []
-            };
-            return next as unknown as AttributesMap;
+            return withBreakpointStyles(next, activeBreakpoint, edited) as unknown as AttributesMap;
         });
 
     }, [updateFn, activeBreakpoint, normalise]);
@@ -259,18 +255,13 @@ export function useAttrSetter(
 
             seedCosteredId(next); // ensure a stable costeredId - we always want a costeredId even if all styles are cleared
             next.costered = ensureShape(next.costered);
+            const map: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
 
-            const currentList = next.costered![activeBreakpoint]!.styles as RawStyle[] | undefined;
+            if (!Object.prototype.hasOwnProperty.call(map, keyName)) return prev; // nothing to remove
+            const edited: StyleMap = { ...map };
+            delete edited[keyName];
+            return withBreakpointStyles(next, activeBreakpoint, edited) as unknown as AttributesMap;
 
-            // Early return if the property is not present (avoid needless writes)
-            const afterRemove = removeStyle(currentList, keyName);
-            if ((currentList?.length || 0) === afterRemove.length) return prev;
-
-            next.costered![activeBreakpoint] = {
-                ...next.costered![activeBreakpoint]!,
-                styles: afterRemove
-            };
-            return next as unknown as AttributesMap;
         });
     }, [updateFn, activeBreakpoint]);
 
@@ -283,18 +274,18 @@ export function useAttrSetter(
             seedCosteredId(next); // ensure a stable costeredId - we always want a costeredId even if all styles are cleared
             next.costered = ensureShape(next.costered);
 
-            const currentList = next.costered![activeBreakpoint]?.styles as RawStyle[] | undefined;
-
-            let list = currentList;
+            const map: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+            let changed = false;
+            const edited: StyleMap = { ...map };
             for (let i = 0; i < keys.length; i++) {
-                list = removeStyle(list, keys[i]!);
+                const key = keys[i]!;
+                if (Object.prototype.hasOwnProperty.call(edited, key)) {
+                    delete edited[key];
+                    changed = true;
+                }
             }
-            
-            next.costered![activeBreakpoint] = {
-                ...next.costered![activeBreakpoint]!,
-                styles: list || []
-            };
-            return next as unknown as AttributesMap;
+            if (!changed) return prev;
+            return withBreakpointStyles(next, activeBreakpoint, edited) as unknown as AttributesMap;
         });
     }, [updateFn, activeBreakpoint]);
 

@@ -4,40 +4,19 @@ import type { CSSProperties, ReactNode } from "react";
 export type Breakpoint = 'desktop' | 'tablet' | 'mobile';
 export type CSSPrimitive = string | number;
 
-/**
- * Normalised declaration used internally by helpers/UI.
- */
-export interface StyleDeclaration {
-    property: string;
-    value: CSSPrimitive;
-    important?: boolean;
+// cannonical shape for styles
+export type StyleMap = Record<string, string>;
+
+export interface BreakpointBucket {
+    styles: StyleMap; // raw wire format
 }
 
-// non-readonly tuples
-type RawTuple2 = [property: string, value: CSSPrimitive] | readonly [property: string, value: CSSPrimitive];
-type RawTuple3 = [property: string, value: CSSPrimitive, important: boolean] | readonly [property: string, value: CSSPrimitive, important: boolean];
-
-/**
- * What might be stored on disk today. We keep this loose to
- * accept either tuples or objects while we're refactoring.
- */
-export type RawStyle = | StyleDeclaration | RawTuple2 | RawTuple3;
-
-export type CosteredBreakpoint = { styles: RawStyle[] };
-export type CosteredAttributes = {
-    desktop?: CosteredBreakpoint;
-    tablet?: CosteredBreakpoint;
-    mobile?: CosteredBreakpoint;
-};
+export type CosteredAttributes = Partial<Record<Breakpoint, BreakpointBucket>>;
 
 export interface BlockAttributes {
     costered?: CosteredAttributes;
     costeredId?: string;
     [key: string]: unknown;
-}
-
-export interface BreakpointBucket {
-    styles: RawStyle[]; // raw wire format
 }
 
 // Reader options shared across hooks

@@ -1,72 +1,30 @@
 // src/utils/attributeUtils.ts
-import type { CosteredAttributes, Breakpoint, RawStyle, StyleDeclaration, CSSPrimitive } from "@types";
+import type { CosteredAttributes, Breakpoint, CSSPrimitive, StyleMap, BreakpointBucket } from "@types";
 
 /**
- * Normalise an unknown "styles" value into RawStyle[].
- * - Accepts an array of StyleDeclaration-like items
- * - Accepts a plain object map { property: value }
- * - Everything else becomes an empty array
+ * Ensure attrs.costered exists with desktop/tablet/mobile buckets and
+ * a canonical styles map (plain object).
  */
-const normaliseStyles = (styles: unknown): RawStyle[] => {
-    if (Array.isArray(styles)) {
-        return (styles as Array<Partial<StyleDeclaration>>)
-            .filter(Boolean)
-            .map((item) => {
-                const property = String((item as any).property ?? '');
-                const value = (item as any).value as CSSPrimitive | undefined;
-                return property && value !== undefined ? { property, value } : undefined;
-            })
-            .filter(Boolean) as RawStyle[];       
-    }
-    if (styles && typeof styles === 'object') {
-        const out: StyleDeclaration[] = [];
-        for (const [property, value] of Object.entries(
-            styles as Record<string, CSSPrimitive | undefined>)
-        ) {
-            if (value !== undefined) out.push({ property, value });
+export const ensureShape = (costered?: Partial<CosteredAttributes> | undefined): CosteredAttributes => {
+    const makeBucket = (maybe: Partial<BreakpointBucket> | undefined) : BreakpointBucket => {
+        const styles = maybe?.styles;
+        if (styles && typeof styles === 'object' && !Array.isArray(styles)) {
+            //clone to avoid mutations
+            return { ...maybe, styles: { ...(styles as StyleMap) } } as BreakpointBucket;
         }
-        return out;
-    }
-    return [];
-};
-
-
-/**
- * Build a bucket object from anything, defaulting to { styles: [] }.
- * Accepts either { styles } or a raw styles value directly.
- */
-const asBucket = (maybeBucket: unknown) => {
-    if (maybeBucket && typeof maybeBucket === 'object' && 'styles' in (maybeBucket as any)) {
-        return  { styles: normaliseStyles((maybeBucket as any).styles) };
-    }
-    return { styles: normaliseStyles(maybeBucket) };
-}
-
-
-
-
-/**
- * Ensure attrs.costered exists with desktop/tablet/mobile buckets and array-based styles.
- * Converts legacy object maps ({ prop: value }) to RawStyle[].
- */
-export const ensureShape = (costered?: unknown): CosteredAttributes => {
-    const input = (costered as Partial<CosteredAttributes>) || {};
+        return { ...maybe || {}, styles: {} as StyleMap } as BreakpointBucket;
+    };
+    
+    const input = (costered && typeof costered === 'object') ? costered : {};
+    
 
     const hasNamedBuckets =
         !!input.desktop || !!input.tablet || !!input.mobile;
 
-    if(!hasNamedBuckets) {
-        return {
-            desktop: asBucket(input),
-            tablet: asBucket(undefined),
-            mobile: asBucket(undefined)
-        }
-    }
-
     return {
-        desktop: asBucket(input.desktop),
-        tablet: asBucket(input.tablet),
-        mobile: asBucket(input.mobile),
+        desktop: makeBucket(input.desktop),
+        tablet: makeBucket(input.tablet),
+        mobile: makeBucket(input.mobile),
     };
 };
 
