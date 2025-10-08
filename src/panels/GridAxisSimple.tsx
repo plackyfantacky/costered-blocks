@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Flex, FlexBlock, RangeControl, ToggleControl } from '@wordpress/components';
@@ -13,31 +14,45 @@ import CustomNotice from "@components/CustomNotice";
 import { GridAxisAside } from "@components/composite/GridAxisAside";
 
 const EMPTY_AXIS = {
-    mode: 'raw',
-    template: null,
-    normalised: '',
-    simple: null,
-    tracks: null
+    mode: 'raw' as const,
+    template: null as string | null,
+    normalised: '' as string,
+    simple: null as { count: number; unit: string } | null,
+    tracks: null as unknown
 };
 
-export function GridAxisSimple({ clientId, axisDisabled = {} }) {
+type UnitOnChange = ComponentProps<typeof UnitControlInput>['onChange'];
+
+type AxisDisabled = { columns?: boolean; rows?: boolean };
+
+type Props = {
+    clientId: string | null;
+    axisDisabled?: AxisDisabled;
+};
+
+export function GridAxisSimple({
+    clientId,
+    axisDisabled = {}
+ }: Props) {
     if (!clientId) return null;
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
+
+    // const { updateBlockAttributes } = useDispatch('core/block-editor');
+    // const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
+    const { set, unset } = useAttrSetter(clientId ?? null);
 
     // Always have a safe model shape
-    const model = useGridModel(clientId) || {};
-    const col = model.columns ?? EMPTY_AXIS;
-    const row = model.rows ?? EMPTY_AXIS;
+    const model = (useGridModel(clientId) as any) || {};
+    const col = (model.columns ?? EMPTY_AXIS) as typeof EMPTY_AXIS;
+    const row = (model.rows ?? EMPTY_AXIS) as typeof EMPTY_AXIS;
 
     // Seed from model (if unknown/raw, fall back to zeros + 1fr)
-    const [colCount, setColCount] = useState(col.simple?.count ?? 0);
-    const [colUnit, setColUnit] = useState(col.simple?.unit ?? DEFAULT_GRID_UNIT);
-    const [colUseDGU, setColUseDGU] = useState((col.simple?.unit ?? DEFAULT_GRID_UNIT) === DEFAULT_GRID_UNIT);
+    const [colCount, setColCount] = useState<number>(col.simple?.count ?? 0);
+    const [colUnit, setColUnit] = useState<string>(col.simple?.unit ?? DEFAULT_GRID_UNIT);
+    const [colUseDGU, setColUseDGU] = useState<boolean>((col.simple?.unit ?? DEFAULT_GRID_UNIT) === DEFAULT_GRID_UNIT);
 
-    const [rowCount, setRowCount] = useState(row.simple?.count ?? 0);
-    const [rowUnit, setRowUnit] = useState(row.simple?.unit ?? DEFAULT_GRID_UNIT);
-    const [rowUseDGU, setRowUseDGU] = useState((row.simple?.unit ?? DEFAULT_GRID_UNIT) === DEFAULT_GRID_UNIT);
+    const [rowCount, setRowCount] = useState<number>(row.simple?.count ?? 0);
+    const [rowUnit, setRowUnit] = useState<string>(row.simple?.unit ?? DEFAULT_GRID_UNIT);
+    const [rowUseDGU, setRowUseDGU] = useState<boolean>((row.simple?.unit ?? DEFAULT_GRID_UNIT) === DEFAULT_GRID_UNIT);
 
     // Keys to avoid optional chaining in deps
     const colKey = col?.normalised ?? '';
@@ -58,11 +73,11 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
 
     // Effective units (avoid transient empty strings)
     const effectiveColUnit = useMemo(
-        () => (colUseDGU ? DEFAULT_GRID_UNIT : (colUnit || DEFAULT_GRID_UNIT)),
+        () => (colUseDGU ? DEFAULT_GRID_UNIT : colUnit || DEFAULT_GRID_UNIT),
         [colUseDGU, colUnit]
     );
     const effectiveRowUnit = useMemo(
-        () => (rowUseDGU ? DEFAULT_GRID_UNIT : (rowUnit || DEFAULT_GRID_UNIT)),
+        () => (rowUseDGU ? DEFAULT_GRID_UNIT : rowUnit || DEFAULT_GRID_UNIT),
         [rowUseDGU, rowUnit]
     );
 
@@ -73,13 +88,13 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
     //const colsActive = !!col.template && normaliseTemplate(colsNow) === colKey;
     //const rowsActive = !!row.template && normaliseTemplate(rowsNow) === rowKey;
 
-    const writeCols = useCallback((nextCount, nextUnit) => {
+    const writeCols = useCallback((nextCount: number, nextUnit: string) => {
         const template = makeRepeat(nextCount, nextUnit);
         template == null ? unset('gridTemplateColumns') : set('gridTemplateColumns', template);
     }, [set, unset]);
 
 
-    const writeRows = useCallback((nextCount, nextUnit) => {
+    const writeRows = useCallback((nextCount: number, nextUnit: string) => {
         const template = makeRepeat(nextCount, nextUnit);
         template == null ? unset('gridTemplateRows') : set('gridTemplateRows', template);
     }, [set, unset]);
@@ -87,44 +102,44 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
 
     /* handlers: update local state, then write immediately */
 
-    const handleColCount = useCallback((n) => {
-        const next = typeof n === 'number' ? n : parseInt(n || '0', 10);
+    const handleColCount = useCallback((num: number | undefined) => {
+        const next = typeof num === 'number' ? num : parseInt(num || '0', 10);
         setColCount(next);
         writeCols(next, colUseDGU ? DEFAULT_GRID_UNIT : colUnit);
     }, [colUseDGU, colUnit, writeCols]);
 
-    const handleRowCount = useCallback((n) => {
-        const next = typeof n === 'number' ? n : parseInt(n || '0', 10);
+    const handleRowCount = useCallback((num: number | undefined) => {
+        const next = typeof num === 'number' ? num : parseInt(num || '0', 10);
         setRowCount(next);
         writeRows(next, rowUseDGU ? DEFAULT_GRID_UNIT : rowUnit);
     }, [rowUseDGU, rowUnit, writeRows]);
 
-    const handleColUseDGU = useCallback((useDGU) => {
+    const handleColUseDGU = useCallback((useDGU: boolean) => {
         setColUseDGU(useDGU);
         const unit = useDGU ? DEFAULT_GRID_UNIT : (colUnit || DEFAULT_GRID_UNIT);
         if (!useDGU && !colUnit) setColUnit(unit);
         writeCols(colCount, unit);
     }, [colCount, colUnit, writeCols]);
 
-    const handleRowUseDGU = useCallback((useDGU) => {
+    const handleRowUseDGU = useCallback((useDGU: boolean) => {
         setRowUseDGU(useDGU);
         const unit = useDGU ? DEFAULT_GRID_UNIT : (rowUnit || DEFAULT_GRID_UNIT);
         if (!useDGU && !rowUnit) setRowUnit(unit);
         writeRows(rowCount, unit);
     }, [rowCount, rowUnit, writeRows]);
 
-    const handleColUnit = useCallback((unit) => {
-        const u = (unit ?? '').trim();
+    const handleColUnit: UnitOnChange = (unit) => {
+        const u = typeof unit === 'number' ? String(unit) : (unit ?? '').trim();
         setColUnit(u);
         writeCols(colCount, colUseDGU ? DEFAULT_GRID_UNIT : (u || DEFAULT_GRID_UNIT));
-    }, [colCount, colUseDGU, writeCols]);
-
-    const handleRowUnit = useCallback((unit) => {
-        const u = (unit ?? '').trim();
+    }
+    
+    const handleRowUnit: UnitOnChange = (unit) => {
+        const u = typeof unit === 'number' ? String(unit) : (unit ?? '').trim();
         setRowUnit(u);
         writeRows(rowCount, rowUseDGU ? DEFAULT_GRID_UNIT : (u || DEFAULT_GRID_UNIT));
-    }, [rowCount, rowUseDGU, writeRows]);
-
+    };
+    
     const clearCols = useCallback(() => {
         setColCount(0);
         unset('gridTemplateColumns');
@@ -135,8 +150,8 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
         unset('gridTemplateRows');
     }, [unset]);
 
-    const colDisabled = axisDisabled?.columns ?? false;
-    const rowDisabled = axisDisabled?.rows ?? false;
+    const colDisabled = !!axisDisabled?.columns;
+    const rowDisabled = !!axisDisabled?.rows;
 
     return (
         <Flex direction="column" gap={6}>
@@ -159,7 +174,7 @@ export function GridAxisSimple({ clientId, axisDisabled = {} }) {
                         axis="columns"
                         canClear={!!col?.template}
                         onClear={clearCols}
-                        owner={model.activePane.columns}
+                        owner={model.activePane.columns ?? null}
                         here="simple"
                         label={LABELS.gridControls.simplePanel.columnsClear}
                         disabled={colDisabled}

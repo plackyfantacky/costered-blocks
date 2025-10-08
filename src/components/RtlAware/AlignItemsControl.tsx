@@ -1,9 +1,10 @@
 import { isRTL } from '@wordpress/i18n';
+import type { ReactNode } from 'react';
 
 import { useAttrGetter } from '@hooks';
-
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import { LABELS } from "@labels";
+
 import {
     EntypoAlignLeft as FlexJustifyStart, 
     EntypoAlignRight as FlexJustifyEnd, 
@@ -19,17 +20,29 @@ import {
     MaterialSymbolsAlignSpaceEven as FlexAlignSpaceEven
 } from "@assets/icons";
 
-export default function AlignControl({ value, setAlignItems, clientId }) {
-    const rtl = isRTL();
-    const { get } = useAttrGetter(clientId);
-    const isRow = get('flexDirection') ? get('flexDirection').includes('row') : true;
+type Props = {
+    value: string;
+    setAlignItems: ( value: string ) => void;
+    clientId: string | null;
+}
 
-    const StartIcon = isRow ? (rtl ? <FlexAlignEnd /> : <FlexAlignStart />) : <FlexJustifyStart />;
-    const EndIcon = isRow ? (rtl ? <FlexAlignStart /> : <FlexAlignEnd />) : <FlexJustifyEnd />;
-    const CenterIcon = isRow ? <FlexAlignCenter /> : <FlexJustifyCenter />;
-    const SpaceAroundIcon = isRow ? <FlexAlignSpaceAround /> : <FlexJustifySpaceAround />;
-    const SpaceBetweenIcon = isRow ? <FlexAlignSpaceBetween /> : <FlexJustifySpaceBetween />;
-    const SpaceEvenlyIcon = isRow ? <FlexAlignSpaceEven /> : <FlexJustifySpaceEven />;
+export default function AlignControl({ 
+    value,
+    setAlignItems,
+    clientId
+}: Props) {
+    const rtl = isRTL();
+    const { getString } = useAttrGetter(clientId ?? null);
+    
+    const flexDir = getString('flexDirection', '');
+    const isRow = flexDir ? flexDir.includes('row') : true;
+
+    const StartIcon: ReactNode = isRow ? (rtl ? <FlexAlignEnd /> : <FlexAlignStart />) : <FlexJustifyStart />;
+    const EndIcon: ReactNode = isRow ? (rtl ? <FlexAlignStart /> : <FlexAlignEnd />) : <FlexJustifyEnd />;
+    const CenterIcon: ReactNode = isRow ? <FlexAlignCenter /> : <FlexJustifyCenter />;
+    const SpaceAroundIcon: ReactNode = isRow ? <FlexAlignSpaceAround /> : <FlexJustifySpaceAround />;
+    const SpaceBetweenIcon: ReactNode = isRow ? <FlexAlignSpaceBetween /> : <FlexJustifySpaceBetween />;
+    const SpaceEvenlyIcon: ReactNode = isRow ? <FlexAlignSpaceEven /> : <FlexJustifySpaceEven />;
 
     return (
         <CustomToggleGroup

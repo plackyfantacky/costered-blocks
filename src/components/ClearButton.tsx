@@ -1,11 +1,27 @@
-import { Button, Tooltip} from '@wordress/components';
-import { Icon, trash } from '@wordress/icons';
-import { useCallback } from '@wordress/element';
+import { Button, Tooltip } from '@wordpress/components';
+import { Icon, trash } from '@wordpress/icons';
+import { useCallback } from '@wordpress/element';
 
 import { LABELS } from '@labels';
 import { useAttrSetter } from '@hooks';
 
-export default function ClearButton({ clientId, keys = [], label, onAfterClear, disabled = false }) {
+type Props = {
+    clientId?: string | null;
+    keys?: readonly string[];
+    label?: string;
+    onAfterClear?: () => void;
+    disabled?: boolean;
+    className?: string;
+};
+
+export default function ClearButton({
+    clientId,
+    keys = [],
+    label,
+    onAfterClear,
+    disabled = false,
+    className = '',
+}: Props) {
     const clearLabel = label || LABELS.actions.clear;
     const { unset, unsetMany } = useAttrSetter(clientId);
 
@@ -13,7 +29,7 @@ export default function ClearButton({ clientId, keys = [], label, onAfterClear, 
         if (Array.isArray(keys) && keys.length > 1) {
             unsetMany(keys);
         } else if (keys && keys.length === 1) {
-            unset(keys[0]);
+            unset(keys[0]!);
         }
         onAfterClear?.();
     }, [keys, unset, unsetMany, onAfterClear]);

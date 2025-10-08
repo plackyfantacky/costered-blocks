@@ -16,28 +16,36 @@ import { GridItemSimple } from '@panels/GridItemSimple';
 import { GridItemTracks } from '@panels/GridItemTracks';
 import { GridItemAreas } from '@panels/GridItemAreas';
 
+import type { GridItemPanelKey, VisibilityCtx } from "@types";
+
 const maxInteger = Number.MAX_SAFE_INTEGER;
 const minInteger = -maxInteger;
 
 const GridItemControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { name } = selectedBlock;
+    const name = selectedBlock?.name;
 
-    const { get } = useAttrGetter(clientId);
+    const { getString, getNumber } = useAttrGetter(clientId ?? null);
     const { set } = useAttrSetter(clientId);
 
-    const blockName = useSafeBlockName(name, clientId);
+    const blockName = useSafeBlockName(name, clientId ?? null);
     const preferenceKey = useScopedKey('activeGridItemPanel', { blockName: blockName });
-    const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences(preferenceKey, 'simple');
+    const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences<string | null>(preferenceKey, 'simple');
 
-    const alignSelf = get('alignSelf') || 'auto';
-    const setAlignSelf = useCallback((value) => set('alignSelf', value), [set]);
-
-    const justifySelf = get('justifySelf') || 'auto';
-    const setJustifySelf = useCallback((value) => set('justifySelf', value), [set]);
+    const alignSelf = getString('alignSelf', 'auto');
+    const setAlignSelf = useCallback((value: string) => {
+        set('alignSelf', value === '' ? undefined : value);
+    }, [set]);
     
-    const order = get('order') || 0;
-    const setOrder = useCallback((value) => set('order', value), [set]);
+    const justifySelf = getString('justifySelf') || 'auto';
+    const setJustifySelf = useCallback((value: string) => {
+        set('justifySelf', value === '' ? undefined : value);
+    }, [set]);
+
+    const order = getNumber('order', 0) ?? 0;
+    const setOrder = useCallback((value: number | '') => {
+        set('order', value === '' ? undefined : value);
+    }, [set]);
 
     return (
         <Panel className="costered-blocks--tab--griditem-controls">
@@ -101,7 +109,7 @@ export default {
     name: 'grid-item-controls',
     title: LABELS.gridItemsControls.panelTitle,
     icon: <GridItem />,
-    isVisible: ({ parentAttrs } = {}) => {
+    isVisible: ({ parentAttrs }: VisibilityCtx = {}) => {
         // Prefer responsive-aware read; fallback to legacy top-level
         const value = (typeof parentAttrs?.$get === 'function'
             ? parentAttrs.$get('display', { cascade: true })

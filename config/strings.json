@@ -263,6 +263,13 @@
         "spaceBetween": "Space Between",
         "spaceEvenly": "Space Evenly"
     },
+    "justifySelfControl" : {
+        "label": "Justify Self",
+        "start": "Start",
+        "end": "End",
+        "center": "Center",
+        "stretch": "Stretch"
+    },
     "alignControls": {
         "label": "Align Items",
         "start": "Start",

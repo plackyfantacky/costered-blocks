@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ComponentType, CSSProperties, ReactNode } from "react";
 
 // Basic primitives
 export type Breakpoint = 'desktop' | 'tablet' | 'mobile';
@@ -21,6 +21,28 @@ export interface BlockAttributes {
 }
 
 // UI context
+
+export type GridControlsPanelMap<Key extends string> = Record<Key, ComponentType<any>>;
+export type GridControlsPanelProps<Key extends string> =
+    | Record<string, unknown>
+    | ((active: Key) => Record<string, unknown>);
+
+
+export type GridAxisModeKey = 'simple' | 'tracks'
+export type GridAxisKey = 'rows' | 'columns';
+export type GridAxisModel = {
+    template: string | null;
+    normalised?: string;
+    tracks?: string[];
+    activePane?: GridAxisModeKey | null;
+};
+export type GridModel = {
+    columns: GridAxisModel | null;
+    rows: GridAxisModel | null;
+    activePane: Record<GridAxisKey, GridAxisModeKey | null>;
+};
+
+export type GridItemPanelKey = 'simple' | 'tracks';
 
 export type GetterLike = {
     $get?: (key: string, options?: unknown) => unknown;

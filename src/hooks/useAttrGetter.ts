@@ -57,16 +57,16 @@ export function useAttrGetter(clientId: string | null) {
     // sugar
 
     const getString = useCallback(
-        (key: string, fallback: string = ''): string => {
-            const val = get(key);
+        (key: string, fallback: string = '', options?: CascadeOptions): string => {
+            const val = get(key, options);
             return typeof val === 'string' ? val : fallback;
         },
         [get]
     );
 
     const getNumber = useCallback(
-        (key: string, fallback: number = 0): number => {
-            const val = get(key);
+        (key: string, fallback: number = 0, options?: CascadeOptions): number => {
+            const val = get(key, options);
             return typeof val === 'number' ? val : fallback;
         },
         [get]

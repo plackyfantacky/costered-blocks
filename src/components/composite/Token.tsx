@@ -1,7 +1,32 @@
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { TextControl, Button, Tooltip, Popover } from '@wordpress/components';
+import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 
 import { LABELS } from '@labels';
+
+type Labels = Partial<{
+    expand: string;
+    collapse: string;
+    remove: string;
+    moveLeft: string;
+    moveRight: string;
+}>;
+
+type Props = {
+    index: number;
+    value: string;
+    isExpanded: boolean;
+    onToggle: (index: number, nextExpanded: boolean) => void;
+    onRemove: (index: number) => void;
+    onChange: (index: number, nextValue: string) => void;
+    onMoveLeft: (index: number) => void;
+    onMoveRight: (index: number) => void;
+    labels?: Labels;
+    emptyPlaceholder?: string;
+    floatingEditor?: boolean;
+    popoverPlacement?: 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end';
+    popoverWidth?: number | string; // e.g. 300 or '20em'
+};
 
 export default function Token({
     index,
@@ -14,20 +39,20 @@ export default function Token({
     onMoveRight,
     labels,
     emptyPlaceholder,
-    floatingEditor = false, // opt-in (default false)
+    floatingEditor = false,
     popoverPlacement = 'bottom-start',
     popoverWidth,
-}) {
-
+}: Props) {
     // Ref to the chip button, used as anchor for the popover (if floatingEditor)
-    const chipRef = useRef(null);
+    const chipRef = useRef<HTMLDivElement | null>(null);
     
     // Manage focus on the input when expanded
-    const inputElementRef = useRef(null);
-    const lastOpenReasonRef = useRef('pointer');
+    const inputElementRef = useRef<HTMLInputElement | null>(null);
+    const lastOpenReasonRef = useRef<'pointer' | 'keyboard'>('pointer');
 
-    const setInputRef = useCallback((node) => {
-        const element = node?.inputRef?.current || node || null;
+    const setInputRef = useCallback((node: any) => {
+        const element: HTMLInputElement | null = 
+            (node && node.inputRef && node.inputRef.current) || node || null;
         inputElementRef.current = element;
     }, []);
 
@@ -43,26 +68,24 @@ export default function Token({
             element.focus?.({ preventScroll: true });
 
             const len = typeof element.value === 'string' ? element.value.length : 0;
-            if (typeof element.setSelectionRange === 'function') {
-                element.setSelectionRange(len, len);
-            }
+            if (typeof element.setSelectionRange === 'function') element.setSelectionRange(len, len);
         }
         // reset; subsequent opens without an explicit reason default to 'pointer'
         lastOpenReasonRef.current = 'pointer';
     }, [isExpanded]);
 
-    const labelData = {
+    const labelData: Required<Labels> = {
         expand: LABELS.token.expand,
         collapse: LABELS.token.collapse,
         remove: LABELS.token.remove,
         moveLeft: LABELS.token.moveLeft,
         moveRight: LABELS.token.moveRight,
         ...labels,
-    };
+    } as Required<Labels>;
 
     const chipText = value && value.trim().length ? value : (emptyPlaceholder ?? '');
 
-    const handleRemove = useCallback((event) => {
+    const handleRemove = useCallback((event: ReactMouseEvent) => {
         event.stopPropagation(); // don’t toggle when pressing the X
         onRemove(index);
     }, [index, onRemove]);
@@ -77,7 +100,7 @@ export default function Token({
         onToggle(index, !isExpanded);
     }, [index, isExpanded, onToggle]);
 
-    const handleChipKeyDown = useCallback((event) => {
+    const handleChipKeyDown = useCallback((event: ReactKeyboardEvent<HTMLButtonElement>) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             openFromKeyboard();
@@ -93,9 +116,9 @@ export default function Token({
                 ref={setInputRef}
                 value={value ?? ''}
                 placeholder={emptyPlaceholder ?? ''}
-                onChange={(next) => onChange(index, next)}
-                onBlur={(event) => onChange(index, event?.target?.value ?? '')}
-                onKeyDownCapture={(e) => e.stopPropagation()} // prevent outer handlers (e.g. esc to close modal)
+                onChange={(next?: string) => onChange(index, next ?? '')}
+                onBlur={(event: any) => onChange(index, event?.target?.value ?? '')}
+                onKeyDownCapture={(event: any) => event.stopPropagation()} // prevent outer handlers (e.g. esc to close modal)
                 __nextHasNoMarginBottom
                 __next40pxDefaultSize
             />
@@ -159,7 +182,7 @@ export default function Token({
                     placement={popoverPlacement} // e.g. 'bottom-start', 'right-start'
                     onClose={() => onToggle(index, false)}
                     focusOnMount="firstElement"
-                    onFocusOutside={(e) => e.preventDefault()}
+                    onFocusOutside={(event: any) => event.preventDefault()}
                     expandOnMobile
                 >
                     <div

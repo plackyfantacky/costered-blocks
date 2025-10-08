@@ -1,10 +1,10 @@
 import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { Panel, PanelBody, Flex, FlexBlock, Button, Modal, ToggleControl, Notice } from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexBlock, Button, Modal } from '@wordpress/components';
 
-import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
-    useParentAttrs, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
+import { useAttrGetter, useSelectedBlockInfo, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { LABELS } from "@labels";
+import type { GridAxisModeKey, VisibilityCtx } from "@types";
 
 import GapControls from '@components/composite/GapControls';
 import TokenGrid from '@components/composite/TokenGrid';
@@ -13,22 +13,22 @@ import SubGridToggle from "@components/composite/SubGridToggle";
 
 import { GridAxisSimple } from '@panels/GridAxisSimple';
 import { GridAxisTracks } from '@panels/GridAxisTracks';
-
 import { MaterialSymbolsBackgroundGridSmall as GridIcon } from "@assets/icons";
+
 
 const GridControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const { name } = selectedBlock;
+    const name = selectedBlock?.name;
 
-    const { get } = useAttrGetter(clientId);
+    const { getString } = useAttrGetter(clientId ?? null);
 
-    const [activeKey, setActiveKey] = useState(null);
+    const [activeKey, setActiveKey] = useState<GridAxisModeKey | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
 
     const openModal = useCallback(() => setModalOpen(true), []);
     const closeModal = useCallback(() => setModalOpen(false), []);
 
-    const safeBlockName = useSafeBlockName(name, clientId);
+    const safeBlockName = useSafeBlockName(name, clientId ?? undefined);
     const gridTemplateKey = useScopedKey('gridTemplatePanelOpen', { blockName: safeBlockName });
     const gridGapKey = useScopedKey('gridGapPanelOpen', { blockName: safeBlockName });
     const gridTemplateAreasKey = useScopedKey('gridTemplateAreasPanelOpen', { blockName: safeBlockName });
@@ -37,8 +37,8 @@ const GridControls = () => {
     const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
     const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences(gridTemplateAreasKey, false);
 
-    const subgridCols = get('gridTemplateColumns', {raw: true}) === 'subgrid';
-    const subgridRows = get('gridTemplateRows', {raw: true}) === 'subgrid';
+    const subgridCols = getString('gridTemplateColumns', '', {raw: true}) === 'subgrid';
+    const subgridRows = getString('gridTemplateRows', '', {raw: true}) === 'subgrid';
 
     const [axisDisabled, setAxisDisabled] = useState({ columns: subgridCols, rows: subgridRows });
 
@@ -66,7 +66,7 @@ const GridControls = () => {
                 <Flex direction="column" expanded={true} className="costered-blocks--grid-controls--gap">
                     <FlexBlock>
                         <GapControls
-                            clientId={clientId}
+                            clientId={clientId as string}
                             blockName={name}
                         />
                     </FlexBlock>
@@ -89,7 +89,7 @@ const GridControls = () => {
                 </Flex>
                 {isModalOpen && (
                     <Modal
-                        title={LABELS.gridControls.gridTemplateAreasModal}
+                        title={LABELS.gridControls.areasPanel.title}
                         onRequestClose={closeModal}
                         className="costered-blocks--grid-controls--modal costered-blocks--modal--wide"
                         shouldCloseOnClickOutside={true}
@@ -108,10 +108,11 @@ const GridControls = () => {
     );
 };
 
-const isGrid = (attributes = {}) => {
-    const value = (typeof attributes?.$get === 'function'
-        ? attributes.$get('display')
-        : attributes?.display) ?? '';
+const isGrid = (attributes: VisibilityCtx['attributes'] = {}) => {
+    const value = 
+        (typeof attributes?.$get === 'function'
+            ? (attributes.$get('display') as unknown)
+            : (attributes as any)?.display) ?? '';
     return /^(grid|inline-grid)$/i.test(String(value));
 };
 
@@ -119,6 +120,6 @@ export default {
     name: 'grid-controls',
     title: LABELS.gridControls.panelTitle,
     icon: <GridIcon />,
-    isVisible: ({ attributes }) => isGrid(attributes),
+    isVisible: ({ attributes }: VisibilityCtx = {}) => isGrid(attributes),
     render: () => <GridControls />,
 };

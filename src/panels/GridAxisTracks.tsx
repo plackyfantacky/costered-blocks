@@ -5,99 +5,132 @@ import { Flex, FlexBlock } from '@wordpress/components';
 import { useAttrSetter, useGridModel } from '@hooks';
 import { normaliseTemplate } from '@utils/gridUtils';
 import { LABELS } from '@labels';
+import type { GridAxisModel, GridModel } from '@types';
 
 import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { TokenEditor } from '@components/composite/TokenEditor';
 
-export function GridAxisTracks({ clientId, axisDisabled }) {
-    if (!clientId) return null;
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { set, unset } = useAttrSetter(updateBlockAttributes, clientId);
+type Props = {
+    clientId: string | null;
+    axisDisabled?: { columns?: boolean; rows?: boolean };
+};
 
-    const model = useGridModel(clientId);
-    const col = model?.columns;
-    const row = model?.rows;
+export function GridAxisTracks({ 
+    clientId,
+    axisDisabled
+ }: Props) {
+    if (!clientId) return null;
+
+    const { set, unset } = useAttrSetter(clientId ?? null);
+
+    const model = (useGridModel(clientId) as GridModel | null) ?? null;
+    const col = (model?.columns ?? null) as GridAxisModel | null;
+    const row = (model?.rows ?? null) as GridAxisModel | null;
 
     // Seed tokens: prefer decoder tokens; else fallback to raw template as one token; else empty
-    const seedCols = useMemo(() => {
+    const seedCols = useMemo<string[]>(() => {
         if (!col) return [];
-        if (col.tracks?.length) return col.tracks;
+        if (Array.isArray(col.tracks) && col.tracks.length) return [...col.tracks];
         if (col.template) return [String(col.template)];
         return [];
-    }, [col]);
+    }, [col?.tracks, col?.template]);
 
-    const seedRows = useMemo(() => {
+    const seedRows = useMemo<string[]>(() => {
         if (!row) return [];
-        if (row.tracks?.length) return row.tracks;
+        if (Array.isArray(row.tracks) && row.tracks.length) return [...row.tracks];
         if (row.template) return [String(row.template)];
         return [];
-    }, [row]);
+    }, [row?.tracks, row?.template]);
 
-    const [colTokens, setColTokens] = useState(seedCols);
-    const [rowTokens, setRowTokens] = useState(seedRows);
+    const [colTokens, setColTokens] = useState<string[]>(seedCols);
+    const [rowTokens, setRowTokens] = useState<string[]>(seedRows);
 
     // Resynchronise when underlying template meaningfully changes
     const colKey = (col && (col.normalised ?? normaliseTemplate(col.template ?? ''))) ?? '';
     const rowKey = (row && (row.normalised ?? normaliseTemplate(row.template ?? ''))) ?? '';
 
-    useEffect(() => { setColTokens(seedCols); }, [colKey]);
-    useEffect(() => { setRowTokens(seedRows); }, [rowKey]);
+    useEffect(() => { setColTokens(seedCols); }, [colKey, seedCols]);
+    useEffect(() => { setRowTokens(seedRows); }, [rowKey, seedRows]);
 
     // Serialisers
-    const serialise = useCallback((tokens) => {
-        const cleaned = tokens.map((t) => String(t ?? '').trim()).filter(Boolean);
+    const serialise = useCallback((tokens: readonly string[]): string | null => {
+        const cleaned = tokens.map((token) => String(token ?? '').trim()).filter(Boolean);
         return cleaned.length ? cleaned.join(' ') : null;
     }, []);
 
-    const writeCols = useCallback((tokens) => {
+    const writeCols = useCallback((tokens: readonly string[]) => {
         const template = serialise(tokens);
         template == null ? unset('gridTemplateColumns') : set('gridTemplateColumns', template);
     }, [serialise, set, unset]);
 
-    const writeRows = useCallback((tokens) => {
+    const writeRows = useCallback((tokens: readonly string[]) => {
         const template = serialise(tokens);
         template == null ? unset('gridTemplateRows') : set('gridTemplateRows', template);
     }, [serialise, set, unset]);
 
     // Active indicators
-    const colsActive = useMemo(() => {
-        const now = serialise(colTokens);
-        return !!col?.template && normaliseTemplate(now ?? '') === colKey;
-    }, [col?.template, colKey, colTokens, serialise]);
+    // const colsActive = useMemo(() => {
+    //     const now = serialise(colTokens);
+    //     return !!col?.template && normaliseTemplate(now ?? '') === colKey;
+    // }, [col?.template, colKey, colTokens, serialise]);
 
-    const rowsActive = useMemo(() => {
-        const now = serialise(rowTokens);
-        return !!row?.template && normaliseTemplate(now ?? '') === rowKey;
-    }, [row?.template, rowKey, rowTokens, serialise]);
+    // const rowsActive = useMemo(() => {
+    //     const now = serialise(rowTokens);
+    //     return !!row?.template && normaliseTemplate(now ?? '') === rowKey;
+    // }, [row?.template, rowKey, rowTokens, serialise]);
 
     // Handlers for token lists
-    const addToken = useCallback((tokens, setTokens, write, value) => {
-        const v = String(value ?? '').trim();
-        if (!v) return;
-        const next = [...tokens, v];
+    const addToken = useCallback((
+        tokens: readonly string[],
+        setTokens: (next: string[]) => void,
+        write: (next: readonly string[]) => void,
+        value: string
+    ) => {
+        const val = String(value ?? '').trim();
+        if (!val) return;
+        const next = [...tokens, val];
         setTokens(next);
         write(next);
     }, []);
 
-    const updateToken = useCallback((tokens, setTokens, write, index, value) => {
-        const next = tokens.slice();
-        next[index] = value;
+    const updateToken = useCallback((
+        tokens: readonly string[],
+        setTokens: (next: string[]) => void,
+        write: (next: readonly string[]) => void,
+        index: number,
+        value: string
+    ) => {
+        if (index < 0 || index >= tokens.length) return;
+        const next = tokens.slice() as string[];
+        next[index] = String(value ?? '').trim();
         setTokens(next);
         write(next);
     }, []);
 
-    const removeToken = useCallback((tokens, setTokens, write, index) => {
-        const next = tokens.slice();
+    const removeToken = useCallback((
+        tokens: readonly string[], 
+        setTokens: (next: string[]) => void,
+        write: (next: readonly string[]) => void,
+        index: number
+    ) => {
+        if (index < 0 || index >= tokens.length) return;
+        const next = tokens.slice() as string[];
         next.splice(index, 1);
         setTokens(next);
         write(next);
     }, []);
 
-    const moveToken = useCallback((tokens, setTokens, write, from, direction) => {
+    const moveToken = useCallback((
+        tokens: readonly string[],
+        setTokens: (next: string[]) => void,
+        write: (next: readonly string[]) => void,
+        from: number, 
+        direction: number
+    ) => {
         const to = from + direction;
-        if (to < 0 || to >= tokens.length) return;
-        const next = tokens.slice();
-        const t = next.splice(from, 1)[0];
+        if (to < 0 || to >= tokens.length || from < 0 || from >= tokens.length) return;
+        const next = tokens.slice() as string[];
+        const t = next.splice(from, 1)[0]!;
         next.splice(to, 0, t);
         setTokens(next);
         write(next);
@@ -114,6 +147,12 @@ export function GridAxisTracks({ clientId, axisDisabled }) {
         unset('gridTemplateRows');
     }, [unset]);
 
+    const colDisabled = !!axisDisabled?.columns;
+    const rowDisabled = !!axisDisabled?.rows;
+
+    const ownerCols: string | null = (model?.activePane?.columns ?? null) as string | null;
+    const ownerRows: string | null = (model?.activePane?.rows ?? null) as string | null;
+
     return (
         <Flex direction="column" gap={6}>
             <FlexBlock>
@@ -127,14 +166,13 @@ export function GridAxisTracks({ clientId, axisDisabled }) {
                             axis="columns"
                             canClear={!!col?.template}
                             onClear={clearCols}
-                            owner={model.activePane.columns}
+                            owner={ownerCols}
                             here="tracks"
                             label={LABELS.gridControls.tracksPanel.columns.clear}
                         />
                     </Flex>
                     <TokenEditor
                         tokens={colTokens}
-                        setTokens={setColTokens}
                         onAdd={(value) => addToken(colTokens, setColTokens, writeCols, value)}
                         onEdit={(index, value) => updateToken(colTokens, setColTokens, writeCols, index, value)}
                         onRemove={(index) => removeToken(colTokens, setColTokens, writeCols, index)}
@@ -157,14 +195,13 @@ export function GridAxisTracks({ clientId, axisDisabled }) {
                             axis="rows"
                             canClear={!!row?.template}
                             onClear={clearRows}
-                            owner={model.activePane.rows}
+                            owner={ownerRows}
                             here="tracks"
                             label={LABELS.gridControls.tracksPanel.rows.clear}
                         />
                     </Flex>
                     <TokenEditor
                         tokens={rowTokens}
-                        setTokens={setRowTokens}
                         onAdd={(value) => addToken(rowTokens, setRowTokens, writeRows, value)}
                         onEdit={(index, value) => updateToken(rowTokens, setRowTokens, writeRows, index, value)}
                         onRemove={(index) => removeToken(rowTokens, setRowTokens, writeRows, index)}
