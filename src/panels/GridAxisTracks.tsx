@@ -5,14 +5,14 @@ import { Flex, FlexBlock } from '@wordpress/components';
 import { useAttrSetter, useGridModel } from '@hooks';
 import { normaliseTemplate } from '@utils/gridUtils';
 import { LABELS } from '@labels';
-import type { GridAxisModel, GridModel } from '@types';
+import type { GridAxisModel, GridModel, GridAxisDisabled } from '@types';
 
 import { GridAxisAside } from "@components/composite/GridAxisAside";
 import { TokenEditor } from '@components/composite/TokenEditor';
 
 type Props = {
     clientId: string | null;
-    axisDisabled?: { columns?: boolean; rows?: boolean };
+    axisDisabled?: GridAxisDisabled;
 };
 
 export function GridAxisTracks({ 

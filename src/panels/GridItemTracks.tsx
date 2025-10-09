@@ -1,118 +1,169 @@
-import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { Notice, Flex, FlexItem, FlexBlock, ComboboxControl } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
+import { Notice, Flex, FlexItem, FlexBlock } from '@wordpress/components';
 
 import { LABELS } from '@labels';
 import {
-    useAttrGetter, useAttrSetter, useParentGridMeta, useGridItemTracksController,
-    useScopedKey, useUIPreferences
+    useAttrSetter,
+    useParentGridMeta,
+    useGridItemTracksController,
+    useScopedKey,
+    useUIPreferences
 } from '@hooks';
 import { isIntToken, toInt } from "@utils/gridPlacement";
 
-import { AxisStartNumber, AxisStartNamed, AxisSpan, AxisEndNumber, AxisEndNamed } from '@components/composite/GridItemControls';
+import {
+    AxisStartNumber,
+    AxisStartNamed,
+    AxisSpan,
+    AxisEndNumber,
+    AxisEndNamed
+} from '@components/composite/GridItemControls';
 
 import CustomToggleGroup from '@components/CustomToggleGroup';
 import { CustomSelectControl as SelectControl } from '@components/CustomSelectControl';
 
-export function GridItemTracks({ clientId, safeBlockName }) {
+type StartMode = 'number' | 'named';
+type EndMode = 'auto' | 'number' | 'named';
+type PlacementMode = 'span' | 'end';
+
+type Ctrl = ReturnType<typeof useGridItemTracksController> | null;
+type EndChangeMode = 'span' | 'end';
+
+type Props = {
+    clientId: string | null;
+    safeBlockName?: string;
+};
+
+export function GridItemTracks({
+    clientId,
+    safeBlockName }
+: Props) {
     if (!clientId) return null;
 
     const { setMany } = useAttrSetter(clientId);
     const parentMeta = useParentGridMeta(clientId);
 
-    const ctrl = useGridItemTracksController({ clientId, setMany, parentMeta });
+    const ctrl = useGridItemTracksController({ clientId, setMany, parentMeta }) as Ctrl;
+    if (!ctrl) return null;
 
-    const gridColStartModeKey = useScopedKey('gridColStartMode', { blockName: safeBlockName });
-    const gridColEndModeKey = useScopedKey('gridColEndMode', { blockName: safeBlockName });
-    const [gridColStartMode, setGridColStartMode] = useUIPreferences(gridColStartModeKey, 'simple');
-    const [gridColEndMode, setGridColEndMode] = useUIPreferences(gridColEndModeKey, 'number');
+    const gridColStartModeKey = useScopedKey('gridColStartMode', { blockName: safeBlockName ?? null });
+    const gridColEndModeKey = useScopedKey('gridColEndMode', { blockName: safeBlockName ?? null });
+    const [gridColStartMode, setGridColStartMode] = useUIPreferences<StartMode>(gridColStartModeKey, 'number');
+    const [gridColEndMode, setGridColEndMode] = useUIPreferences<EndMode>(gridColEndModeKey, 'number');
 
-    const gridRowStartModeKey = useScopedKey('gridRowStartMode', { blockName: safeBlockName });
-    const gridRowEndModeKey = useScopedKey('gridRowEndMode', { blockName: safeBlockName });
-    const [gridRowStartMode, setGridRowStartMode] = useUIPreferences(gridRowStartModeKey, 'simple');
-    const [gridRowEndMode, setGridRowEndMode] = useUIPreferences(gridRowEndModeKey, 'number');
+    const gridRowStartModeKey = useScopedKey('gridRowStartMode', { blockName: safeBlockName ?? null });
+    const gridRowEndModeKey = useScopedKey('gridRowEndMode', { blockName: safeBlockName ?? null });
+    const [gridRowStartMode, setGridRowStartMode] = useUIPreferences<StartMode>(gridRowStartModeKey, 'number');
+    const [gridRowEndMode, setGridRowEndMode] = useUIPreferences<EndMode>(gridRowEndModeKey, 'number');
 
-    const onColStartChangeMode = useCallback((mode) => {
+    /* ----- Mode change helpers ----- */
+
+    const isEndMode = (value: string): value is EndChangeMode => value === 'span' || value === 'end';
+
+
+    const onColModeChange = (next: string) => {
+        if (isEndMode(next)) ctrl.column.setMode(next);
+    };
+
+    const onRowModeChange = (next: string) => {
+        if (isEndMode(next)) ctrl.row.setMode(next);
+    }
+
+    /* ----- Column Mode Switchers ----- */
+
+    const onColStartChangeMode = useCallback((mode: StartMode | string) => {
+        const nextMode = (mode as StartMode);
         const { start: colStart } = ctrl.column.values;
         const { onStartNumber, onStartNamed } = ctrl.column.handlers;
         const { hasLines, lines } = ctrl.column.named;
 
-        if (mode === 'number') {
+        if (nextMode === 'number') {
             const fallback = isIntToken(colStart) ? toInt(colStart, 1) : 1;
             onStartNumber(fallback);
-        } else if (mode === 'named') {
+        } else {
             if (hasLines) {
-                const fallback = (!isIntToken(colStart) && colStart) ?? lines[0] ?? '';
+                const fallback = (!isIntToken(colStart) && colStart) ? String(colStart) : (lines[0] ?? '');
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
             }
         }
-        //also save to user prefs
-        setGridColStartMode(mode);
-    }, [ctrl.column.values, ctrl.column.named, ctrl.handlers]);
+        setGridColStartMode(nextMode);
+    }, [ctrl.column.values, ctrl.column.named, ctrl.column.handlers, setGridColStartMode]);
 
-    const onColEndChangeMode = useCallback((mode) => {
+    const onColEndChangeMode = useCallback((mode: EndMode | string) => {
+        const nextMode = (mode as EndMode);
         const { end: colEnd, start: colStart } = ctrl.column.values;
         const { onEndAuto, onEndNumber, onEndNamed } = ctrl.column.handlers;
         const { hasLines, lines } = ctrl.column.named;
 
-        if (mode === 'auto') { onEndAuto(); return; }
-        if (mode === 'number') {
-            const fallback = isIntToken(colEnd) ? toInt(colEnd, 1) : (isIntToken(colStart) ? toInt(colStart, 1) : 1);
+        if (nextMode === 'auto') { 
+            onEndAuto(); return; 
+        } else if (nextMode === 'number') {
+            const fallback = isIntToken(colEnd) 
+                ? toInt(colEnd, 1) 
+                : (isIntToken(colStart) ? toInt(colStart, 1) : 1);
             onEndNumber(fallback);
-            return;
-        }
-        if (mode === 'named') {
+        } else {
             if (hasLines) {
-                const fallback = (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) ?? lines[0] ?? '';
+                const fallback = 
+                    (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) 
+                    ? String(colEnd) 
+                    : (lines[0] ?? '');
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);
             }
         }
-        //also save to user prefs
-        setGridColEndMode(mode);
-    }, [ctrl.column.values, ctrl.column.named, ctrl.handlers]);
+        setGridColEndMode(nextMode);
+    }, [ctrl.column.values, ctrl.column.named, ctrl.column.handlers]);
 
-    const onRowStartChangeMode = useCallback((mode) => {
+    /* ----- Row Mode Switchers ----- */
+
+    const onRowStartChangeMode = useCallback((mode: StartMode | string) => {
+        const nextMode = (mode as StartMode);
         const { start: rowStart } = ctrl.row.values;
         const { onStartNumber, onStartNamed } = ctrl.row.handlers;
         const { hasLines, lines } = ctrl.row.named;
 
-        if (mode === 'number') {
+        if (nextMode === 'number') {
             const fallback = isIntToken(rowStart) ? toInt(rowStart, 1) : 1;
             onStartNumber(fallback);
-        } else if (mode === 'named') {
+        } else {
             if (hasLines) {
-                const fallback = (!isIntToken(rowStart) && rowStart) ?? lines[0] ?? '';
+                const fallback = (!isIntToken(rowStart) && rowStart) ? String(rowStart) : (lines[0] ?? '');
                 onStartNamed(fallback);
             } else {
                 onStartNumber(1);
             }
         }
-    }, [ctrl.row.values, ctrl.row.named, ctrl.handlers]);
+    }, [ctrl.row.values, ctrl.row.named, ctrl.row.handlers]);
 
-    const onRowEndChangeMode = useCallback((mode) => {
+    const onRowEndChangeMode = useCallback((mode: EndMode | string) => {
+        const nextMode = (mode as EndMode);
         const { end: rowEnd, start: rowStart } = ctrl.row.values;
         const { onEndAuto, onEndNumber, onEndNamed } = ctrl.row.handlers;
         const { hasLines, lines } = ctrl.row.named;
 
-        if (mode === 'auto') { onEndAuto(); return; }
-        if (mode === 'number') {
-            const fallback = isIntToken(rowEnd) ? toInt(rowEnd, 1) : (isIntToken(rowStart) ? toInt(rowStart, 1) : 1);
+        if (nextMode === 'auto') { 
+            onEndAuto();
+        } else if (nextMode === 'number') {
+            const fallback = isIntToken(rowEnd) 
+                ? toInt(rowEnd, 1)
+                : (isIntToken(rowStart) ? toInt(rowStart, 1) : 1);
             onEndNumber(fallback);
-            return;
-        }
-        if (mode === 'named') {
+        } else {
             if (hasLines) {
-                const fallback = (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) ?? lines[0] ?? '';
+                const fallback = 
+                    (!isIntToken(rowEnd) && rowEnd !== 'auto' && rowEnd) 
+                        ? String(rowEnd)
+                        : (lines[0] ?? '');
                 onEndNamed(fallback);
             } else {
                 onEndNumber(1);
             }
         }
-    }, [ctrl.row.values, ctrl.row.named, ctrl.handlers]);
+    }, [ctrl.row.values, ctrl.row.named, ctrl.row.handlers]);
 
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-tracks--panel">
@@ -175,7 +226,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                             <CustomToggleGroup
                                 label={LABELS.gridItemsControls.tracksPanel.columns.trackEndMode}
                                 value={ctrl.column.modes.mode}
-                                onChange={ctrl.column.setMode}
+                                onChange={onColModeChange}
                                 disabled={ctrl.disabledLines}
                                 isBlock
                             >
@@ -187,8 +238,8 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                         {ctrl.column.modes.mode === 'span' ? (
                             <FlexBlock>
                                 <AxisSpan
-                                    label={LABELS.gridItemsControls.tracksPanel.columns.endSpan}
-                                    help={LABELS.gridItemsControls.tracksPanel.columns.endSpanHelp}
+                                    label={LABELS.gridItemsControls.tracksPanel.columns.spanNumber}
+                                    help={LABELS.gridItemsControls.tracksPanel.columns.spanNumberHelp}
                                     value={ctrl.column.values.span}
                                     cap={ctrl.column.caps.span}
                                     onChange={ctrl.column.handlers.onSpan}
@@ -201,7 +252,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                                     <FlexBlock>
                                         {/* End mode: drop the "Named" option if no names */}
                                         <SelectControl
-                                            label={LABELS.gridItemsControls.tracksPanel.columns.endMode}
+                                            label={LABELS.gridItemsControls.tracksPanel.columns.trackEndMode}
                                             value={gridColEndMode}
                                             onChange={(mode) => onColEndChangeMode(mode)} // this handler is locally defined
                                             disabled={ctrl.disabledLines}
@@ -301,7 +352,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                             <CustomToggleGroup
                                 label={LABELS.gridItemsControls.tracksPanel.rows.trackEndMode}
                                 value={ctrl.row.modes.mode}
-                                onChange={ctrl.row.setMode}
+                                onChange={onRowModeChange}
                                 disabled={ctrl.disabledLines}
                                 isBlock
                             >
@@ -313,8 +364,8 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                         {ctrl.row.modes.mode === 'span' ? (
                             <FlexBlock>
                                 <AxisSpan
-                                    label={LABELS.gridItemsControls.tracksPanel.rows.endSpan}
-                                    help={LABELS.gridItemsControls.tracksPanel.rows.endSpanHelp}
+                                    label={LABELS.gridItemsControls.tracksPanel.rows.spanNumber}
+                                    help={LABELS.gridItemsControls.tracksPanel.rows.spanNumberHelp}
                                     value={ctrl.row.values.span}
                                     cap={ctrl.row.caps.span}
                                     onChange={ctrl.row.handlers.onSpan}
@@ -327,7 +378,7 @@ export function GridItemTracks({ clientId, safeBlockName }) {
                                     <FlexBlock>
                                         {/* End mode: drop the "Named" option if no names */}
                                         <SelectControl
-                                            label={LABELS.gridItemsControls.tracksPanel.rows.endMode}
+                                            label={LABELS.gridItemsControls.tracksPanel.rows.trackEndMode}
                                             value={gridRowEndMode}
                                             onChange={(mode) => onRowEndChangeMode(mode)} // this handler is locally defined
                                             disabled={ctrl.disabledLines}

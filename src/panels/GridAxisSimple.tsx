@@ -12,6 +12,7 @@ import { makeRepeat } from '@utils/gridUtils';
 import UnitControlInput from '@components/UnitControlInput';
 import CustomNotice from "@components/CustomNotice";
 import { GridAxisAside } from "@components/composite/GridAxisAside";
+import type { GridAxisDisabled } from '@types';
 
 const EMPTY_AXIS = {
     mode: 'raw' as const,
@@ -23,16 +24,15 @@ const EMPTY_AXIS = {
 
 type UnitOnChange = ComponentProps<typeof UnitControlInput>['onChange'];
 
-type AxisDisabled = { columns?: boolean; rows?: boolean };
 
 type Props = {
     clientId: string | null;
-    axisDisabled?: AxisDisabled;
+    axisDisabled: GridAxisDisabled;
 };
 
 export function GridAxisSimple({
     clientId,
-    axisDisabled = {}
+    axisDisabled
  }: Props) {
     if (!clientId) return null;
 

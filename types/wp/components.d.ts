@@ -2,6 +2,7 @@
 declare module '@wordpress/components' {
     export const __experimentalConfirmDialog: any;
     export const __experimentalGrid: any;
+    export const __experimentalHeading: any;
     export const __experimentalHStack: any;
     export const __experimentalNumberControl: any;
     export const __experimentalModal: any;

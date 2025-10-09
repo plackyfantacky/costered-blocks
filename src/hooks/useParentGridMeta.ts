@@ -6,7 +6,27 @@ import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { augmentAttributes } from '@utils/breakpointUtils';
 import { countTracks } from "@utils/gridUtils";
 
-export function useParentGridMeta(passedClientId?: string): ParentMeta {
+function extractAreaNames(template: string): string[] {
+    if (!template) return [];
+    const names = new Set<string>();
+    
+    const rows = template.split('"').filter((segment, index) => index % 2 === 1);
+    for (let r = 0; r < rows.length; r++) {
+        const row = rows[r]!.trim();
+        if (!row) continue;
+        const parts = row.split(/\s+/);
+        for (let c = 0; c < parts.length; c++) {
+            const name = parts[c]!;
+            if (name === '.' || name.toLowerCase() === 'none') continue;
+            names.add(name);
+        }
+    }
+    return Array.from(names); 
+}
+
+export function useParentGridMeta(
+    passedClientId?: string
+): ParentMeta {
     const { parentId, parentBlock } = useSelect((select: any) => {
         const blockEditor = select('core/block-editor');
     
@@ -61,6 +81,8 @@ export function useParentGridMeta(passedClientId?: string): ParentMeta {
         [display]
     );
 
+    const areaNames = useMemo(() => extractAreaNames(areaTemplate), [areaTemplate]);
+
     return {
         parentId,
         parentBlock,
@@ -72,5 +94,6 @@ export function useParentGridMeta(passedClientId?: string): ParentMeta {
         areaTemplate,
         columns,
         rows,
+        areaNames,
     }
 }

@@ -6,6 +6,8 @@ declare module '@wordpress/blocks' {
     ): any;
     
     export function getBlockType(name: string): any;
+    export function getBlockVariations(name: string): Array<{ name: string; isDefault?: boolean }> | undefined;
+    export function unregisterBlockVariation(blockName: string, variationName: string): void;
 
     export interface BlockConfiguration<Attrs extends Record<string, unknown> = Record<string, unknown>> {
         apiVersion?: number;

@@ -7,51 +7,90 @@ import { GridBoard } from './GridBoard';
 import { NoticePanel } from './NoticePanel';
 import { LABELS as DEFAULT_LABELS } from '@labels';
 import { toCount } from '@utils/gridUtils';
+import type { Matrix, ColumnInfo, RowInfo } from '@types';
 
-export default function TokenGrid({ clientId, labels = {} }) {
+type LabelsTokenGrid = typeof DEFAULT_LABELS['tokenGrid'];
+type LabelsTokenGridNotice = typeof DEFAULT_LABELS['tokenGridNotice'];
+
+type Props = {
+    clientId: string;
+    labels?: {
+        tokenGrid?: Partial<LabelsTokenGrid>;
+        tokenGridNotice?: Partial<LabelsTokenGridNotice>;
+    };
+};
+
+type MatrixReturn = {
+    matrix: Matrix;
+    columnData: ColumnInfo;
+    rowData: RowInfo;
+    setCell: (row: number, col: number, token: string) => void;
+    resize: (args: { cols: number; rows: number }) => void;
+    clear: () => void;
+};
+
+export default function TokenGrid({
+    clientId,
+    labels = {}
+}: Props) {
     const [isEditing, setIsEditing] = useState(false);
-    const resumeRef = useRef(null);
+    const resumeRef = useRef<number | undefined>(undefined);
 
-    const tokenGridLabels = useMemo(
-        () => ({ ...DEFAULT_LABELS.tokenGrid, ...labels.tokenGrid }),
+    const tokenGridLabels: LabelsTokenGrid = useMemo(
+        () => ({ ...DEFAULT_LABELS.tokenGrid, ...(labels.tokenGrid || {}) }),
         [labels]
     );
 
-    const tokenGridNoticeLabels = useMemo(
-        () => ({ ...DEFAULT_LABELS.tokenGridNotice, ...labels.tokenGridNotice }),
+    const tokenGridNoticeLabels: LabelsTokenGridNotice = useMemo(
+        () => ({ ...DEFAULT_LABELS.tokenGridNotice, ...(labels.tokenGridNotice || {}) }),
         [labels]
     );
 
     const {
         matrix,
-        columnData: columns,
-        rowData: rows,
+        columnData,
+        rowData,
         setCell,
-        resize,
+        resize: resizeObj,
         clear
-    } = useGridAreasMatrix(clientId);
+    } = useGridAreasMatrix(clientId) as MatrixReturn;
+
+    const resize = useCallback((cols: number, rows: number) => {
+        resizeObj({ cols, rows });
+    }, [resizeObj]);
 
     const areaCols = Array.isArray(matrix) && Array.isArray(matrix[0]) ? matrix[0].length : 0;
     const areaRows = Array.isArray(matrix) ? matrix.length : 0;
 
-    const trackCols = toCount(columns?.count ?? columns);
-    const trackRows = toCount(rows?.count ?? rows);
+    const trackCols = toCount((columnData as any)?.count ?? columnData);
+    const trackRows = toCount((rowData as any)?.count ?? rowData);
 
-    const mismatch = (areaCols || areaRows || trackCols || trackRows)
-        ? (areaCols !== trackCols || areaRows !== trackRows)
-        : false;
+    const mismatch = 
+        areaCols || areaRows || trackCols || trackRows
+            ? areaCols !== trackCols || areaRows !== trackRows
+            : false;
 
-    const handleEditingChange = useCallback((editing) => {
-        if (resumeRef.current) clearTimeout(resumeRef.current);
+    const handleEditingChange = useCallback((editing: boolean) => {
+        if (resumeRef.current !== undefined) {
+            window.clearTimeout(resumeRef.current);
+            resumeRef.current = undefined;
+        }
         if (editing) {
             setIsEditing(true);
         } else {
-            resumeRef.current = setTimeout(() => setIsEditing(false), 60);
+            resumeRef.current = window.setTimeout(() => {
+                setIsEditing(false);
+                resumeRef.current = undefined;
+            }, 60);
         }
     }, []);
 
     // Cleanup any pending timer on unmount
-    useEffect(() => () => resumeRef.current && clearTimeout(resumeRef.current), []);
+    useEffect(() => {
+        return () =>  {
+            if (resumeRef.current !== undefined)  window.clearTimeout(resumeRef.current);
+        };
+    }, []);
 
     return (
         <Flex direction="column" gap={2} className="costered-blocks--token-grid-component">
@@ -60,7 +99,7 @@ export default function TokenGrid({ clientId, labels = {} }) {
                     clientId={clientId}
                     columnData={trackCols}
                     rowData={trackRows}
-                    gridMatrix={matrix}
+                    gridMatrix={{ resize }}
                     labels={tokenGridNoticeLabels}
                 />
             )}

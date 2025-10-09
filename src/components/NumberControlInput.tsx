@@ -8,6 +8,7 @@ type NumberControlInputProps = {
     value: number | '';
     onChange: (value: number | '') => void;
     label?: ReactNode | string;
+    help?: ReactNode | string | undefined;
     placeholder?: string;
     min?: number;
     max?: number;
@@ -26,7 +27,8 @@ type UnderlyingOnChange = WPNumberControlProps extends { onChange: infer H }
 export default function NumberControlInput({ 
     value, 
     onChange, 
-    label, 
+    label,
+    help = '',
     placeholder,
     min = 2, 
     max = 100, 
@@ -35,7 +37,8 @@ export default function NumberControlInput({
     clamp = true,
     ...rest
 }: NumberControlInputProps) {
-    const formattedLabel = maybeFormat(label as string, { toDashes: true, toSpaces: false });
+    const formattedLabel = maybeFormat(label as string, { toDashes: true, toSpaces: false }) || undefined;
+    const formattedHelp = maybeFormat(help as string, { toDashes: true, toSpaces: false }) || undefined;
 
     const displayValue: string | number | undefined =  value === '' ? '' : value;
 
@@ -86,6 +89,7 @@ export default function NumberControlInput({
                 isBlock
                 label={formattedLabel}
                 value={displayValue}
+                help={formattedHelp}
                 onChange={handleChange}
                 placeholder={placeholder}
                 min={min}

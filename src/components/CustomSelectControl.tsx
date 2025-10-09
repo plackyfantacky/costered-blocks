@@ -1,6 +1,7 @@
 import { isRTL } from '@wordpress/i18n';
 import { useState, useCallback, useEffect, useRef, createContext, useContext, useMemo, Children, memo } from '@wordpress/element';
 import { Flex, FlexItem } from '@wordpress/components';
+import type * as React from 'react'; 
 
 import { LABELS } from "@labels";
 
@@ -17,7 +18,9 @@ export interface CustomSelectControlProps {
     value: ToggleValue;
     onChange: (value: ToggleValue) => void;
     label?: React.ReactNode | string;
+    help?: React.ReactNode | string;
     className?: string;
+    disabled?: boolean;
     children: React.ReactNode;
 }
 
@@ -25,7 +28,9 @@ const CustomSelectControlBase: React.FC<CustomSelectControlProps> = ({
     value,
     onChange,
     label = "",
+    help = "",
     className = "",
+    disabled = false,
     children
 }) => {
     const [open, setOpen] = useState(false);
@@ -80,20 +85,42 @@ const CustomSelectControlBase: React.FC<CustomSelectControlProps> = ({
 
     const { icon, labelNode } = getSelectedVisual();
 
+    const handleButtonClick = useCallback(() => {
+        if (disabled) return;
+        setOpen((o) => !o);
+    }, [disabled]);
+
+    const handleButtonKeyDown: React.KeyboardEventHandler<HTMLButtonElement> = useCallback(
+        (event) => {
+            if (disabled) return;
+            if (event.key === 'ArrowDown' && !open) setOpen(true);
+            if (event.key === 'Escape' && open) setOpen(false);
+        },
+        [disabled, open]
+    );
+
+    const wrapperClassname: string = (
+        `costered-blocks--custom-select costered-blocks--custom-select--wrapper` +
+        `${className ?? ''}` +
+        `${disabled ? 'is-disabled' : ''}`
+    ).trim();
+
     return (
         <Ctx.Provider value={ctxValue}>
-            <div className="costered-blocks--custom-select costered-blocks--custom-select--wrapper" ref={rootRef}>
-                {label ? <label className="costered-blocks--custom-select--label">{label}</label> : null}
+            <div
+                className={wrapperClassname} 
+                aria-disabled={disabled || undefined}
+                ref={rootRef}
+            >
+                {label && <label className="costered-blocks--custom-select--label">{label}</label>}
                 <button
                     type="button"
                     aria-haspopup="listbox"
-                    aria-expanded={open}
-                    onClick={() => setOpen(o => !o)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'ArrowDown' && !open) setOpen(true);
-                        if (e.key === 'Escape' && open) setOpen(false);
-                    }}
+                    aria-expanded={disabled ? open : undefined}
+                    onClick={handleButtonClick}
+                    onKeyDown={handleButtonKeyDown}
                     className="costered-blocks--custom-select--button"
+                    disabled={disabled}
                 >
                     <Flex
                         direction={isRTL() ? "row-reverse" : "row"}
@@ -112,7 +139,7 @@ const CustomSelectControlBase: React.FC<CustomSelectControlProps> = ({
                     </Flex>
                 </button>
 
-                {open && (
+                {!disabled && open && (
                     <ul
                         role="listbox"
                         tabIndex={-1}
@@ -121,6 +148,7 @@ const CustomSelectControlBase: React.FC<CustomSelectControlProps> = ({
                         {children}
                     </ul>
                 )}
+                {help && <div className="costered-blocks--custom-select--help">{help}</div>}
             </div>
         </Ctx.Provider>
     );

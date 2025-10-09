@@ -6,7 +6,14 @@ import { useAttrGetter, useAttrSetter, useParentGridMeta } from '@hooks';
 import { normaliseGridAreaName } from "@utils/gridPlacement";
 import { LABELS } from '@labels';
 
-export function GridItemAreas({ clientId, blockName}) {
+type Props = {
+    clientId: string | null;
+    blockName?: string | null;
+};
+
+export function GridItemAreas({ 
+    clientId
+}: Props) {
     if (!clientId) return null;
 
     const { get } = useAttrGetter(clientId);
@@ -14,8 +21,8 @@ export function GridItemAreas({ clientId, blockName}) {
     const { areaNames } = useParentGridMeta();
 
     // Guard gridArea *before* saving
-    const writeGridArea = useCallback((raw) => {
-        const name = normaliseGridAreaName(raw);
+    const writeGridArea = useCallback((raw?: string) => {
+        const name = normaliseGridAreaName(raw ?? '');
         // Only set if it's a valid name; otherwise do nothing (or clear if you prefer)
         setMany({
             'gridArea': name,
@@ -25,17 +32,21 @@ export function GridItemAreas({ clientId, blockName}) {
         });
     }, [setMany]);
 
+    const value = String(get('gridArea') ?? '');
+
+    const options: ReadonlyArray<{ label: string; value: string }> = [
+        { label: LABELS.gridItemsControls.areasPanel.gridAreaNone, value: '' },
+        ...areaNames.map((area: string) => ({ label: area, value: area }))
+    ];
+
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-area--panel">
             <FlexBlock className={'costered-blocks-grid-item-advanced-controls--grid-area-selector'}>
                 <ComboboxControl
                     label={LABELS.gridItemsControls.areasPanel.gridAreaLabel}
-                    value={get('gridArea') ?? ''}
-                    options={[
-                        { label: LABELS.gridItemsControls.areasPanel.gridAreaNone, value: '' },
-                        ...areaNames.map((area) => ({ label: area, value: area }))
-                    ]}
-                    onChange={(value) => writeGridArea(value)}
+                    value={value}
+                    options={options}
+                    onChange={(next?: string) => writeGridArea(next)}
                     help={LABELS.gridItemsControls.areasPanel.gridAreaHelp}
                     __nextHasNoMarginBottom
                     __next40pxDefaultSize

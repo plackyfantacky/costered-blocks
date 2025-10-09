@@ -1,9 +1,12 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useState, useCallback } from "@wordpress/element";
 
 import {
-    Button, Notice, Flex, FlexBlock,
+    Button, 
+    Notice, 
+    Flex, 
+    FlexBlock,
     __experimentalConfirmDialog as ConfirmDialog,
     __experimentalHeading as Heading
 } from '@wordpress/components';
@@ -13,10 +16,35 @@ import { useAttrSetter, useGridStoreAreasIO, useGridModel } from '@hooks';
 import { LABELS as DEFAULT_LABELS } from "@labels";
 import { DEFAULT_GRID_UNIT } from '@config';
 
-export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resize }, labels = DEFAULT_LABELS.tokenGridNotice }) {
+type CountLike = 
+    | number
+    | { count?: number; unit?: string }
+    | undefined;
 
-    const { updateBlockAttributes } = useDispatch('core/block-editor');
-    const { set } = useAttrSetter(updateBlockAttributes, clientId);
+type GridMatrixControls = {
+  resize: (cols: number, rows: number) => void;
+};
+
+type LabelsShape = typeof DEFAULT_LABELS.tokenGridNotice;
+
+type Props = {
+    clientId: string | null;
+    columnData: CountLike;
+    rowData: CountLike;
+    gridMatrix: GridMatrixControls;
+    labels?: LabelsShape;
+};
+
+export function NoticePanel({ 
+    clientId,
+    columnData,
+    rowData,
+    gridMatrix,
+    labels = DEFAULT_LABELS.tokenGridNotice
+}: Props) {
+    if (!clientId) return null;
+
+    const { set } = useAttrSetter(clientId ?? '');
 
     const { trackColumnCount, trackRowCount } = useGridStoreAreasIO(clientId);
     const model = useGridModel(clientId);
@@ -24,12 +52,17 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
     // ConfirmDialog state
     const [isConfirmOpen, setConfirmOpen] = useState(false);
 
-    const asCount = (v) => (v && typeof v === 'object' ? (v.count ?? 0) : (Number(v) || 0));
-    const asUnit = (v, fallback) => (v && typeof v === 'object' && v.unit) ? v.unit : fallback;
+    const asCount = (val: CountLike): number => 
+        val && typeof val === 'object' ? val.count ?? 0 : Number(val) || 0;
 
-    // Normalised sizes
+    const asUnit = (val: CountLike, fallback: string): string => 
+        val && typeof val === 'object' && val.unit ? val.unit : fallback;
+
+    // Normalised sizes (areas)
     const areaCols = Number(columnData) || 0;
     const areaRows = Number(rowData) || 0;
+
+    // Normalised sizes (tracks)
     const trackCols = asCount(trackColumnCount);
     const trackRows = asCount(trackRowCount);
     const colUnit = asUnit(trackColumnCount, DEFAULT_GRID_UNIT); // e.g. '1fr'
@@ -42,8 +75,8 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
     const resizeAreasToTracks = useCallback(() => {
         const targetCols = trackCols || areaCols || 1;
         const targetRows = trackRows || areaRows || 1;
-        resize(targetCols, targetRows);
-    }, [resize, trackCols, trackRows, areaCols, areaRows]);
+        gridMatrix.resize(targetCols, targetRows);
+    }, [gridMatrix.resize, trackCols, trackRows, areaCols, areaRows]);
 
     // need-to-grow flags
     const needGrowCols = areaCols > trackCols;
@@ -62,14 +95,11 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
             : curRows;
 
         // Optional: bail if nothing changes
-        if (nextColumns === curCols && nextRows === curRows) {
-            // console.debug('[Grid] grow: no-op', { curCols, curRows, areaCols, areaRows, trackCols, trackRows });
-            return;
-        }
+        if (nextColumns === curCols && nextRows === curRows) return;
 
         set('gridTemplateColumns', nextColumns);
         set('gridTemplateRows', nextRows);
-    }, [areaCols, areaRows, colUnit, rowUnit, model, set]);
+    }, [areaCols, areaRows, colUnit, rowUnit, model, needGrowCols, needGrowRows, set]);
 
     const performShrink = useCallback(() => {
         const nextColumns = shrinkTrackTemplate(model?.columns?.template ?? '', areaCols);
@@ -98,31 +128,56 @@ export function NoticePanel({ clientId, columnData, rowData, gridMatrix: { resiz
                 {sprintf(labels.mismatchText, areaCols, areaRows, trackCols, trackRows)}
                 <Flex direction="column" gap={2} style={{ marginTop: 8 }}>
                     <FlexBlock>
-                        <Button variant="secondary" onClick={resizeAreasToTracks}>{labels.resizeToTracks}</Button>
+                        <Button 
+                            variant="secondary"
+                            onClick={resizeAreasToTracks}
+                        >
+                            {labels.resizeToTracks}
+                        </Button>
                     </FlexBlock>
                     {(needGrowCols || needGrowRows) && (
                         <FlexBlock>
-                            <Button variant="secondary" onClick={growTracksToAreas} disabled={!needGrowCols && !needGrowRows}>{labels.growTracksToAreas}</Button>
+                            <Button
+                                variant="secondary"
+                                onClick={growTracksToAreas}
+                                disabled={!needGrowCols && !needGrowRows}
+                            >
+                                {labels.growTracksToAreas}
+                            </Button>
                         </FlexBlock>
                     )}
                     {canShrinkTracks && (
                         <FlexBlock>
-                            <Button variant="secondary" isDestructive onClick={requestShrink}>{labels.shrinkTracks.button}</Button>
+                            <Button
+                                variant="secondary"
+                                isDestructive
+                                onClick={requestShrink}
+                            >
+                                {labels.shrinkTracks.button}
+                            </Button>
                         </FlexBlock>
                     )}
                 </Flex>
             </Notice>
             {canShrinkTracks && (
-                <Notice status="warning" isDismissible={false} className="costered-blocks--grid-area-notice--shrink-warning">
+                <Notice
+                    status="warning"
+                    isDismissible={false}
+                    className="costered-blocks--grid-area-notice--shrink-warning"
+                >
                     <span>{labels.shrinkTracks.warning}</span>
                 </Notice>
             )}
             <ConfirmDialog
                 isOpen={isConfirmOpen}
-                onConfirm={() => { performShrink(); setConfirmOpen(false); }}
+                onConfirm={() => { 
+                    performShrink(); 
+                    setConfirmOpen(false); 
+                }}
                 onCancel={() => setConfirmOpen(false)}
                 confirmButtonText={labels.shrinkTracks.confirm}
-                cancelButtonText={labels.shrinkTracks.cancel}>
+                cancelButtonText={labels.shrinkTracks.cancel}
+            >
                 <Heading>{labels.shrinkTracks.heading}</Heading>
                 <p>{labels.shrinkTracks.description}</p>
             </ConfirmDialog>
