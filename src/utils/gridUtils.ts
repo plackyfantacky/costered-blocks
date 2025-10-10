@@ -19,8 +19,8 @@ export function normaliseTemplate(input: unknown): string {
         .replace(/\s*\(\s*/g, '(')
         .replace(/\s*\)\s*/g, ')')
         .replace(/\s*,\s*/g, ',')
-        .trim()
-        .toLowerCase();
+        .trim();
+        //.toLowerCase(); //removed to preserve identifiers like "Header"
 }
 
 /**
@@ -40,13 +40,18 @@ export function splitTopLevel(input: unknown): string[] {
 
     const output: string[] = [];
     for (let i = 0; i < source.length; i++) {
-        const character = source[i];
+        const character = source[i]!;
+        
         if (character === '(') { braces++; buffer += character; continue; }
         if (character === ')') { braces = Math.max(0, braces - 1); buffer += character; continue; }
         if (character === '[') { bracket++; buffer += character; continue; }
         if (character === ']') { bracket = Math.max(0, bracket - 1); buffer += character; continue; }
-        if (character === ' ' && braces === 0 && bracket === 0) {
-            if (buffer) { output.push(buffer); buffer = ''; }
+        
+        if (braces === 0 && bracket === 0 && /\s/.test(character)) {
+            if (buffer) {
+                output.push(buffer);
+                buffer = '';
+            }
             continue;
         }
         buffer += character;
@@ -55,6 +60,23 @@ export function splitTopLevel(input: unknown): string[] {
     return output;   
 }
 
+/** 
+ * Collapse consecutive named-line groups: "[a] [b]" -> "[a b]" 
+ */
+export function collapseAdjacentNamedLines(input: unknown): string {
+    const source = String(input ?? '').trim();
+
+    // 1. collapse `] [` to single space so groups merge
+    let output = source.replace(/\]\s+\[/g, ' ');
+
+    // 2. tidy inner whitespace inside bracket: "[  a   b  ]" -> "[a b]"
+    output = output.replace(/\[\s+/g, '[').replace(/\s+\]/g, ']');
+    output = output.replace(/\[(?:\s+)?([^\]]*?)(?:\s+)?\]/g, (_m, inner) =>
+        `[${String(inner).replace(/\s+/g, ' ').trim()}]`
+    );
+
+    return output;
+}
 
 /* ------------------------------ repeat(...) utils ------------------------------ */
 
@@ -113,9 +135,9 @@ export function extendTrackTemplate(
     fill: string = '1fr'
 ): string {
     const safeTarget = Math.max(0, Number(targetCount) || 0);
-    const current = normaliseTemplate(template ?? '');
+    const collapsed = collapseAdjacentNamedLines(template);
 
-    // Nothing to do
+    const current = normaliseTemplate(collapsed);
     if (safeTarget <= 0) return current;
 
     const { count } = countTracks(current);
@@ -158,10 +180,13 @@ export function extendTrackTemplate(
  */
 export function shrinkTrackTemplate(template: unknown, targetCount: unknown): string {
     if (!template || typeof template !== 'string') return '';
+    const collapsed = collapseAdjacentNamedLines(template);
+    if (!collapsed || typeof collapsed !== 'string') return '';
+
     const target = Math.max(0, Math.trunc(Number(targetCount) || 0));
 
     // Strip line names so we only work with sizes.
-    const withoutLines = template.replace(/\[[^\]]*\]/g, ' ').trim();
+    const withoutLines = collapsed.replace(/\[[^\]]*\]/g, ' ').trim();
     if (!withoutLines) return '';
 
     // If template is a simple repeat(n, X) with a single size token, keep it in repeat().
@@ -196,8 +221,10 @@ export type TrackCount = { count: number, unit: string };
  */
 export function countTracks(template: unknown, fallbackUnit: string = DEFAULT_GRID_UNIT): TrackCount {
     if (!template || typeof template !== 'string') return { count: 0, unit: fallbackUnit };
-    
-    let source = template.trim();
+    const collapsed = collapseAdjacentNamedLines(template);
+    if (!collapsed || typeof collapsed !== 'string') return { count: 0, unit: fallbackUnit };
+
+    let source = collapsed.trim();
     if (!source) return { count: 0, unit: fallbackUnit };
 
     // subgrid has no fixed count
@@ -235,14 +262,14 @@ function countAndUnit(source: string, fallbackUnit: string): TrackCount {
     const repeat = parseRepeatAtStart(source);
     if (repeat) {
         const inner = repeat.inner.trim();
-        const innerTokens = tokeniseTopLevel(inner);
+        const innerTokens = splitTopLevel(inner);
         const innerCount = innerTokens.length;
         const unit = deriveUnitFromTemplate(inner, fallbackUnit);
         return { count: repeat.times * innerCount, unit: unit || fallbackUnit };
     }
 
     // Mixed tokens (some may be repeat(...))
-    const tokens = tokeniseTopLevel(source);
+    const tokens = splitTopLevel(source);
     let count = 0;
     let unitHint = '';
     
@@ -308,7 +335,7 @@ function countRepeatToken(token: string): { count: number, unitHint: string } | 
     if (times <= 0) return { count: 0, unitHint: '' };
     
     const inner = match[2]!.trim();
-    const innerTokens = tokeniseTopLevel(inner);
+    const innerTokens = splitTopLevel(inner);
     
     const count = times * innerTokens.length;
 
@@ -322,43 +349,6 @@ function countRepeatToken(token: string): { count: number, unitHint: string } | 
 
     return { count, unitHint };
 }
-
-
-/**
- * Internal: tokenise at top level (spaces outside parentheses).
- *
- * @param {string} source
- * @returns {string[]}
- * @internal
- */
-function tokeniseTopLevel(source: string): string[] {
-    const tokens: string[] = [];
-    let depth = 0;
-    let buffer = '';
-
-    for (let i = 0; i < source.length; i++) {
-        const character = source[i]!;
-        if (character === '(') {
-            depth++;
-            buffer += character;
-            continue;
-        }
-        if (character === ')') {
-            depth = Math.max(0, depth - 1);
-            buffer += character;
-            continue;
-        }
-        if (depth === 0 && /\s/.test(character)) {
-            if (buffer.trim()) tokens.push(buffer.trim());
-            buffer = '';
-            continue;
-        }
-        buffer += character;
-    }
-    if (buffer.trim()) tokens.push(buffer.trim());
-    return tokens;
-}
-
 
 /**
  * Internal: derive a representative unit for UI hints from a template.
@@ -377,7 +367,7 @@ function deriveUnitFromTemplate(source: string, fallbackUnit: string): string {
 
     const repeat = parseRepeatAtStart(source);
     if (repeat) {
-        const innerTokens = tokeniseTopLevel(repeat.inner);
+        const innerTokens = splitTopLevel(repeat.inner);
         if (innerTokens.length === 1) {
             return normaliseUnit(innerTokens[0]) || fallbackUnit;
         }
@@ -386,7 +376,7 @@ function deriveUnitFromTemplate(source: string, fallbackUnit: string): string {
         // fall through
     }
 
-    const tokens = tokeniseTopLevel(source);
+    const tokens = splitTopLevel(source);
     if (tokens.length === 1) {
         return normaliseUnit(tokens[0]) || fallbackUnit;
     }
@@ -459,24 +449,11 @@ function expandSimpleRepeat(template: string): string {
  * @returns {string}
  * @internal
  */
-function sliceTrackTokens(trackList: string, targetCount: number): string {
-    if (targetCount <= 0) return '';
-    // Split on whitespace outside parentheses
-    let depth = 0, buf = '';
-    const tokens: string[] = [];
-    for (const ch of trackList) {
-        if (ch === '(') depth++;
-        if (ch === ')') depth = Math.max(0, depth - 1);
-        if (/\s/.test(ch) && depth === 0) {
-            if (buf) { tokens.push(buf); buf = ''; }
-        } else {
-            buf += ch;
-        }
-    }
-    if (buf) tokens.push(buf);
-    const sliced = tokens.slice(0, targetCount);
-    if (sliced.length === 0) return '';
-    return sliced.join(' ');
+function sliceTrackTokens(trackList: string, count: number): string {
+    if (count <= 0) return '';
+    const tokens = splitTopLevel(trackList);
+    if (tokens.length === 0) return '';
+    return tokens.slice(0, count).join(' ');
 }
 
 
@@ -496,8 +473,6 @@ export function toCount(value: unknown): number {
 
 /**
  * Normalise a cell value: empty -> emptyToken.
- * @param {unknown} value
- * @param {string} emptyToken
  */
 export function coerceEmpty(value: unknown, emptyToken = '.'): string {
     const output = String(value ?? '').trim();
@@ -557,10 +532,6 @@ export function measureAreas(rawTemplate: string | undefined): AreasMeasure {
  * Serialise a 2D areas matrix into a grid-template-areas string.
  * Empty cells are filled with `emptyToken` (default ".").
  * Returns '' if the matrix is entirely emptyToken.
- *
- * @param {string[][]} matrix
- * @param {string} [emptyToken='.']
- * @returns {string}
  */
 export function serialiseAreas(matrix: string[][], emptyToken: string = '.'): string {
     if (!Array.isArray(matrix) || matrix.length === 0) return '';
@@ -581,10 +552,6 @@ export function serialiseAreas(matrix: string[][], emptyToken: string = '.'): st
 
 /**
  * Parse a grid-template-areas string into a 2D matrix (ragged).
- *
- * @param {string} template
- * @param {string} [emptyToken='.']
- * @returns {string[][]}
  */
 export function parseAreas(template: string, emptyToken: string = '.'): string[][] {
     const text = String(template ?? '').trim();
@@ -607,12 +574,6 @@ export function parseAreas(template: string, emptyToken: string = '.'): string[]
 
 /**
  * Ensure a matrix has exactly cols × rows, filling with `fill`.
- *
- * @param {string[][]} matrix
- * @param {number} cols
- * @param {number} rows
- * @param {string} [fill='.']
- * @returns {string[][]}
  */
 export function ensureSize<Value>(
     matrix: readonly (readonly Value[])[] | Value[][], 
@@ -643,9 +604,6 @@ export function ensureSize<Value>(
 /**
  * Measure the number of tracks in a grid-template-columns or grid-template-rows string.
  * Handles repeat(N, ...), strips named lines, ignores subgrid.
- * 
- * @param {string} template
- * @returns {number}
  */
 export function measureTrackCount(template: unknown): number {
     const text = String(template ?? '').trim();
@@ -670,11 +628,6 @@ export function measureTrackCount(template: unknown): number {
 
 /**
  * Resize a matrix to new cols/rows, preserving existing cells. Fills with `fill`.
- * @param {string[][]} matrix
- * @param {number} cols
- * @param {number} rows
- * @param {string} [fill='.']
- * @returns {string[][]}
  */
 export function resizeMatrix(matrix: string[][], cols: number, rows: number, fill: string = '.'): string[][] {
     return ensureSize<string>(matrix, cols, rows, fill);
@@ -683,12 +636,6 @@ export function resizeMatrix(matrix: string[][], cols: number, rows: number, fil
 
 /**
  * Safely set a single cell (immutable).
- * @param {string[][]} matrix
- * @param {number} x
- * @param {number} y
- * @param {string} value
- * @param {string} [emptyToken='.']
- * @returns {string[][]}
  */
 export function setCellImmutable(
     matrix: string[][],
@@ -710,9 +657,6 @@ export function setCellImmutable(
 
 /**
  * Compute (x,y) from a 1D index inside a cols×rows board.
- * @param {number} index
- * @param {number} cols
- * @returns {[number, number]}
  */
 export function xyFromIndex(index: number, cols: number): [number, number] {
     const count = Math.max(1, toCount(cols));
@@ -731,9 +675,6 @@ export type GridItemPanel = 'Simple' | 'Advanced';
  *  - Any presence of gridArea / grid*End => Advanced
  *  - Non-numeric or negative starts => Advanced
  *  - Otherwise => Simple
- *
- * @param {Record<string, any>} [attrs={}]
- * @returns {'Simple'|'Advanced'}
  */
 export function whereGridItemDefined(attrs: Record<string, unknown> = {}): GridItemPanel {
     const has = (value: unknown) => value !== undefined && value !== null && String(value).trim() !== '';
@@ -775,9 +716,6 @@ export type AxisDecode =
 
 /**
  * Decode a "simple" axis i.e. repeat(N, X).
- *
- * @param {string} template
- * @returns {{ mode:'simple', template:string|null, normalised:string, simple:{count:number, unit:string} }|null}
  */
 export function decodeSimple(template: unknown): SimpleAxis {
     const repeats = parseRepeat(template);
@@ -794,12 +732,10 @@ export function decodeSimple(template: unknown): SimpleAxis {
 
 /**
  * Decode an explicit tracks template (tokens separated by top-level spaces).
- *
- * @param {string} template
- * @returns {{ mode:'tracks', template:string|null, normalised:string, tracks:string[] }|null}
  */
 export function decodeTracks(template: unknown): TracksAxis {
-    const tokens = splitTopLevel(template);
+    const collapsed = collapseAdjacentNamedLines(template);
+    const tokens = splitTopLevel(collapsed);
     if (!tokens.length) return null;
     const normalised = normaliseTemplate(tokens.join(' '));
     return {
@@ -815,14 +751,11 @@ const DECODERS = [decodeSimple, decodeTracks];
 /**
  * Decode either a simple repeat-based axis or an explicit tracks axis.
  * Falls back to { mode:'raw' } when unrecognised.
- *
- * @param {string} template
- * @returns {{ mode:'simple'|'tracks'|'raw', template:string|null, normalised:string, simple?:object, tracks?:string[] }}
  */
 export function decodeAxis(template: unknown): AxisDecode {
-    const tpl = template ?? '';
+    const collapsed = collapseAdjacentNamedLines(template);
     for(const dec of DECODERS) {
-        const out = dec(tpl);
+        const out = dec(collapsed);
         if (out) return out;
     }
     // Fallback: unknown/raw (empty or unrecognized string)

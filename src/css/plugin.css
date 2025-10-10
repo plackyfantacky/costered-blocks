@@ -70,6 +70,14 @@
     }
 }
 
+/* Common UI elements */
+
+fieldset.costered-blocks--fieldset {
+    padding:0.5rem;
+    border:1px solid #DCDCDE;
+    border-radius:4px;
+}
+
 /* Custom Select Control */
 
 .costered-blocks--custom-select {
@@ -363,9 +371,19 @@
         gap: 0.25rem;
         align-items: center;
 
-        .costered-blocks--token-editor--add-options {
-            width: fit-content;
+        .costered-blocks--token-editor--add-input {
+            flex: 1;
+            margin-bottom: 0 !important; /* override wp */
+            width:100%;
         }
+
+        .costered-blocks--token-editor--add-controls {
+            align-items: center;
+            display: flex;
+            gap: 0.25rem;
+            width:100%;
+        }
+
     }
 }
 
@@ -493,3 +511,5 @@
         grid-template-columns: 1fr auto;
     }
 }
+
+/* GridItemControls sub-panels */

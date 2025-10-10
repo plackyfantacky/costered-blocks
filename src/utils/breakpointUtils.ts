@@ -7,6 +7,12 @@ import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, StyleMa
 const BP_DESKTOP: Breakpoint = 'desktop';
 const EMPTY_ATTRS = Object.freeze({}) as Record<string, unknown>;
 
+type ReaderOptions = {
+    raw?: boolean;
+    breakpoint?: Breakpoint;
+    fallback?: CSSPrimitive | undefined;
+}; 
+
 export const mapDeviceToBp = (device: unknown): Breakpoint => {
     const dev = String(device ?? '').toLowerCase();
     if (dev.includes('tablet')) return 'tablet';
@@ -22,11 +28,6 @@ function readBucket(map: StyleMap | undefined, property: string): CSSPrimitive |
     return (typeof value === 'string' || typeof value === 'number') ? value : undefined;
 };
 
-type ReaderOptions = {
-    raw?: boolean;
-    breakpoint?: Breakpoint;
-    fallback?: CSSPrimitive | undefined;
-}; 
 
 /**
  * Factory for a breakpoint-aware reader.

@@ -11,6 +11,7 @@ declare module '@wordpress/element' {
     export const Fragment: typeof import('react').Fragment;
     export const isValidElement: typeof import('react').isValidElement;
     export const memo: typeof import('react').memo;
+    export const Suspense: typeof import('react').Suspense;
     export const useCallback: typeof import('react').useCallback;
     export const useContext: typeof import('react').useContext;
     export const useEffect: typeof import('react').useEffect;

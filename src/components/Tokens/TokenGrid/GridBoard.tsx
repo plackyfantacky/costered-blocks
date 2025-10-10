@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
 import { toCount } from '@utils/gridUtils';
-import Token from '@components/composite/Token';
+import Token from '@components/Tokens/Token';
 
 import type { Matrix, ColumnInfo, RowInfo } from '@types';
 

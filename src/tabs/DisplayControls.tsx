@@ -1,7 +1,7 @@
 import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useAttrGetter, useAttrSetter } from "@hooks";
+import { useSelectedBlockInfo, useAttrGetter, useAttrSetter, useSafeBlockName, useScopedKey, useUIPreferences } from "@hooks";
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import { LABELS } from "@labels";
 import {
@@ -16,9 +16,11 @@ import {
     MdiEyeOffOutline as EyeOffOutline,
     IconoirCollapse as Collapse
 } from "@assets/icons";
+import { useEffect } from "react";
 
 const DisplayControls = () => {
-    const { clientId } = useSelectedBlockInfo();
+    const { selectedBlock, clientId } = useSelectedBlockInfo();
+    const name = selectedBlock?.name;
     if (!clientId) return null;
 
     const { get } = useAttrGetter(clientId);
@@ -34,9 +36,18 @@ const DisplayControls = () => {
         set('visibility', value === '' ? undefined : value);
     }, [set]);
 
+    const safeBlockName = useSafeBlockName(name, clientId ?? undefined);
+    const displayPanelKey = useScopedKey('displayPanelOpen', { blockName: safeBlockName });
+    const [displayPanelOpen, setDisplayPanelOpen] = useUIPreferences(displayPanelKey, true);
+
     return (
         <Panel className="costered-blocks--tab--display-controls">
-            <PanelBody title={LABELS.displayControls.panelTitle} initialOpen={true} className="costered-blocks--display-controls--inner">
+            <PanelBody 
+                title={LABELS.displayControls.panelTitle} 
+                initialOpen={displayPanelOpen} 
+                onToggle={setDisplayPanelOpen}
+                className="costered-blocks--display-controls--inner"
+            >
                 <Flex direction="column" gap={4}>
                     <FlexItem className="costered-blocks--display-controls--display">
                         <SelectControl

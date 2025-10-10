@@ -11,7 +11,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect, select as dataSelect } from '@wordpress/data';
 
 import type { Breakpoint, BlockAttributes, CSSPrimitive, StyleMap } from "@types";
-import { getStylesForBreakpoint, withBreakpointStyles } from '@utils/costeredStyles';
+import { ensureStylesForBreakpoint, withBreakpointStyles } from '@utils/costeredStyles';
 
 import { ensureShape } from '@utils/attributeUtils';
 import { seedCosteredId } from '@utils/blockUtils';
@@ -209,7 +209,7 @@ export function useAttrSetter(
                 next.costered = ensureShape(next.costered);
 
                 const value = normalise(input, keyName); // only run once
-                const currentMap: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+                const currentMap: StyleMap = ensureStylesForBreakpoint(next, activeBreakpoint);
                 const edited: StyleMap = { ...currentMap };
                 if (value === undefined) {
                     if (Object.prototype.hasOwnProperty.call(edited, keyName)) {
@@ -233,7 +233,7 @@ export function useAttrSetter(
             seedCosteredId(next); // ensure a stable costeredId
             next.costered = ensureShape(next.costered);
 
-            const base: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+            const base: StyleMap = ensureStylesForBreakpoint(next, activeBreakpoint);
             const edited: StyleMap = { ...base };
             for (const [keyName, input] of Object.entries(partial)) {
                 const value = normalise(input, keyName); // only run once per key
@@ -254,7 +254,7 @@ export function useAttrSetter(
 
             seedCosteredId(next); // ensure a stable costeredId - we always want a costeredId even if all styles are cleared
             next.costered = ensureShape(next.costered);
-            const map: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+            const map: StyleMap = ensureStylesForBreakpoint(next, activeBreakpoint);
 
             if (!Object.prototype.hasOwnProperty.call(map, keyName)) return prev; // nothing to remove
             const edited: StyleMap = { ...map };
@@ -273,7 +273,7 @@ export function useAttrSetter(
             seedCosteredId(next); // ensure a stable costeredId - we always want a costeredId even if all styles are cleared
             next.costered = ensureShape(next.costered);
 
-            const map: StyleMap = getStylesForBreakpoint(next, activeBreakpoint);
+            const map: StyleMap = ensureStylesForBreakpoint(next, activeBreakpoint);
             let changed = false;
             const edited: StyleMap = { ...map };
             for (let i = 0; i < keys.length; i++) {

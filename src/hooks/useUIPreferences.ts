@@ -2,12 +2,36 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferenceStore } from '@wordpress/preferences';
 import { useCallback } from '@wordpress/element';
 
+
+/**
+ * Helper to read a preference value, trying various access patterns to support different WP versions.
+ */
+function readPref<Token>(select: any, store: any, ns: string, key: string): Token | undefined {
+    const api = select(store);
+
+    try {
+        const direct = api?.get?.(ns, key);
+        if (direct !== undefined) return direct as Token;
+    } catch { /* noop */ }
+
+    try {
+        const scoped = api?.get?.(ns);
+        if (scoped !== undefined && scoped !== null) {
+            //map like?
+            const viaMap = (scoped as any)?.get?.(key);
+            if (viaMap !== undefined) return viaMap as Token;
+
+            //object like?
+            const viaProp = (scoped as any)?.[key];
+            if (viaProp !== undefined) return viaProp as Token;
+        }
+    } catch { /* noop */ }
+    
+    return undefined;
+}
+
 /**
  * A hook to get and set UI preferences for the current user.
- *
- * @param {string} key The preference key.
- * @param {any} defaultValue The default value if the preference is not set.
- * @returns {[any, function]} The current value and a setter function.
  */
 export function useUIPreferences<Token>(
     key: string,
@@ -16,14 +40,13 @@ export function useUIPreferences<Token>(
 ): [Token, (next: Token) => void, () => void] {
     // Ensure the key is nsd to avoid collisions.
     const value = useSelect((select: any) => {
-        const pref = select(preferenceStore).get(ns, key);
-        const value = pref?.get?.(ns, key);
-        return (value ?? defaultValue) as Token;
-    }, [key, defaultValue, ns]);
+        const stored = readPref<Token>(select, preferenceStore, ns, key);
+        return (stored === undefined ? defaultValue : stored) as Token;
+    }, [key, ns]);
 
     const { set, __experimentalReset: resetPref } = useDispatch(preferenceStore) as {
-        set: (ns: string, k: string, v: Token) => void;
-        __experimentalReset?: (ns: string, k: string) => void;
+        set: (scope: string, k: string, v: Token) => void;
+        __experimentalReset?: (scope: string, k: string) => void;
     };
 
     const setValue = useCallback((next: Token) => {
@@ -39,14 +62,14 @@ export function useUIPreferences<Token>(
     return [value, setValue, reset];
 }
 
+/**
+ * Generate a namespaced preference key.
+ */
 type ScopedKeyOptions = {
     blockName?: string | null | undefined;
     variant?: string | null | undefined;
 };
 
-/**
- * Generate a namespaced preference key.
- */
 export function useScopedKey(
     base: string,
     opts: ScopedKeyOptions = {}

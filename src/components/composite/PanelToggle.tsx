@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode, ReactElement } from 'react';
-import React, { memo, useCallback, useEffect, Children } from '@wordpress/element';
+import { memo, useCallback, useLayoutEffect, useRef, Children, Suspense } from '@wordpress/element';
 import { Flex, FlexBlock } from '@wordpress/components';
 
 import { LABELS } from '@labels';
@@ -7,12 +7,11 @@ import CustomToggleGroup from '@components/CustomToggleGroup';
 import type { GridControlsPanelMap, GridControlsPanelProps } from '@types';
 
 type PanelToggleBaseProps<Key extends string> = {
-    value: Key | null;
-    onChange?: (next: Key | null) => void;
+    value: Key; //controlled value, not-nullable
+    onChange: (next: Key) => void; //controlled setter
     panels: GridControlsPanelMap<Key>;
     panelProps?: GridControlsPanelProps<Key>;
     label?: ReactNode;
-    forceActive?: boolean;
     className?: string;
     children?: ReactNode;
 } & Record<string, unknown>;
@@ -23,12 +22,10 @@ function PanelToggleBase<Key extends string>({
     panels,
     panelProps = {},
     label = LABELS.panelToggle.label,
-    forceActive = false,
     className,
     children,
     ...rest
-}: PanelToggleBaseProps<Key>) {
-
+}: PanelToggleBaseProps<Key>): ReactElement {
     // Extract child values to determine available panels
     // We will always have one panel showing, and panels cannot be deselected
     const childValues = Children.toArray(children)
@@ -36,46 +33,47 @@ function PanelToggleBase<Key extends string>({
         .filter((val): val is Key => typeof val === 'string' && val.length > 0);
 
     const panelKeys: readonly Key[] = 
-    (childValues.length > 0 ? childValues : (Object.keys(panels || {}) as Key[]));
+        childValues.length > 0 ? (childValues as Key[]) : (Object.keys(panels || {}) as Key[]);
+    
     const firstKey: Key | null = panelKeys[0] ?? null;
+    const isValid = (k: string): k is Key => (panelKeys as readonly string[]).includes(k);
 
-    useEffect(() => {
-        if (!panelKeys.length) return; // nothing to select
-        if (!value || !panelKeys.includes(value)) {
-            onChange?.(firstKey);
-        }
-    }, [value, firstKey, JSON.stringify(panelKeys)]);
+    // Effective value to render with (never blank in the toggle)
+    const effectiveValue: Key | '' = isValid(value as unknown as string)
+        ? value
+        : (firstKey ?? '') as Key | '';
 
     // Handle change, respecting forceActive
     const handleChange = useCallback(
-        (next: Key | null | undefined) => {
-            const nextValue: Key | null = (next ?? null) as Key | null;
-            if (forceActive && nextValue === null) return;
-            onChange?.(nextValue);
+        (next: string) => {
+            const ok = isValid(next);
+            if(ok && next !== value) onChange(next as Key);
         },
-        [onChange, forceActive]
+        [onChange, value, isValid]
     );
 
-    const ActiveComponent: ComponentType<any> | null = value ? panels?.[value] : null;
+    const ActiveComponent: ComponentType<any> | null = 
+        (effectiveValue ? panels?.[effectiveValue as Key] : null) ?? null;
+
     const resolvedProps =
         typeof panelProps === 'function'
-            ? (value ? (panelProps as (k: Key) => Record<string, unknown>)(value) : {})
+            ? (panelProps as (k: Key) => Record<string, unknown>)(effectiveValue as Key)
             : panelProps;
 
     return (
         <Flex direction="column" gap={2} className={className} {...rest}>
             <CustomToggleGroup
                 label={label}
-                value={(value ?? '') as string}
-                onChange={handleChange as (v: string | null | undefined) => void}
+                value={effectiveValue as string}
+                onChange={handleChange}
             >
                 {children}
             </CustomToggleGroup>
             {ActiveComponent ? (
                 <FlexBlock>
-                    <React.Suspense fallback={null}>
+                    <Suspense fallback={null}>
                         <ActiveComponent {...resolvedProps} />
-                    </React.Suspense>
+                    </Suspense>
                 </FlexBlock>
             ) : null}
         </Flex>
