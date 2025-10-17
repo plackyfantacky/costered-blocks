@@ -26,6 +26,7 @@ import { useSelect } from '@wordpress/data';
 import { memo, useLayoutEffect, useMemo } from '@wordpress/element';
 
 import type { AugmentedAttributes, CSSPrimitive } from "@types";
+import { asNonEmptyString, maybeFormat } from "@utils/common";
 import { augmentAttributes } from '@utils/breakpointUtils';
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 
@@ -34,16 +35,6 @@ import {
     ATTRS_TO_CSS,
     gridItemsProps,
 } from '@config';
-
-//console.log('MIRRORED_STYLE_KEYS', MIRRORED_STYLE_KEYS)
-
-// helpers
-const kebabToCamel = (value: string) => value.replace(/-([a-z])/g, (_:string, char: string) => char.toUpperCase());
-const hasNonEmptyString = (input: unknown) => {
-    if (input === undefined || input === null) return false;
-    const output = String(input).trim();
-    return output !== '' && output !== 'undefined' && output !== 'null';
-};
 
 // Logical CSS properties for margin overrides (to beat blockGap)
 const LOGICAL_CSS_PROPS: Record<string, string> = {
@@ -80,7 +71,7 @@ for (const key of keys) {
         (gridItemsProps as Record<string, GridItemProp>)[key]?.css
         ?? PLACEMENT[key]?.css 
         ?? key;
-    PLACEMENT[key] = { css, attr: kebabToCamel(css) };
+    PLACEMENT[key] = { css, attr: maybeFormat(css, { toCamelCase: true }) };
 }
 
 const GRID_AREA_ATTR = PLACEMENT.gridArea.attr;
@@ -108,44 +99,45 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
     let hasMt = false, hasMb = false, hasMl = false, hasMr = false;
 
     // margin top
-    if (hasNonEmptyString(read('marginTop'))) {
-        const value = String(read('marginTop'));
-        style.marginTop = value;
-        style.marginBlockStart = value; // <- beats parent’s blockGap rule
+    const mt = asNonEmptyString(read('marginTop'));
+    if (mt) {
+        style.marginTop = mt;
+        style.marginBlockStart = mt; // <- beats parent’s blockGap rule
         any = true;
         hasMt = true;
     }
 
     // margin bottom
-    if (hasNonEmptyString(read('marginBottom'))) {
-        const value = String(read('marginBottom'));
-        style.marginBottom = value;
-        style.marginBlockEnd = value; // <- beats parent’s blockGap rule
+    const mb = asNonEmptyString(read('marginBottom'));
+    if (mb) {
+        style.marginBottom = mb;
+        style.marginBlockEnd = mb; // <- beats parent’s blockGap rule
         any = true;
         hasMb = true;
     }
 
     // margin left
-    if (hasNonEmptyString(read('marginLeft'))) {
-        const value = String(read('marginLeft'));
-        style.marginLeft = value;
-        style.marginInlineStart = value; // <- beats parent’s blockGap rule
+    const ml = asNonEmptyString(read('marginLeft'));
+    if (ml) {
+        style.marginLeft = ml;
+        style.marginInlineStart = ml; // <- beats parent’s blockGap rule
         any = true;
         hasMl = true;
     }
 
     // margin right
-    if (hasNonEmptyString(read('marginRight'))) {
-        const value = String(read('marginRight'));
-        style.marginRight = value;
-        style.marginInlineEnd = value; // <- beats parent’s blockGap rule
+    const mr = asNonEmptyString(read('marginRight'));
+    if (mr) {
+        style.marginRight = mr;
+        style.marginInlineEnd = mr; // <- beats parent’s blockGap rule
         any = true;
         hasMr = true;
     }
 
     // zIndex
-    if (hasNonEmptyString(read('zIndex'))) {
-        const value = Number(read('zIndex'));
+    const zIndex = asNonEmptyString(read('zIndex'));
+    if (zIndex) {
+        const value = Number(zIndex);
         style.zIndex = value;
         any = true;
     }
@@ -170,8 +162,8 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
             key === 'zIndex' || key === 'z-index' ||
             key === GRID_AREA_ATTR || key === GRID_COLUMN_ATTR || key === GRID_ROW_ATTR
         ) continue;
-        const value = read(key);
-        if (hasNonEmptyString(value)) {
+        const value = asNonEmptyString(read(key));
+        if (value) {
             style[key] = String(value);
             any = true;
         }
@@ -179,7 +171,7 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
 
     // has flexDirection: ensure display:flex is set if it is
     // ensure flexDirection “sticks”
-    const haveFlexDir = hasNonEmptyString(read('flexDirection'));
+    const haveFlexDir = asNonEmptyString(read('flexDirection'));
     if (haveFlexDir && !style.display) {
         style.display = 'flex';
         any = true;
@@ -187,11 +179,12 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
 
     // drop any empty/"undefined"/"null" strings from style
     Object.keys(style).forEach((key) => {
-        if (!hasNonEmptyString(style[key])) {
-            delete style[key];
+        const value = asNonEmptyString((style as any)[key]);
+        if (value === null) {
+            delete (style as any)[key];
         } else {
             // normalise strings in-place (trim)
-            style[key] = String(style[key]).trim();
+            (style as any)[key] = String(value).trim();
         }
     });
 

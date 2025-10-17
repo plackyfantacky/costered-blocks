@@ -1,18 +1,16 @@
 // TokenListEditor.tsx
 import type { ReactNode } from "react";
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo, Fragment } from '@wordpress/element';
 import { Button, TextControl, Flex, FlexItem } from '@wordpress/components';
 
-
+import { t, scoped } from '@labels';
 import Token from './Token';
-import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import type { TokenAtomicItem, TokenModelAdapter } from '@types';
 
 type Labels = Partial<{
-    addLabel: string;
     addPlaceholder: string;
-    addKindName: string;
-    addKindRaw: string;
+    addLabel: string;
+    addToken: string;
     emptyState: string;
     mergeLeft: string;
     splitOut: string;
@@ -22,6 +20,7 @@ type Props<Persisted> = {
     persisted: Persisted;
     adapter: TokenModelAdapter<Persisted>;
     onChange: (next: Persisted) => void;
+    labelScope: string;
     floatingEditor?: boolean;
     popoverPlacement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end' | 'left-start' | 'left-end' | 'right-start' | 'right-end';
     popoverWidth?: string | number;
@@ -31,42 +30,39 @@ type Props<Persisted> = {
     labels?: Labels;
 }
 
-type AddKind = 'name' | 'raw';
-
 export function TokenListEditor<Persisted>({
     persisted,
     adapter,
     onChange,
+    labelScope,
     floatingEditor = false,
     popoverPlacement = 'bottom-start',
     popoverWidth = 200,
-    allowRaw = true,
+    //allowRaw = true,
     showPerTokenGrouping = true,
     toolbar,
-    labels: userLabels,
 }: Props<Persisted>) {
 
-    //TODO: remap these to @labels and import LABELS
+    const L = useMemo(() => scoped(labelScope), [labelScope]);
     const labels = useMemo<Required<Labels>>(() => ({
-        addLabel: '@@Add token@@',
-        addPlaceholder: '@@Enter value…@@',
-        addKindName: '@@Name [a]@@',
-        addKindRaw: '@@Raw (e.g. 1fr, minmax)@@',
-        emptyState: '@@No tokens yet.@@',
-        mergeLeft: '@@Merge with left@@',
-        splitOut: '@@Split from group@@',
-        ...(userLabels || {})
-    }), [userLabels]);
+        addPlaceholder: L('addPlaceholder', '#Enter value…#'),
+        addLabel: L('addLabel', '#Add [Name]#'),
+        addToken: L('addToken', '#Add measurement#'),
+        emptyState: L('emptyState', '#No tokens yet.#'),
+        mergeLeft: L('mergeLeft', '#Merge with left#'),
+        splitOut: L('splitOut', '#Split from group#'),
+    }), [L]);
 
     const [items, setItems] = useState<TokenAtomicItem[]>(() => adapter.expand(persisted));
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
     // “Add” control state
     const [addText, setAddText] = useState<string>('');
-    const [addKind, setAddKind] = useState<AddKind>('name');
 
     useEffect(() => {
-        setItems(adapter.expand(persisted));
+        const expanded = adapter.expand(persisted);
+        
+        setItems(expanded);
         setExpandedIndex(null);
     }, [persisted, adapter]);
 
@@ -117,72 +113,90 @@ export function TokenListEditor<Persisted>({
         commit(adapter.clearGroup(items, index));
     }, [items, commit, adapter]);
 
-    // Add/Insert behaviour:
-    // - If a chip is expanded, insert AFTER it (keeps local flow).
-    // - Otherwise append to the end.
-    const addToken = useCallback(() => {
+    const addNamedToken = useCallback(() => {
+        const raw = addText.trim();
+        if (!raw) return;
+
+        // Accept "[a b]" or "a b"; strip outer brackets if present
+        const inner = raw.startsWith('[') && raw.endsWith(']') 
+                ? raw.slice(1, -1).trim()
+                : raw.replace(/^\[|\]$/g, '').trim();
+
+        const names = inner.split(/\s+/).filter(Boolean);
+        if (!names.length) return;
+
+        const insertionIndex = expandedIndex != null ? expandedIndex + 1 : items.length;
+        const gid = items.reduce((max, item) => Math.max(max, item.groupId ?? 0), 0) + 1;
+        
+        const next = items.slice();
+        next.splice(
+            insertionIndex,
+            0,
+            ...names.map(name => ({ kind: 'name' as const, text: name, groupId: gid }))
+        );
+
+        commit(next);
+        setAddText('');
+        setExpandedIndex(insertionIndex + names.length - 1);
+    }, [addText, expandedIndex, items, commit]);
+
+    const addRawToken = useCallback(() => {
         const text = addText.trim();
         if (!text) return;
 
         const insertionIndex = expandedIndex != null ? expandedIndex + 1 : items.length;
         const next = items.slice();
 
-        if (addKind === 'name') {
-            next.splice(insertionIndex, 0, { kind: 'name', text });
-        } else {
-            next.splice(insertionIndex, 0, { kind: 'raw', text });
-        }
+        next.splice(insertionIndex, 0, { kind: 'raw', text });
 
         commit(next);
         setAddText('');
         setExpandedIndex(insertionIndex);
-    }, [addText, addKind, expandedIndex, items, commit]);
+    }, [addText, expandedIndex, items, commit]);
 
+    // keyboard: Enter = add size; Cmd/Ctrl+Enter = add name; Esc = collapse
     const onAddKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            addToken();
+            if (event.metaKey || event.ctrlKey) addNamedToken();
+            else addRawToken();
         }
-        if (event.key === 'Escape') {
-            setExpandedIndex(null);
-        }
-    }, [addToken]);
+        if (event.key === 'Escape') setExpandedIndex(null);
+    }, [addRawToken, addNamedToken]);
 
     const hasItems = items.length > 0;
-
 
     return (
         <div className="costered-blocks--token-editor">
             <div className="costered-blocks--token-editor--controls">
-                <Flex align="center" wrap>
-                    <FlexItem style={{ minWidth: 180 }}>
-                        <TextControl
-                            label={labels.addLabel}
-                            placeholder={labels.addPlaceholder}
-                            value={addText}
-                            onChange={setAddText}
-                            onKeyDown={onAddKeyDown}
-                        />
-                    </FlexItem>
-                    <FlexItem>
-                        <SelectControl
-                            value={addKind}
-                            onChange={(v: string) => setAddKind((v === 'raw' ? 'raw' : 'name'))}
-                        >
-                            <SelectControl.Option value="name">{labels.addKindName}</SelectControl.Option>
-                            {allowRaw ? <SelectControl.Option value="raw">{labels.addKindRaw}</SelectControl.Option> : null}
-                        </SelectControl>
-                    </FlexItem>
-                    <FlexItem>
+                <Flex 
+                    className="costered-blocks--token-editor--add"
+                    align="center"
+                >
+                    <TextControl
+                        placeholder={labels.addPlaceholder}
+                        value={addText}
+                        onChange={setAddText}
+                        onKeyDown={onAddKeyDown}
+                        __nextHasNoMarginBottom
+                        __next40pxDefaultSize
+                    />
+                    <Flex className="costered-blocks--token-editor--add-options" gap={0} align="center" justify="flex-start">
                         <Button
-                            variant="primary"
-                            onClick={addToken}
-                            disabled={addText.trim() === ''}
-                        >
-                            {labels.addLabel}
-                        </Button>
-                    </FlexItem>
-
+                            icon="editor-code"
+                            variant="tertiary"
+                            onClick={addRawToken}
+                            aria-label={labels.addToken}
+                            title={labels.addToken}
+                        />
+                        <Button
+                            icon="tag"
+                            variant="tertiary"
+                            onClick={addNamedToken}
+                            aria-label={labels.addLabel}
+                            title={labels.addLabel}
+                        />
+                    </Flex>
                     {toolbar ? <FlexItem style={{ marginLeft: 'auto' }}>{toolbar}</FlexItem> : null}
                 </Flex>
             </div>
@@ -196,8 +210,9 @@ export function TokenListEditor<Persisted>({
                 { items.map((item, index) => {
                     const isExpanded = expandedIndex === index;
                     return (
-                        <>
+                        <Fragment key={`token-${index}`}>
                             <Token
+                                key={`token-${index}`} //shuts up React warning about non-unique keys
                                 index={index}
                                 value={item.text}
                                 isExpanded={isExpanded}
@@ -236,7 +251,7 @@ export function TokenListEditor<Persisted>({
                                     )}
                                 </div>
                             )}
-                        </>
+                        </Fragment>
                     );
                 })}
             </div>

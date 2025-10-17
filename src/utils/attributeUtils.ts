@@ -1,5 +1,5 @@
 // src/utils/attributeUtils.ts
-import type { CosteredAttributes, Breakpoint, CSSPrimitive, StyleMap, BreakpointBucket } from "@types";
+import type { CosteredAttributes, StyleMap, BreakpointBucket } from "@types";
 
 /**
  * Ensure attrs.costered exists with desktop/tablet/mobile buckets and

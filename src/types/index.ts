@@ -5,7 +5,7 @@ export type MeasurementMode = 'unit' | 'text';
 export type StyleMap = Record<string, string>; // cannonical shape for styles
 
 export type { Breakpoint, BreakpointBucket } from './breakpoints.ts';
-export type { CosteredAttributes, BlockAttributes, CascadeOptions, AugmentedAttributes } from './attributes.ts';
+export type { CosteredAttributes, BlockAttributes, CascadeOptions, AugmentedAttributes, UnsavedAttr } from './attributes.ts';
 
 // UI context
 

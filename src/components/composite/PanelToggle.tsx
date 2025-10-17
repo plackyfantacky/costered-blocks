@@ -1,8 +1,9 @@
 import type { ComponentType, ReactNode, ReactElement } from 'react';
-import { memo, useCallback, useLayoutEffect, useRef, Children, Suspense } from '@wordpress/element';
+import { memo, useCallback, Children, Suspense } from '@wordpress/element';
 import { Flex, FlexBlock } from '@wordpress/components';
 
 import { LABELS } from '@labels';
+
 import CustomToggleGroup from '@components/CustomToggleGroup';
 import type { GridControlsPanelMap, GridControlsPanelProps } from '@types';
 
@@ -43,6 +44,14 @@ function PanelToggleBase<Key extends string>({
         ? value
         : (firstKey ?? '') as Key | '';
 
+    const ActiveComponent: ComponentType<any> | null = 
+        (effectiveValue ? panels?.[effectiveValue as Key] : null) ?? null;
+
+    const resolvedProps =
+        typeof panelProps === 'function'
+            ? (panelProps as (k: Key) => Record<string, unknown>)(effectiveValue as Key)
+            : panelProps;
+
     // Handle change, respecting forceActive
     const handleChange = useCallback(
         (next: string) => {
@@ -52,21 +61,13 @@ function PanelToggleBase<Key extends string>({
         [onChange, value, isValid]
     );
 
-    const ActiveComponent: ComponentType<any> | null = 
-        (effectiveValue ? panels?.[effectiveValue as Key] : null) ?? null;
-
-    const resolvedProps =
-        typeof panelProps === 'function'
-            ? (panelProps as (k: Key) => Record<string, unknown>)(effectiveValue as Key)
-            : panelProps;
-
     return (
         <Flex direction="column" gap={2} className={className} {...rest}>
             <CustomToggleGroup
                 label={label}
                 value={effectiveValue as string}
                 onChange={handleChange}
-            >
+                >
                 {children}
             </CustomToggleGroup>
             {ActiveComponent ? (
@@ -85,14 +86,14 @@ const PanelToggleInner = memo(PanelToggleBase) as <Key extends string>(
 ) => ReactElement;
 
 type PanelToggleComponent = typeof PanelToggleInner & {
-    TextOption: typeof CustomToggleGroup.TextOption;
-    IconOption: typeof CustomToggleGroup.IconOption;
-    CombinedOption: typeof CustomToggleGroup.CombinedOption;
+    Text: typeof CustomToggleGroup.TextOption;
+    Icon: typeof CustomToggleGroup.IconOption;
+    Composite: typeof CustomToggleGroup.CompositeOption;
+
 };
 
 const PanelToggle = PanelToggleInner as PanelToggleComponent;
-PanelToggle.TextOption = CustomToggleGroup.TextOption;
-PanelToggle.IconOption = CustomToggleGroup.IconOption;
-PanelToggle.CombinedOption = CustomToggleGroup.CombinedOption;
-
+PanelToggle.Text = CustomToggleGroup.TextOption;
+PanelToggle.Icon = CustomToggleGroup.IconOption;
+PanelToggle.Composite = CustomToggleGroup.CompositeOption;
 export default PanelToggle;

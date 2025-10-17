@@ -24,7 +24,6 @@ import { CustomSelectControl as SelectControl } from '@components/CustomSelectCo
 
 type StartMode = 'number' | 'named';
 type EndMode = 'auto' | 'number' | 'named';
-type PlacementMode = 'span' | 'end';
 
 type Ctrl = ReturnType<typeof useGridItemTracksController> | null;
 type EndChangeMode = 'span' | 'end';

@@ -2,7 +2,7 @@ import { __experimentalNumberControl as NumberControl } from '@wordpress/compone
 import { useCallback } from "@wordpress/element";
 import type { ComponentProps, ReactNode } from "react";
 
-import { maybeFormat } from "@utils/componentUtils";
+import { maybeFormat } from "@utils/common";
 
 type NumberControlInputProps = {
     value: number | '';

@@ -1,6 +1,6 @@
 
 import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 
 import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
     useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
@@ -17,30 +17,74 @@ import { GridItemTracks } from '@panels/GridItemTracks';
 import { GridItemAreas } from '@panels/GridItemAreas';
 
 import type { GridItemPanelKey, VisibilityCtx } from "@types";
+import { useEffect } from "react";
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 const minInteger = -maxInteger;
 
 const GridItemControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    const name = selectedBlock?.name;
+    if (!clientId) return null;
 
-    const { getString, getNumber } = useAttrGetter(clientId ?? null);
+    const name = selectedBlock?.name;
+    const blockName = useSafeBlockName(name, clientId);
+    if (!name || !blockName) return null;
+
+    const { getString, getNumber } = useAttrGetter(clientId);
     const { set } = useAttrSetter(clientId);
 
-    const blockName = useSafeBlockName(name, clientId ?? null);
-    const preferenceKey = useScopedKey('activeGridItemPanel', { blockName: blockName });
-    const [activeGridItemPanel, setActiveGridItemPanel] = useUIPreferences<string | null>(preferenceKey, 'simple');
+    /* --- unsaved fields --- */
+
+    /* --- panel prefs + mode --- */
+
+    const panelPrefKey = useScopedKey('activeGridItemPanel', { blockName: blockName });
+    const [panelStoredKey, setPanelStoredKey] = useUIPreferences<string | null>(panelPrefKey, 'simple');
+
+    /* --- panel mode toggle --- */
+
+    const panelsMap = useMemo(() => ({
+        simple: GridItemSimple,
+        tracks: GridItemTracks,
+        areas: GridItemAreas,
+    }), []);
+    const panelKeys = useMemo(() => Object.keys(panelsMap) as Array<GridItemPanelKey>, [panelsMap]);
+    const firstKey = panelKeys[0]!;
+
+    const axisKeySet = useMemo(() => new Set(panelKeys), [panelKeys]);
+    const isValid = (k: unknown): k is GridItemPanelKey =>
+        typeof k === "string" && axisKeySet.has(k as GridItemPanelKey);
+
+    const [panelActiveKey, setPanelActiveKey] = useState<GridItemPanelKey>(
+        isValid(panelStoredKey) ? panelStoredKey : firstKey
+    );
+
+    const handleChange = (next: GridItemPanelKey) => {
+        if (!isValid(next) || next === panelActiveKey) return;
+        setPanelActiveKey(next);
+        setPanelStoredKey(next);
+    };
+    
+    useEffect(() => {
+        if (isValid(panelStoredKey) && panelStoredKey !== panelActiveKey) {
+            setPanelActiveKey(panelStoredKey);
+        }
+    }, [panelActiveKey, panelStoredKey]);
+
+    /* --- alignment controls --- */
 
     const alignSelf = getString('alignSelf', 'auto');
     const setAlignSelf = useCallback((value: string) => {
         set('alignSelf', value === '' ? undefined : value);
     }, [set]);
+
+    /* --- justifySelf control --- */
     
     const justifySelf = getString('justifySelf') || 'auto';
     const setJustifySelf = useCallback((value: string) => {
         set('justifySelf', value === '' ? undefined : value);
     }, [set]);
+
+    /* --- order control --- */
 
     const order = getNumber('order', 0) ?? 0;
     const setOrder = useCallback((value: number | '') => {
@@ -53,20 +97,26 @@ const GridItemControls = () => {
                 <Flex expanded={true} gap={4} direction="column" className="costered-blocks--griditem-controls--griditem">
                     <FlexBlock>
                         <PanelToggle
-                            value={activeGridItemPanel}
-                            onChange={setActiveGridItemPanel}
+                            className={'costered-blocks--griditem-controls--panel-template-mode'}
+                            value={panelActiveKey}
+                            onChange={handleChange}
                             label={null}
                             forceActive
-                            panels={{
-                                simple: GridItemSimple,
-                                tracks: GridItemTracks,
-                                areas: GridItemAreas,
-                            }}
+                            panels={panelsMap}
                             panelProps={{ clientId, blockName }}
                         >
-                            <PanelToggle.TextOption value="simple" label={LABELS.gridItemsControls.simplePanel.title} />
-                            <PanelToggle.TextOption value="tracks" label={LABELS.gridItemsControls.tracksPanel.title} />
-                            <PanelToggle.TextOption value="areas" label={LABELS.gridItemsControls.areasPanel.title} />
+                            <PanelToggle.Composite value="simple">
+                                {LABELS.gridItemsControls.simplePanel.title}
+
+                            </PanelToggle.Composite>
+                            <PanelToggle.Composite value="tracks">
+                                {LABELS.gridItemsControls.tracksPanel.title}
+
+                            </PanelToggle.Composite>
+                            <PanelToggle.Composite value="areas">
+                                {LABELS.gridItemsControls.areasPanel.title}
+
+                            </PanelToggle.Composite>
                         </PanelToggle>
                     </FlexBlock>
                 </Flex>

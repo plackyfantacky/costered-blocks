@@ -37,13 +37,6 @@ export interface IconOptionProps {
     disabled?: boolean;
 }
 
-export interface CombinedOptionProps {
-    value: ToggleValue;
-    icon: React.ReactNode;
-    label: string;
-    disabled?: boolean;
-}
-
 export interface CompositeOptionProps {
     value: ToggleValue;
     label?: string;
@@ -136,23 +129,6 @@ function IconOption({ value, icon, label, showTooltip = true, disabled }: IconOp
     );
 }
 
-function CombinedOption({ value, icon, label, disabled }: CombinedOptionProps) {
-    return (
-        <ToggleGroupControlOption
-            className={`costered-blocks--custom-toggle-grid--tile costered-blocks--custom-toggle-grid--combined-option`}
-            value={value}
-            aria-label={label}
-            label={
-                <Flex direction="column" gap={0} align="center" style={{ paddingBlock: '0.5em' }}>
-                    <FlexItem>{icon}</FlexItem>
-                    <FlexItem>{label}</FlexItem>
-                </Flex>
-            }
-            disabled={disabled}
-        />
-    );
-}
-
 function CompositeOption({ value, children, label, disabled }: CompositeOptionProps) {
     return (
         <ToggleGroupControlOption
@@ -169,13 +145,11 @@ type CustomToggleGridCompound =
     React.MemoExoticComponent<React.FC<CustomToggleGridProps>> & {
         TextOption: React.FC<TextOptionProps>;
         IconOption: React.FC<IconOptionProps>;
-        CombinedOption: React.FC<CombinedOptionProps>;
         CompositeOption: React.FC<CompositeOptionProps>;
     };
 
 const CustomToggleGrid = memo(CustomToggleGridBase) as CustomToggleGridCompound;
 CustomToggleGrid.TextOption = TextOption;
 CustomToggleGrid.IconOption = IconOption;
-CustomToggleGrid.CombinedOption = CombinedOption;
 CustomToggleGrid.CompositeOption = CompositeOption;
 export default CustomToggleGrid;

@@ -35,5 +35,8 @@ declare module '@wordpress/components' {
     export const TabPanel: any;
     export const TextControl: any;
     export const ToggleControl: any;
+    export const Toolbar: any;
+    export const ToolbarButton: any;
+    export const ToolbarGroup: any;
     export const Tooltip: any;
 }

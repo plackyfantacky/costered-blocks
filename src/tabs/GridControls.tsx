@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "@wordpress/element";
-import { useDispatch } from "@wordpress/data";
-import { Panel, PanelBody, Flex, FlexBlock, Button, Modal } from "@wordpress/components";
+import { Panel, PanelBody, Flex, FlexBlock, Button, Modal, FlexItem } from "@wordpress/components";
 
 import {
     useAttrGetter,
@@ -8,10 +7,13 @@ import {
     useSafeBlockName,
     useScopedKey,
     useUIPreferences,
+    useUnsavedBySource
 } from "@hooks";
+import { getBlockCosteredId } from '@utils/blockUtils';
 import { LABELS } from "@labels";
 import type { GridAxisModeKey, VisibilityCtx } from "@types";
 
+import { UnsavedIcon } from "@components/UnsavedIcon";
 import GapControls from "@components/composite/GapControls";
 import TokenGrid from "@components/Tokens/TokenGrid";
 import PanelToggle from "@components/composite/PanelToggle";
@@ -23,59 +25,53 @@ import { MaterialSymbolsBackgroundGridSmall as GridIcon } from "@assets/icons";
 
 const GridControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
+    if(!clientId) return null;
+
     const name = selectedBlock?.name;
-    const safeBlockName = useSafeBlockName(name, clientId ?? undefined);
+    const safeBlockName = useSafeBlockName(name, clientId);
+    if (!name || !safeBlockName) return null;
 
-    // Bail out until block scope is ready: prevents wrong pref keys + TS unions.
-    if (!name || !safeBlockName || !clientId) return null;
+    const { getString } = useAttrGetter(clientId);
 
-    const { getString } = useAttrGetter(clientId ?? null);
+    /* --- modal ---  */
 
-    //const [activeKey, setActiveKey] = useState<GridAxisModeKey | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
 
     const openModal = useCallback(() => setModalOpen(true), []);
     const closeModal = useCallback(() => setModalOpen(false), []);
 
+    /* --- unsaved fields --- */
+
+    const costeredId = getBlockCosteredId(clientId);
+    const { hasAny, get } = useUnsavedBySource(costeredId, ['gridTemplateColumns', 'gridTemplateRows']);
+    const unsavedSimple = get("simple");
+    const unsavedTracks = get("tracks");
+
+    /* --- subgrid detection --- */
+
     const subgridCols = getString("gridTemplateColumns", "", { raw: true }) === "subgrid";
     const subgridRows = getString("gridTemplateRows", "", { raw: true }) === "subgrid";
 
-    const [axisDisabled, setAxisDisabled] = useState({ columns: subgridCols, rows: subgridRows });
+    /* --- panel prefs + mode --- */
 
     const gridTemplateKey = useScopedKey("gridTemplatePanelOpen", { blockName: safeBlockName });
     const gridGapKey = useScopedKey("gridGapPanelOpen", { blockName: safeBlockName });
-    const gridTemplateAreasKey = useScopedKey("gridTemplateAreasPanelOpen", {
-        blockName: safeBlockName,
-    });
+    const gridTemplateAreasKey = useScopedKey("gridTemplateAreasPanelOpen", { blockName: safeBlockName });
+    const axisPrefKey = useScopedKey("gridAxisPanelMode", { blockName: safeBlockName });
 
-    const [gridTemplatePanelOpen, setGridTemplatePanelOpen] = useUIPreferences(
-        gridTemplateKey,
-        true
-    );
+    const [gridTemplatePanelOpen, setGridTemplatePanelOpen] = useUIPreferences( gridTemplateKey, true );
     const [gridGapPanelOpen, setGridGapPanelOpen] = useUIPreferences(gridGapKey, false);
-    const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences(
-        gridTemplateAreasKey,
-        false
-    );
+    const [gridTemplateAreasPanelOpen, setGridTemplateAreasPanelOpen] = useUIPreferences( gridTemplateAreasKey, false );
+    const [axisStoredKey, setAxisStoredKey] = useUIPreferences<GridAxisModeKey | null>( axisPrefKey, null );
 
-    // Grid Axis sub-panel mode
-    const panelsMap = useMemo(
-        () =>
-            ({
-                simple: GridAxisSimple,
-                tracks: GridAxisTracks,
-            }) as const,
-        []
-    );
+    /* --- panel mode toggle --- */
+
+    const panelsMap = useMemo(() =>({
+        simple: GridAxisSimple,
+        tracks: GridAxisTracks,
+    }) as const, []);
     const panelKeys = useMemo(() => Object.keys(panelsMap) as Array<GridAxisModeKey>, [panelsMap]);
     const firstKey = panelKeys[0]!;
-    const ready = !!name && !!safeBlockName && !!clientId;
-
-    const axisPrefKey = useScopedKey("gridAxisPanelMode", { blockName: safeBlockName });
-    const [axisStoredKey, setAxisStoredKey] = useUIPreferences<GridAxisModeKey | null>(
-        axisPrefKey,
-        null
-    );
 
     const axisKeySet = useMemo(() => new Set(panelKeys), [panelKeys]);
     const isValid = (k: unknown): k is GridAxisModeKey =>
@@ -97,7 +93,10 @@ const GridControls = () => {
         }
     }, [axisStoredKey, axisActiveKey]);
 
-    // keep axisDisabled in sync if source attrs change
+    /* --- axis disabled state --- */
+
+    const [axisDisabled, setAxisDisabled] = useState({ columns: subgridCols, rows: subgridRows });
+
     useEffect(() => {
         setAxisDisabled({ columns: subgridCols, rows: subgridRows });
     }, [subgridCols, subgridRows]);
@@ -123,14 +122,19 @@ const GridControls = () => {
                     panels={panelsMap}
                     panelProps={{ clientId, axisDisabled }}
                 >
-                    <PanelToggle.TextOption
-                        value="simple"
-                        label={LABELS.gridControls.simplePanel.title}
-                    />
-                    <PanelToggle.TextOption
-                        value="tracks"
-                        label={LABELS.gridControls.tracksPanel.title}
-                    />
+                    <PanelToggle.Composite value="simple">
+                        <Flex align="center" gap={4} justify="space-between">
+                            <FlexItem>{LABELS.gridControls.simplePanel.title}</FlexItem>
+                            { hasAny('simple') && <UnsavedIcon costeredId={costeredId} attrs={unsavedSimple} /> }
+                        </Flex>
+                    </PanelToggle.Composite>
+
+                    <PanelToggle.Composite value="tracks">
+                        <Flex align="center" gap={4} justify="space-between">
+                            <FlexItem>{LABELS.gridControls.tracksPanel.title}</FlexItem>
+                            { hasAny('tracks') && <UnsavedIcon costeredId={costeredId} attrs={unsavedTracks} /> }
+                        </Flex> 
+                    </PanelToggle.Composite>
                 </PanelToggle>
             </PanelBody>
 

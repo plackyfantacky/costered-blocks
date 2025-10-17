@@ -208,7 +208,6 @@ function costered_build_css_for_selector($selector, $stylesByBp) {
         $css .= $selector . ' { ' . costered_style_string($stylesByBp['desktop']) . " }\n";
     }
     if (!empty($stylesByBp['tablet'])) {
-        // Adjust your tablet query to taste
         $css .= "@media (min-width: 783px) and (max-width: 1024px) { {$selector} { " . costered_style_string($stylesByBp['tablet']) . " } }\n";
     }
     if (!empty($stylesByBp['mobile'])) {

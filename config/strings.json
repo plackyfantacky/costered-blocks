@@ -89,12 +89,15 @@
             "title": "Tracks",
             "description": "In Tracks mode, you can define the exact track sizes using any valid CSS Grid value.",
             "columns": {
-                "label": "Columns",
-                "clear": "Clear Columns",
-                "size": "Column Sizes",
                 "addPlaceholder": "Add track or [line names]",
+                "addLabel": "Add [line name]",
                 "addToken": "Add column size",
-                "addLabel": "Add [line name]"
+                "clear": "Clear Columns",
+                "emptyState": "No columns defined",
+                "label": "Columns",
+                "mergeLeft": "Merge left",
+                "size": "Column Sizes",
+                "splitOut": "Split"
             },
             "rows": {
                 "label": "Rows",
@@ -145,11 +148,13 @@
         "panelTitle": "Grid Item Controls",
         "simplePanel": {
             "title": "Simple",
+            "columnLegend": "Columns",
             "columnStart": "Column Start",
             "columnStartHelp": "%1$d columns",
             "columnStartHelpUnknown": "Parent grid columns unknown; using a default range (1–24).",
             "columnSpan": "Column Span",
             "columnSpanHelp": "Max updates with start",
+            "rowLegend": "Rows",
             "rowStart": "Row Start",
             "rowStartHelp": "%1$d rows",
             "rowStartHelpUnknown": "Parent grid rows unknown; using a default range (1–24).",
@@ -382,5 +387,11 @@
         "copy": "Copy",
         "undo": "Undo",
         "redo": "Redo"
+    },
+    "editingContext": {
+        "unsavedChanges": "Unsaved changes",
+        "unsavedChangesForAttrs": "Unsaved changes for: %s",
+        "saveChanges": "Save Changes",
+        "discardChanges": "Discard Changes"
     }
 }

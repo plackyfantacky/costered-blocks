@@ -38,25 +38,41 @@ export function splitTopLevel(input: unknown): string[] {
     let bracket = 0;
     let buffer = '';
 
+    const pushBuffer = () => {
+        const trimmed = buffer.trim();
+        if (trimmed) {
+            output.push(trimmed);
+        }
+        buffer = '';
+    }
+
     const output: string[] = [];
     for (let i = 0; i < source.length; i++) {
         const character = source[i]!;
         
         if (character === '(') { braces++; buffer += character; continue; }
         if (character === ')') { braces = Math.max(0, braces - 1); buffer += character; continue; }
-        if (character === '[') { bracket++; buffer += character; continue; }
+        if (character === '[') { 
+            if(braces === 0 && bracket === 0 && buffer.trim()) pushBuffer();
+            bracket++; buffer += character; continue; 
+        }
         if (character === ']') { bracket = Math.max(0, bracket - 1); buffer += character; continue; }
-        
+
+        // any whitespace (not in [] or ()) at top level is a token boundary
         if (braces === 0 && bracket === 0 && /\s/.test(character)) {
-            if (buffer) {
-                output.push(buffer);
-                buffer = '';
-            }
+            if (buffer.trim()) pushBuffer();
             continue;
         }
+
+        // boundary between a closed group/func and the next top-level token
+        // e.g. "... )repeat(...", "... ][name]", "... )1fr"
+        if (braces === 0 && bracket === 0 && buffer && /[\])]/.test(buffer[buffer.length - 1]!) && /[\w.\[]/.test(character)) {
+            pushBuffer();
+        }
+
         buffer += character;
     }
-    if (buffer) output.push(buffer);
+    if (buffer) pushBuffer();
     return output;   
 }
 

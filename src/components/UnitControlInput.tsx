@@ -1,7 +1,7 @@
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import type { ComponentProps, CSSProperties } from 'react';
 
-import { maybeFormat } from "@utils/componentUtils";
+import { maybeFormat } from "@utils/common";
 
 type BaseProps = {
     label?: string;

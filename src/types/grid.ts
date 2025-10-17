@@ -21,7 +21,7 @@ export type GridModel = {
     activePane: Record<GridAxisKey, GridAxisModeKey | null>;
 };
 
-export type GridItemPanelKey = 'simple' | 'tracks';
+export type GridItemPanelKey = 'simple' | 'tracks' | 'areas';
 
 export type ColumnInfo = number | { count?: number } | undefined;
 export type RowInfo = number | { count?: number } | undefined;

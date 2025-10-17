@@ -87,6 +87,8 @@ export default function SubGridToggle({
                             help={LABELS.gridControls.subgridPanel.columns.help}
                             checked={!!subCols}
                             onChange={onToggleCols}
+                            __nextHasNoMarginBottom
+                            __next40pxDefaultSize       
                         />
                     </FlexBlock>
                     <FlexBlock>
@@ -95,6 +97,8 @@ export default function SubGridToggle({
                             help={LABELS.gridControls.subgridPanel.rows.help}
                             checked={!!subRows}
                             onChange={onToggleRows}
+                            __nextHasNoMarginBottom
+                            __next40pxDefaultSize
                         />
                     </FlexBlock>
                 </Flex>

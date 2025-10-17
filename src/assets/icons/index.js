@@ -41,6 +41,7 @@ export { default as MdiArrowLeftThin } from './mdi--arrow-left-thin.jsx';
 export { default as MdiArrowRightThin } from './mdi--arrow-right-thin.jsx';
 export { default as MdiArrowUpThin } from './mdi--arrow-up-thin.jsx';
 export { default as MdiBorderNoneVariant } from './mdi--border-none-variant.jsx';
+export { default as MdiEditOutline } from './mdi--edit-outline.jsx';
 export { default as MdiEyeOffOutline } from './mdi--eye-off-outline.jsx';
 export { default as MdiEyeOutline } from './mdi--eye-outline.jsx';
 export { default as MdiPlus } from './mdi--plus.jsx';

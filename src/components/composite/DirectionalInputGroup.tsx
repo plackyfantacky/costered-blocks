@@ -98,7 +98,7 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
                     onChange={handleChange(direction)}
                     allowReset
                     // pass through id to underlying inputs
-                    // (both UnitControlInput/TextControlInput accept an id prop in your codebase)
+                    // (both UnitControlInput/TextControlInput accept an id prop)
                     textProps={{ id }}
                     unitProps={{ id }}
                 />
@@ -135,6 +135,7 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
                     checked={mode === 'text'}
                     onChange={(checked: boolean) => setMode(checked ? 'text' : 'unit')}
                     __nextHasNoMarginBottom
+                    __next40pxDefaultSize
                 />
             </div>
         </Grid>

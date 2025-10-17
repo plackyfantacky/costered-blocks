@@ -134,6 +134,7 @@ export default function GapControls({ clientId, blockName = null }: Props) {
                     checked={unitMode === 'text'}
                     onChange={onUnitToggleMode}
                     __nextHasNoMarginBottom
+                    __next40pxDefaultSize
                 />
             </FlexBlock>
         </Flex>

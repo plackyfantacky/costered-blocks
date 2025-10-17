@@ -1,4 +1,4 @@
-import { splitTopLevel, collapseAdjacentNamedLines, normaliseTemplate } from '@utils/gridUtils';
+import { splitTopLevel, collapseAdjacentNamedLines } from '@utils/gridUtils';
 import type { TokenAtomicItem, TokenModelAdapter, PersistedTracks } from "@types";
 
 export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks> = {
@@ -37,7 +37,7 @@ export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks> = {
                 const bucket = [item.text];
                 if (groupId != null) {
                     let j = i + 1;
-                    while (j < items.length && items[j]!.kind === 'name' && items[j]!.groupId === groupId) {
+                    while (j < items.length && items[j]?.kind === 'name' && items[j]!.groupId === groupId) {
                         bucket.push(items[j]!.text);
                         j++;
                     }
@@ -52,8 +52,8 @@ export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks> = {
                 i++;
             }
         }
-        
-        return normaliseTemplate(output.join(' '));
+        const joined = output.join(' ').trim();
+        return collapseAdjacentNamedLines(joined);
     },
 
     mergeWithPrev(items, index) {

@@ -7,6 +7,8 @@ import { startViewportSync } from '@utils/viewportSync';
 
 import { BLOCKS_WITH_EDITOR_STYLES, IS_DEBUG } from "@config";
 import { LABELS } from '@labels';
+
+import { UnsavedFieldsProvider } from "@providers/UnsavedFieldsProvider";
 import { useSelectedBlockInfo } from "@hooks";
 import SidebarTabs from "@components/SidebarTabs";
 import TabIcon from '@components/TabIcon';
@@ -26,38 +28,40 @@ function SidebarBody() {
     const { selectedBlock } = useSelectedBlockInfo();
     
     return (
-        <Panel className="costered-blocks--sidebar-header">
-            <PanelBody>
-                {selectedBlock ? (
-                    <>
-                        <Flex className="costered-blocks--header-selected-block" justify="space-between" align="center">
-                            <FlexItem>
-                                {LABELS.pluginSidebar.selectedBlock}:
-                            </FlexItem>
-                            <FlexItem>
-                                <Flex align="center" gap={0.5}>
-                                    <TabIcon name={selectedBlock.name} size={24} />
-                                    <strong>{selectedBlock.name}</strong>
-                                </Flex>
-                            </FlexItem>
-                        </Flex>
-                        {BLOCKS_WITH_EDITOR_STYLES.includes(selectedBlock.name) && (
-                            <CustomNotice 
-                                type="info"
-                                title={LABELS.pluginSidebar.blockWarningSummary}
-                                content={LABELS.pluginSidebar.blockWarningDetails}
-                                className="costered-blocks--block-difference-warning"
-                            />
-                        )}
-                    </>
-                ) : (
-                    <Notice status="info" isDismissible={false}>
-                        {LABELS.pluginSidebar.noBlockSelected}
-                    </Notice>
-                )}
-            </PanelBody>
-            {selectedBlock ? <SidebarTabs className="costered-blocks--sidebar-body" /> : null}
-        </Panel>
+        <UnsavedFieldsProvider>
+            <Panel className="costered-blocks--sidebar-header">
+                <PanelBody>
+                    {selectedBlock ? (
+                        <>
+                            <Flex className="costered-blocks--header-selected-block" justify="space-between" align="center">
+                                <FlexItem>
+                                    {LABELS.pluginSidebar.selectedBlock}:
+                                </FlexItem>
+                                <FlexItem>
+                                    <Flex align="center" gap={0.5}>
+                                        <TabIcon name={selectedBlock.name} size={24} />
+                                        <strong>{selectedBlock.name}</strong>
+                                    </Flex>
+                                </FlexItem>
+                            </Flex>
+                            {BLOCKS_WITH_EDITOR_STYLES.includes(selectedBlock.name) && (
+                                <CustomNotice 
+                                    type="info"
+                                    title={LABELS.pluginSidebar.blockWarningSummary}
+                                    content={LABELS.pluginSidebar.blockWarningDetails}
+                                    className="costered-blocks--block-difference-warning"
+                                />
+                            )}
+                        </>
+                    ) : (
+                        <Notice status="info" isDismissible={false}>
+                            {LABELS.pluginSidebar.noBlockSelected}
+                        </Notice>
+                    )}
+                </PanelBody>
+                {selectedBlock ? <SidebarTabs className="costered-blocks--sidebar-body" /> : null}
+            </Panel>
+        </UnsavedFieldsProvider>
     );
 };
 

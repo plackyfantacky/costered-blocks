@@ -22,60 +22,48 @@
     }
     
     .costered-blocks--sidebar-body {
-        .costered-blocks--tab-panel-outer {
-            .costered-blocks--tab--display-controls {
-                .costered-blocks--display-controls--inner {
-                    margin-bottom: 1rem;
-                }
+        
+        .costered-blocks--tab--display-controls {
+            .costered-blocks--display-controls--inner {
+                margin-bottom: 1rem;
             }
-
-            /* .costered-blocks--tab--flexbox-controls {
-                .costered-blocks--flexbox-controls--inner {}
-                .costered-blocks--flexbox-controls--alignment {}
-                .costered-blocks--flexbox-controls--gap {}
-            } */
-
-            /* .costered-blocks--tab--dimensions-controls {} */
-
-            /* .costered-blocks--tab--flexitem-controls {
-                .costered-blocks--flexitem-controls--inner {}
-                .costered-blocks--flexitem-controls--order {}
-                .costered-blocks--flexitem-controls--alignself {}
-            } */
-
-            /* .costered-blocks--tab--grid-controls {
-                .costered-blocks--grid-controls--template-axis {}
-                .costered-blocks--grid-controls--gap {}
-                .costered-blocks--grid-controls--template-areas {}
-                .costered-blocks--grid-control--modal {}
-            } */
-
-            /* .costered-blocks--griditem-controls-tab {
-                .costered-blocks--griditem-controls--inner {}
-                .costered-blocks--griditem-controls-alignment {
-                    .costered-blocks--griditem-controls-alignment-flex {
-                        .costered-blocks--griditem-controls--justifyself {}
-                        .costered-blocks--griditem-controls--alignself {}  
-                    }
-                .costered-blocks--griditem-controls-order {}  
-            } */
-
-            /* .costered-blocks--spacing-controls-tab {
-                .costered-blocks--spacing-controls-inner {
-                    .costered-blocks--spacing-controls-margin {}
-                    .costered-blocks--spacing-controls-padding {}
-                }
-            } */
         }
     }
 }
 
 /* Common UI elements */
 
+.costered-blocks--unsaved-dot {
+    background-color: var(--wp-admin-theme-color, #3858e9);
+    border-radius: 50%; 
+    display: inline-block;
+    height: 0.5rem;
+    margin-left: 0.25rem;
+    width: 0.5rem;
+}
+
+.costered-blocks--unsaved-icon {
+    color: var(--wp-admin-theme-color, #3858e9);
+    display: inline-block;
+    fill: var(--wp-admin-theme-color, #3858e9);
+    height: 1rem;
+    margin-left: 0.25rem;
+    vertical-align: middle;
+    width: 1rem;
+}
+
 fieldset.costered-blocks--fieldset {
-    padding:0.5rem;
     border:1px solid #DCDCDE;
     border-radius:4px;
+    padding:0.5rem;
+    position:relative;
+
+    .costered-blocks--unsaved-icon,
+    .costered-blocks--unsaved-dot {
+        position: absolute;
+        top: 0rem;
+        right: 0.5rem;
+    }    
 }
 
 /* Custom Select Control */

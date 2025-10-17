@@ -1,7 +1,7 @@
 import { TextControl } from '@wordpress/components';
 import type { CSSProperties } from 'react';
 
-import { maybeFormat } from "@utils/componentUtils";
+import { maybeFormat } from "@utils/common";
 
 type Props = {
     id?: string | null;

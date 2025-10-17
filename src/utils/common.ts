@@ -1,6 +1,22 @@
-// src/utils/componentUtils.ts
+/** value must already be a string with no whitespace. */
+export function isNonEmptyString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0;
+}
 
-export type FormatOptions = {
+/**
+ * turn unknown into a trimmed string, or null when empty/meaningless.
+ * filters out '', 'undefined', 'null' (case-insensitive), but preserves '0'.
+ */
+export function asNonEmptyString(value: unknown): string | null {
+    if (value === undefined || value === null) return null;
+    const str = String(value).trim();
+    if (!str) return null;
+    const lower = str.toLowerCase();
+    if (lower === 'undefined' || lower === 'null') return null;
+    return str;
+}
+
+type FormatOptions = {
     trim?: boolean;
     toLower?: boolean;
     toUpper?: boolean;
@@ -11,7 +27,10 @@ export type FormatOptions = {
     toSpaces?: boolean;
 }
 
-export function maybeFormat(input: unknown = '', formatting: FormatOptions = {}): string {
+export function maybeFormat(
+    input: unknown = '',
+    formatting: FormatOptions = {}
+): string {
     const {
         trim = true,
         toLower = false,

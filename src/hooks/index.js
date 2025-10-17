@@ -10,3 +10,4 @@ export { useParentGridMeta } from "@hooks/useParentGridMeta";
 export { useSafeBlockName } from "@hooks/useSafeBlockName";
 export { useSelectedBlockInfo } from "@hooks/useSelectedBlockInfo";
 export { useUIPreferences, useScopedKey } from "@hooks/useUIPreferences";
+export { useUnsavedFields, useUnsavedAttr, useUnsavedAttrs, useUnsavedBySource } from "@hooks/useUnsavedFields";

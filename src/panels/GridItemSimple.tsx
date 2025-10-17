@@ -92,70 +92,76 @@ export function GridItemSimple({ clientId }: Props) {
 
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-simple--panel">
-            <FlexBlock className={'costered-blocks-grid-item-simple-controls--columns'}>
-                <Flex direction="column" gap={2}>
-                    <RangeControl
-                        label={LABELS.gridItemsControls.simplePanel.columnStart}
-                        value={displayStartCol}
-                        onChange={handleColumnStartChange}
-                        min={1}
-                        max={effectiveCols}
-                        step={1}
-                        disabled={disabledSimple}
-                        help={
-                            hasCols
-                                ? sprintf(LABELS.gridItemsControls.simplePanel.columnStartHelp, columns as number)
-                                : LABELS.gridItemsControls.simplePanel.columnStartHelpUnknown
-                        }
-                        __next40pxDefaultSize
-                        __nextHasNoMarginBottom
-                    />
-                    <RangeControl
-                        label={LABELS.gridItemsControls.simplePanel.columnSpan}
-                        value={displaySpanCol}
-                        onChange={handleColumnSpanChange}
-                        min={1}
-                        max={colSpanCap}
-                        step={1}
-                        disabled={disabledSimple}
-                        help={LABELS.gridItemsControls.simplePanel.columnSpanHelp}
-                        __next40pxDefaultSize
-                        __nextHasNoMarginBottom
-                    />
-                </Flex>
-            </FlexBlock>
-            <FlexBlock className={'costered-blocks-grid-item-simple-controls--rows'}>
-                <Flex direction="column" gap={2}>
-                    <RangeControl
-                        label={LABELS.gridItemsControls.simplePanel.rowStart}
-                        value={displayStartRow}
-                        onChange={handleRowStartChange}
-                        min={1}
-                        max={effectiveRows}
-                        step={1}
-                        disabled={disabledSimple}
-                        help={
-                            hasRows
-                                ? sprintf(LABELS.gridItemsControls.simplePanel.rowStartHelp, rows as number)
-                                : LABELS.gridItemsControls.simplePanel.rowStartHelpUnknown
-                        }
-                        __next40pxDefaultSize
-                        __nextHasNoMarginBottom
-                    />
-                    <RangeControl
-                        label={LABELS.gridItemsControls.simplePanel.rowSpan}
-                        value={displaySpanRow}
-                        onChange={handleRowSpanChange}
-                        min={1}
-                        max={rowSpanCap}
-                        step={1}
-                        disabled={disabledSimple}
-                        help={LABELS.gridItemsControls.simplePanel.rowSpanHelp}
-                        __next40pxDefaultSize
-                        __nextHasNoMarginBottom
-                    />
-                </Flex>
-            </FlexBlock>
+            <fieldset className="costered-blocks--fieldset costered-blocks-grid-item-simple--controls">
+                <legend>{LABELS.gridItemsControls.simplePanel.columnLegend}</legend>
+                <FlexBlock className={'costered-blocks-grid-item-simple-controls--columns-inner'}>
+                    <Flex direction="column" gap={4}>
+                        <RangeControl
+                            label={LABELS.gridItemsControls.simplePanel.columnStart}
+                            value={displayStartCol}
+                            onChange={handleColumnStartChange}
+                            min={1}
+                            max={effectiveCols}
+                            step={1}
+                            disabled={disabledSimple}
+                            help={
+                                hasCols
+                                    ? sprintf(LABELS.gridItemsControls.simplePanel.columnStartHelp, columns as number)
+                                    : LABELS.gridItemsControls.simplePanel.columnStartHelpUnknown
+                            }
+                            __next40pxDefaultSize
+                            __nextHasNoMarginBottom
+                        />
+                        <RangeControl
+                            label={LABELS.gridItemsControls.simplePanel.columnSpan}
+                            value={displaySpanCol}
+                            onChange={handleColumnSpanChange}
+                            min={1}
+                            max={colSpanCap}
+                            step={1}
+                            disabled={disabledSimple}
+                            help={LABELS.gridItemsControls.simplePanel.columnSpanHelp}
+                            __next40pxDefaultSize
+                            __nextHasNoMarginBottom
+                        />
+                    </Flex>
+                </FlexBlock>
+            </fieldset>
+            <fieldset className="costered-blocks--fieldset costered-blocks-grid-item-simple--controls">
+                <legend>{LABELS.gridItemsControls.simplePanel.rowLegend}</legend>
+                <FlexBlock className={'costered-blocks-grid-item-simple-controls--rows'}>
+                    <Flex direction="column" gap={4}>
+                            <RangeControl
+                                label={LABELS.gridItemsControls.simplePanel.rowStart}
+                                value={displayStartRow}
+                            onChange={handleRowStartChange}
+                            min={1}
+                            max={effectiveRows}
+                            step={1}
+                            disabled={disabledSimple}
+                            help={
+                                hasRows
+                                    ? sprintf(LABELS.gridItemsControls.simplePanel.rowStartHelp, rows as number)
+                                    : LABELS.gridItemsControls.simplePanel.rowStartHelpUnknown
+                            }
+                            __next40pxDefaultSize
+                            __nextHasNoMarginBottom
+                        />
+                        <RangeControl
+                            label={LABELS.gridItemsControls.simplePanel.rowSpan}
+                            value={displaySpanRow}
+                            onChange={handleRowSpanChange}
+                            min={1}
+                            max={rowSpanCap}
+                            step={1}
+                            disabled={disabledSimple}
+                            help={LABELS.gridItemsControls.simplePanel.rowSpanHelp}
+                            __next40pxDefaultSize
+                            __nextHasNoMarginBottom
+                        />
+                    </Flex>
+                </FlexBlock>
+            </fieldset>
         </Flex>
     );
 }

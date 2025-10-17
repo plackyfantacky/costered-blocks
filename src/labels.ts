@@ -37,8 +37,6 @@ function translateDeep<Token extends JsonValue>(value: Token): Token {
 export const LABELS: Labels = translateDeep(strings as Labels);
 
 /**
- * Optional helpers (use only if handy in your codebase):
- *
  * getLabel('pluginSidebar.title') – retrieves a translated value via path.
  * t('pluginSidebar.title', 'Costered Blocks') – translate by path with fallback.
  */
@@ -62,4 +60,10 @@ export function t(path: string, fallback?: string): string {
     
     const base = typeof raw === 'string' ? raw : (fallback ?? path);
     return __(base, TEXT_DOMAIN);
+}
+
+// label scope helper
+export const scoped = (labelScope: string) => (key: string, fallback?: string) => {
+    const path = `${labelScope}.${key}`;
+    return t(path, fallback);
 }

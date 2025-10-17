@@ -58,3 +58,7 @@
     align-items: unset;
     justify-content: unset;
 }
+
+.components-range-control {
+    padding-left: 6px; /* offset the width of the dot */
+}

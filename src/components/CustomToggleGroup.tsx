@@ -31,18 +31,11 @@ export interface IconOptionProps {
     disabled?: boolean;
 }
 
-export interface CombinedOptionProps {
-    value: ToggleValue;
-    icon: React.ReactNode;
-    label: string;
-    disabled?: boolean;
-}
-
 export interface CompositeOptionProps {
     value: ToggleValue;
     children: React.ReactNode;
-    label: string;
     disabled?: boolean;
+    className?: string;
 }
 
 function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, children, ...rest }: CustomToggleGroupProps) {
@@ -90,30 +83,15 @@ function IconOption({ value, icon, label, showTooltip = true, disabled }: IconOp
     );
 }
 
-function CombinedOption({ value, icon, label, disabled }: CombinedOptionProps) {
+/**
+ * convert <CompositeOption className={classname} value={value} disabled>{children}</CompositeOption> to <ToggleGroupControlOption className={classname} value={value} label={children} disabled={disabled} />
+ */
+function CompositeOption({ children, value, disabled, className = '' }: CompositeOptionProps) {
     return (
         <ToggleGroupControlOption
-            className={`costered-blocks--custom-toggle-group--combined-option`}
+            className={`costered-blocks--custom-toggle-group--item ${className}`}
             value={value}
-            aria-label={label}
-            label={
-                <Flex direction="column" gap={0} align="center" style={{ paddingBlock: '0.5em' }}>
-                    <FlexItem>{icon}</FlexItem>
-                    <FlexItem>{label}</FlexItem>
-                </Flex>
-            }
-            disabled={disabled}
-        />
-    );
-}
-
-function CompositeOption({ value, children, label, disabled }: CompositeOptionProps) {
-    return (
-        <ToggleGroupControlOption
-            className={`costered-blocks--custom-toggle-group--composite-option`}
-            value={value}
-            aria-label={label}
-            label={children} // label accepts React nodes.
+            label={children} // children can be string or ReactNode (apparently)
             disabled={disabled}
         />
     );
@@ -123,14 +101,12 @@ type CustomToggleGroupCompound =
     React.MemoExoticComponent<React.FC<CustomToggleGroupProps>> & {
         TextOption: React.FC<TextOptionProps>;
         IconOption: React.FC<IconOptionProps>;
-        CombinedOption: React.FC<CombinedOptionProps>;
         CompositeOption: React.FC<CompositeOptionProps>;
     };
 
 const CustomToggleGroup = memo(CustomToggleGroupBase) as CustomToggleGroupCompound;
 CustomToggleGroup.TextOption = TextOption;
 CustomToggleGroup.IconOption = IconOption;
-CustomToggleGroup.CombinedOption = CombinedOption;
 CustomToggleGroup.CompositeOption = CompositeOption;
 
 export default CustomToggleGroup;

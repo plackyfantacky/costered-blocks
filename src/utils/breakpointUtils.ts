@@ -1,7 +1,6 @@
 // src/utils/breakpointUtils.ts
 
 import { ensureShape, isUnsetLike } from '@utils/attributeUtils';
-import { getStylesForBreakpoint } from '@utils/costeredStyles';
 import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, StyleMap } from '@types';
 
 const BP_DESKTOP: Breakpoint = 'desktop';

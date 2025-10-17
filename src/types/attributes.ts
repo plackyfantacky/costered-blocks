@@ -18,3 +18,9 @@ export type AugmentedAttributes = BlockAttributes & {
     $getMany: (keys: ReadonlyArray<string>, options?: CascadeOptions) => Record<string, CSSPrimitive | undefined>;
     $bp: Breakpoint;
 };
+
+export type UnsavedAttr = {
+    attr: string;
+    id: string;
+    source?: string;
+}

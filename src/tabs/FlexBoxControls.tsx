@@ -93,9 +93,27 @@ const FlexBoxControls = () => {
                             value={flexWrap}
                             onChange={setFlexWrap}
                         >
-                            <CustomToggleGroup.CombinedOption value="nowrap" icon={<FlexWrapNone />} label={LABELS.flexBoxControls.flexWrapNone} />
-                            <CustomToggleGroup.CombinedOption value="wrap" icon={<FlexWrapWrap />} label={LABELS.flexBoxControls.flexWrapWrap} />
-                            <CustomToggleGroup.CombinedOption value="wrap-reverse" icon={<FlexWrapReverse />} label={LABELS.flexBoxControls.flexWrapReverse} />
+                            <CustomToggleGroup.CompositeOption value="nowrap">
+                                <Flex direction="column" gap={0} align="center" style={{ paddingBlock: '0.5em' }}>
+                                    <FlexItem><FlexWrapNone /></FlexItem>
+                                    <FlexItem>{LABELS.flexBoxControls.flexWrapNone}</FlexItem>
+                                </Flex>
+                            </CustomToggleGroup.CompositeOption>
+
+                            <CustomToggleGroup.CompositeOption value="wrap">
+                                <Flex direction="column" gap={0} align="center" style={{ paddingBlock: '0.5em' }}>
+                                    <FlexItem><FlexWrapWrap /></FlexItem>
+                                    <FlexItem>{LABELS.flexBoxControls.flexWrapWrap}</FlexItem>
+                                </Flex>
+                            </CustomToggleGroup.CompositeOption>
+
+                            <CustomToggleGroup.CompositeOption value="wrap-reverse">
+                                <Flex direction="column" gap={0} align="center" style={{ paddingBlock: '0.5em' }}>
+                                    <FlexItem><FlexWrapReverse /></FlexItem>
+                                    <FlexItem>{LABELS.flexBoxControls.flexWrapReverse}</FlexItem>
+                                </Flex>
+                            </CustomToggleGroup.CompositeOption>
+                            
                         </CustomToggleGroup>
                     </FlexItem>
                     <FlexItem>
