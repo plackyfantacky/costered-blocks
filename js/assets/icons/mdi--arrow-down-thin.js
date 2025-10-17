@@ -1,1 +1,0 @@
-(()=>{var l=({size:t=24,...h})=>wp.element.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:t,height:t,...h},wp.element.createElement("path",{fill:"currentColor",d:"M7.03 13.92h4V5l2.01-.03v8.95h3.99l-5 5Z"})),o=l;})();

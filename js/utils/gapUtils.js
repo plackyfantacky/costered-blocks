@@ -1,1 +1,0 @@
-(()=>{var o=n=>n==null?"":String(n).trim(),s=(n="")=>{let t=o(n).split(/\s+(?![^(]*\))/).filter(Boolean).slice(0,2);return t.length===2?[t[0],t[1]]:[t[0]]},i=(n="",t="")=>{let r=o(n),e=o(t);return[r,e].filter(Boolean).join(" ").trim()};})();
