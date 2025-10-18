@@ -59,7 +59,8 @@ export function isZeroToken(value: unknown): boolean {
 }
 
 /** 
- * Returns { start, span } from shorthand like "2 / span 3" or "auto / 4" or "5". 
+ * Returns { start, span } from shorthand like "2 / span 3" or "auto / 4" or "5".
+ * Supports negative spans ("span -3") for backwards placement.
  */
 export const parsePlacementSimple = (input: unknown): { start: number, span: number } => {
     const value = String(input ?? '').trim();
@@ -68,12 +69,19 @@ export const parsePlacementSimple = (input: unknown): { start: number, span: num
     const parts = value.split('/').map((part) => part.trim());
     if (parts.length === 1) {
         // e.g. "2"
-        return { start: toInt(parts[0], 1), span: 1 /* parts[0] !== 'auto' ? 1 : 1; //this part doesn't make sense */ };
+        return { start: toInt(parts[0], 1), span: 1 };
     }
+
     const left = parts[0]!;
     const right = parts[1]!;
-    const m = /^span\s+(\d+)$/i.exec(right);
-    return { start: left === 'auto' ? 1 : toInt(left, 1), span: m ? toInt(m[1], 1) : 1 };
+    
+    // Allow both positive and negative spans
+    const match = /^span\s+(-?\d+)$/i.exec(right);
+
+    return {
+        start: left === 'auto' ? 1 : toInt(left, 1),
+        span: match ? toInt(match[1], 1) : 1
+    };
 }
 
 /*

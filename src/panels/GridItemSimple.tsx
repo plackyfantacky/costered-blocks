@@ -1,8 +1,8 @@
 import { sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { Flex, FlexBlock, RangeControl } from '@wordpress/components';
 
-import NumberControlInput from '@components/NumberControlInput';
+
 import { LABELS } from "@labels";
 
 import { useAttrGetter, useAttrSetter, useParentGridMeta } from '@hooks';
@@ -13,6 +13,30 @@ type Props = {
 };
 
 const VIRTUAL_TRACKS = 24; // a sane amount
+
+/**
+ * Handle span changes, skipping 0 while allowing positive and negative integers.
+ * If the user reaches 0, we nudge them to 1 or -1 depending on direction.
+ */
+function handleSpanChangeSkippingZero(
+    next: number | undefined,
+    lastRef: { current: number },
+    cap: number,
+    save: (span: number) => void
+) {
+    let span = toInt(next, 1);
+    const last = lastRef.current;
+
+    if (span === 0) {
+        // Nudge away from zero
+        span = last > 0 ? -1 : 1;
+    }
+
+    span = clamp(span, -cap, cap);
+    lastRef.current = span;
+    save(span);
+}
+
 
 export function GridItemSimple({ clientId }: Props) {
     if (!clientId) return null;
@@ -52,9 +76,14 @@ export function GridItemSimple({ clientId }: Props) {
 
     // 4) Display-safe values so RangeControl always initialises
     const displayStartCol = clamp(startCol, 1, effectiveCols);
-    const displaySpanCol = clamp(spanCol, 1, colSpanCap);
     const displayStartRow = clamp(startRow, 1, effectiveRows);
-    const displaySpanRow = clamp(spanRow, 1, rowSpanCap);
+
+    // 4a) Refs to track last span values for skipping zero
+    const displaySpanCol = spanCol === 0 ? 1 : clamp(spanCol, -colSpanCap, colSpanCap);
+    const displaySpanRow = spanRow === 0 ? 1 : clamp(spanRow, -rowSpanCap, rowSpanCap);
+
+    const lastSpanColRef = useRef<number>(displaySpanCol);
+    const lastSpanRowRef = useRef<number>(displaySpanRow);
 
     // 5) Shorthand saves only
     const saveColumn = (start: number, span: number) => 
@@ -70,11 +99,6 @@ export function GridItemSimple({ clientId }: Props) {
         saveColumn(start, span);
     };
 
-    const handleColumnSpanChange = (next?: number) => {
-        const span = clamp(toInt(next, 1), 1, colSpanCap);
-        saveColumn(displayStartCol, span);
-    };
-
     const handleRowStartChange = (next?: number) => {
         const start = clamp(toInt(next, 1), 1, effectiveRows);
         const cap = Math.max(1, effectiveRows - start + 1);
@@ -82,9 +106,16 @@ export function GridItemSimple({ clientId }: Props) {
         saveRow(start, span);
     };
 
+    const handleColumnSpanChange = (next?: number) => {
+        handleSpanChangeSkippingZero(next, lastSpanColRef, colSpanCap, (span) => 
+            saveColumn(displayStartCol, span)
+        );
+    };
+
     const handleRowSpanChange = (next?: number) => {
-        const span = clamp(toInt(next, 1), 1, rowSpanCap);
-        saveRow(displayStartRow, span);
+        handleSpanChangeSkippingZero(next, lastSpanRowRef, rowSpanCap, (span) => 
+            saveRow(displayStartRow, span)
+        );
     };
 
     // disable if using grid-area
@@ -116,7 +147,7 @@ export function GridItemSimple({ clientId }: Props) {
                             label={LABELS.gridItemsControls.simplePanel.columnSpan}
                             value={displaySpanCol}
                             onChange={handleColumnSpanChange}
-                            min={1}
+                            min={-colSpanCap}
                             max={colSpanCap}
                             step={1}
                             disabled={disabledSimple}
@@ -151,7 +182,7 @@ export function GridItemSimple({ clientId }: Props) {
                             label={LABELS.gridItemsControls.simplePanel.rowSpan}
                             value={displaySpanRow}
                             onChange={handleRowSpanChange}
-                            min={1}
+                            min={-rowSpanCap}
                             max={rowSpanCap}
                             step={1}
                             disabled={disabledSimple}

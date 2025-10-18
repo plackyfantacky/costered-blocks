@@ -144,15 +144,52 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
 
     // grid shorthands
     const area = String(read(GRID_AREA_ATTR) ?? '').trim();
-    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { style[GRID_AREA_ATTR] = area; any = true; }
+    if (area && !area.includes('/') && !/\bspan\b/i.test(area)) { 
+        style[GRID_AREA_ATTR] = area; 
+        any = true; 
+    }
 
     //grid column
     const col = String(read(GRID_COLUMN_ATTR) ?? '').trim();
-    if (col) { style[GRID_COLUMN_ATTR] = col; any = true; }
+    if (col) {     
+        // handle "X / span -N" → "X - N / X"
+        const match = col.match(/^(\d+)\s*\/\s*span\s*(-?\d+)$/i);
+        if (match) {
+            const start = parseInt(match[1]!, 10);
+            const span = parseInt(match[2]!, 10);
+            if (span < 0) {
+                const end = start;
+                const newStart = start + span; // move backwards
+                style[GRID_COLUMN_ATTR] = `${newStart} / ${end}`;
+            } else {
+                style[GRID_COLUMN_ATTR] = col;
+            }
+        } else {
+            style[GRID_COLUMN_ATTR] = col;
+        }
+        any = true; 
+    }
 
     //grid row
     const row = String(read(GRID_ROW_ATTR) ?? '').trim();
-    if (row) { style[GRID_ROW_ATTR] = row; any = true; }
+    if (row) { 
+        // handle "X / span -N" → "X - N / X"
+        const match = row.match(/^(\d+)\s*\/\s*span\s*(-?\d+)$/i);
+        if (match) {
+            const start = parseInt(match[1]!, 10);
+            const span = parseInt(match[2]!, 10);
+            if (span < 0) {
+                const end = start;
+                const newStart = start + span; // move backwards
+                style[GRID_ROW_ATTR] = `${newStart} / ${end}`;
+            } else {
+                style[GRID_ROW_ATTR] = row;
+            }
+        } else {
+            style[GRID_ROW_ATTR] = row;
+        }
+        any = true; 
+    }
 
     // All other mirrored style keys (skip margins and grid shorthands already handled)
     for (const key of Array.from(MIRRORED_STYLE_KEYS)) {
