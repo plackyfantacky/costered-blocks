@@ -37,8 +37,8 @@ export default function NumberControlInput({
     clamp = true,
     ...rest
 }: NumberControlInputProps) {
-    const formattedLabel = maybeFormat(label as string, { toDashes: true, toSpaces: false }) || undefined;
-    const formattedHelp = maybeFormat(help as string, { toDashes: true, toSpaces: false }) || undefined;
+    const formattedLabel = maybeFormat(label as string, { toDashes: false, toSpaces: false }) || undefined;
+    const formattedHelp = maybeFormat(help as string, { toDashes: false, toSpaces: false }) || undefined;
 
     const displayValue: string | number | undefined =  value === '' ? '' : value;
 

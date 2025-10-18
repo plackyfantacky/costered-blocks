@@ -1,5 +1,5 @@
 import { useCallback } from '@wordpress/element';
-import { Notice, Flex, FlexItem, FlexBlock } from '@wordpress/components';
+import { Notice, Flex, FlexBlock } from '@wordpress/components';
 
 import { LABELS } from '@labels';
 import {
@@ -172,9 +172,9 @@ export function GridItemTracks({
                 </Notice>
             )}
             {/* Columns placement */}
-            <fieldset className="costered-blocks-grid-item-tracks-controls--columns">
-                <legend className="components-base-control__label">{LABELS.gridItemsControls.tracksPanel.columns.legend}</legend>
-                <FlexBlock className={'costered-blocks-grid-item-tracks-controls--column-placement'}>
+            <fieldset className="costered-blocks--fieldset costered-blocks--griditems-tracks-controls--columns">
+                <legend>{LABELS.gridItemsControls.tracksPanel.columns.legend}</legend>
+                <FlexBlock className={'costered-blocks--griditems-tracks-controls--column-placement'}>
                     <Flex direction="column" gap={4}>
                         {ctrl.column.named.hasLines && (
                             <FlexBlock>

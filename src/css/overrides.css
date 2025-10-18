@@ -60,5 +60,7 @@
 }
 
 .components-range-control {
-    padding-left: 6px; /* offset the width of the dot */
+    .components-range-control__root {
+        padding-left: 6px; /* offset the width of the dot */
+    }
 }

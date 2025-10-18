@@ -1,5 +1,6 @@
 export { default as AlignSelfBaseline } from './AlignSelfBaseline.jsx';
 export { default as AlignSelfStretch } from './AlignSelfStretch.jsx';
+export { default as BxCopy } from './bx--copy.jsx';
 export { default as EntypoAlignBottom } from './entypo--align-bottom.jsx';
 export { default as EntypoAlignLeft } from './entypo--align-left.jsx';
 export { default as EntypoAlignRight } from './entypo--align-right.jsx';

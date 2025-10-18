@@ -1,8 +1,9 @@
+import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { TextControl, Button, Tooltip, Popover } from '@wordpress/components';
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 
 import { LABELS } from '@labels';
+import { BxCopy } from "@assets/icons";
 
 type Labels = Partial<{
     expand: string;
@@ -10,6 +11,7 @@ type Labels = Partial<{
     remove: string;
     moveLeft: string;
     moveRight: string;
+    duplicate: string;
 }>;
 
 type Props = {
@@ -21,7 +23,9 @@ type Props = {
     onChange: (index: number, nextValue: string) => void;
     onMoveLeft: (index: number) => void;
     onMoveRight: (index: number) => void;
+    onDuplicate: (index: number) => void;
     labels?: Labels;
+    typeClass?: string | null;
     emptyPlaceholder?: string;
     floatingEditor?: boolean;
     popoverPlacement?: 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end';
@@ -37,7 +41,9 @@ export default function Token({
     onChange,
     onMoveLeft,
     onMoveRight,
+    onDuplicate,
     labels,
+    typeClass = null,
     emptyPlaceholder,
     floatingEditor = false,
     popoverPlacement = 'bottom-start',
@@ -80,6 +86,7 @@ export default function Token({
         remove: LABELS.token.remove,
         moveLeft: LABELS.token.moveLeft,
         moveRight: LABELS.token.moveRight,
+        duplicate: LABELS.token.duplicate,
         ...labels,
     } as Required<Labels>;
 
@@ -110,9 +117,15 @@ export default function Token({
         }
     }, [openFromKeyboard, index, isExpanded, onToggle]);
 
+    const tokenTypeClass = (typeClass !== null && typeClass !== undefined) ? `costered-blocks--token--type-${typeClass}` : '';
+    
+    const tokenChipClassnames = ['costered-blocks--token ', isExpanded ? 'is-expanded ' : '', tokenTypeClass].join('').trimEnd();
+    const tokenEditorClassnames = ['costered-blocks--token--panel ', 'costered-blocks--token--panel-inline ', tokenTypeClass].join('').trimEnd();
+
     const EditorPanel = (
-        <div id={`costered-blocks--token--panel-${index}`} className="costered-blocks--token--panel">
+        <div id={`costered-blocks--token--panel-${index}`} className={tokenEditorClassnames}>
             <TextControl
+                className="costered-blocks--token-editor--edit-input"
                 ref={setInputRef}
                 value={value ?? ''}
                 placeholder={emptyPlaceholder ?? ''}
@@ -139,26 +152,32 @@ export default function Token({
                         variant="tertiary"
                     />
                 </Tooltip>
+                <Tooltip text={labelData.duplicate}>
+                    <Button
+                        icon={<BxCopy />}
+                        onClick={() => onDuplicate(index)}
+                        label={labelData.duplicate}
+                        variant="tertiary"
+                    />
+                </Tooltip>
             </div>
         </div>
     );
 
-
-
     return (
-        <div className={`costered-blocks--token ${isExpanded ? 'is-expanded' : ''}`}>
+        <div className={tokenChipClassnames}>
             {/* collapsed “chip” header */}
             <div className="costered-blocks--token--chip" ref={chipRef}>
                 <button
                     type="button"
-                    className="costered-blocks--token--chipButton"
+                    className="costered-blocks--token--chip-button"
                     aria-expanded={isExpanded}
                     aria-controls={`costered-blocks--token--panel-${index}`}
                     onClick={openFromPointer}
                     onKeyDown={handleChipKeyDown}
                     title={isExpanded ? labelData.collapse : labelData.expand}
                 >
-                    <span className="costered-blocks--token--chipText">{chipText}</span>
+                    <span className="costered-blocks--token--chip-text">{chipText}</span>
                 </button>
 
                 <Tooltip text={labelData.remove}>
@@ -186,7 +205,7 @@ export default function Token({
                     expandOnMobile
                 >
                     <div
-                        className="costered-blocks--token--popoverInner"
+                        className="costered-blocks--token--popover-inner"
                         style={popoverWidth ? { width: popoverWidth } : undefined}
                     >
                         {EditorPanel}

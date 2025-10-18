@@ -333,7 +333,9 @@
         "collapse": "Close editor",
         "remove": "Remove",
         "moveLeft": "Move left",
-        "moveRight": "Move right"
+        "moveRight": "Move right",
+        "duplicate": "Duplicate"
+
     },
     "tokenGrid": {
         "title": "Cells",
@@ -356,6 +358,7 @@
         "listAriaLabel": "List of tokens",
         "moveLeft": "Move left",
         "moveRight": "Move right",
+        "duplicate": "Duplicate",
         "remove": "Remove",
         "expand": "Edit token",
         "collapse": "Close editor"

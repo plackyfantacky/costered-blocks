@@ -122,10 +122,10 @@ export function GridItemSimple({ clientId }: Props) {
     const disabledSimple = hasArea;
 
     return (
-        <Flex direction="column" gap={4} className="costered-blocks-grid-item-simple--panel">
-            <fieldset className="costered-blocks--fieldset costered-blocks-grid-item-simple--controls">
+        <Flex direction="column" gap={4} className="costered-blocks--griditems-simple--panel">
+            <fieldset className="costered-blocks--fieldset costered-blocks--griditems-simple--column-controls">
                 <legend>{LABELS.gridItemsControls.simplePanel.columnLegend}</legend>
-                <FlexBlock className={'costered-blocks-grid-item-simple-controls--columns-inner'}>
+                <FlexBlock className={'costered-blocks--griditems-simple--column-controls-inner'}>
                     <Flex direction="column" gap={4}>
                         <RangeControl
                             label={LABELS.gridItemsControls.simplePanel.columnStart}
@@ -158,9 +158,9 @@ export function GridItemSimple({ clientId }: Props) {
                     </Flex>
                 </FlexBlock>
             </fieldset>
-            <fieldset className="costered-blocks--fieldset costered-blocks-grid-item-simple--controls">
+            <fieldset className="costered-blocks--fieldset costered-blocks--griditems-simple--controls">
                 <legend>{LABELS.gridItemsControls.simplePanel.rowLegend}</legend>
-                <FlexBlock className={'costered-blocks-grid-item-simple-controls--rows'}>
+                <FlexBlock className={'costered-blocks--griditems-simple--controls-inner'}>
                     <Flex direction="column" gap={4}>
                             <RangeControl
                                 label={LABELS.gridItemsControls.simplePanel.rowStart}

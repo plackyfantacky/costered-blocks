@@ -346,32 +346,42 @@ fieldset.costered-blocks--fieldset {
     flex-direction: column;
     gap: 0.5rem;
 
+    .costered-blocks--token-editor--controls {
+        .costered-blocks--token-editor--add {
+            display: flex;
+            /* flex-direction:column; */
+            flex-wrap: nowrap;
+            gap: 0.25rem;
+            align-items: center;
+
+            .costered-blocks--token-editor--add-input {
+                flex: 2;
+                margin-bottom: 0 !important; /* override wp */
+            }
+
+            .costered-blocks--token-editor--add-options {
+                align-items: center;
+                display: flex;
+                flex: 1;
+                gap: 0.25rem;
+            }
+        }
+    }
+
+
     .costered-blocks--token-editor--list {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 0.25rem;
-    }
 
-    .costered-blocks--token-editor--add {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-        align-items: center;
-
-        .costered-blocks--token-editor--add-input {
-            flex: 1;
-            margin-bottom: 0 !important; /* override wp */
-            width:100%;
+        .costered-blocks--token--type-label-token {
+            background-color:#f0f6fc;
         }
 
-        .costered-blocks--token-editor--add-controls {
-            align-items: center;
-            display: flex;
-            gap: 0.25rem;
-            width:100%;
+        .costered-blocks--token--type-value-token {
+            background-color:#fcf0f1;
         }
-
     }
 }
 
@@ -438,7 +448,7 @@ fieldset.costered-blocks--fieldset {
         justify-content: space-between;
         gap: 0.25rem;
 
-        button.costered-blocks--token--chipButton {
+        button.costered-blocks--token--chip-button {
             all: unset;
             cursor: pointer;
             padding: 0 0 0 0.25rem;
@@ -452,7 +462,7 @@ fieldset.costered-blocks--fieldset {
             }
         }
 
-        span.costered-blocks--token--chipText {
+        span.costered-blocks--token--chip-text {
             display: block;
             max-width: 80px;
             white-space: nowrap;
@@ -473,12 +483,15 @@ fieldset.costered-blocks--fieldset {
             min-width: unset;
         }
     }
+}
+
+.costered-blocks--token--popover {
 
     .costered-blocks--token--panel {
-        margin-top: 8px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px;
+        display:flex;
+        flex-direction: column;
+        gap:0.5rem;
+        padding:0.25rem;
 
         .costered-blocks--token--actions {
             display: flex;
