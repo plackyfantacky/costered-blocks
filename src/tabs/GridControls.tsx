@@ -154,7 +154,7 @@ const GridControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            <PanelBody
+            {/* <PanelBody
                 title={LABELS.gridControls.areasPanel.title}
                 className="costered-blocks--grid-controls--template-areas-inner"
                 initialOpen={gridTemplateAreasPanelOpen}
@@ -194,7 +194,7 @@ const GridControls = () => {
                         />
                     </Modal>
                 )}
-            </PanelBody>
+            </PanelBody> */}
         </Panel>
     );
 };

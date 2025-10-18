@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, Fragment } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
 import { Button, TextControl, Flex} from '@wordpress/components';
 
 import { scoped } from '@labels';
@@ -11,8 +11,6 @@ type Labels = Partial<{
     addLabel: string;
     addToken: string;
     emptyState: string;
-    mergeLeft: string;
-    splitOut: string;
     duplicate: string;
 }>;
 
@@ -36,73 +34,93 @@ export function TokenEditor({
 
     const adapter = useMemo(() => TracksTokensAdapter, []);
     const L = useMemo(() => scoped(labelScope), [labelScope]);
+    const internalCommitRef = useRef(false);
 
     const labels = useMemo<Required<Labels>>(() => ({
         addPlaceholder: L('addPlaceholder', '#Enter value…#'),
         addLabel: L('addLabel', '#Add [Name]#'),
         addToken: L('addToken', '#Add measurement#'),
         emptyState: L('emptyState', '#No tokens yet.#'),
-        mergeLeft: L('mergeLeft', '#Merge with left#'),
-        splitOut: L('splitOut', '#Split from group#'),
         duplicate: L('duplicate', '#Duplicate#'),
     }), [L]);
 
-    const [items, setItems] = useState<TokenAtomicItem[]>(() => adapter.expand(value));
-    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+    const withIds = (list: TokenAtomicItem[]) =>
+        list.map(item => (item._id ? item : { ...item, _id: crypto.randomUUID() }));
 
-    // “Add” control state
+    const [items, setItems] = useState<TokenAtomicItem[]>(() => withIds(adapter.expand(value)));
+    
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    
     const [addText, setAddText] = useState<string>('');
 
     useEffect(() => {
-        setItems(adapter.expand(value));
-        setExpandedIndex(null);
+        if (internalCommitRef.current) {
+            internalCommitRef.current = false;
+            return;
+        }
+
+        // Avoid pointless re-hydrates if parent echoed the same value back
+        const currentCollapsed = adapter.collapse(items);
+        if (currentCollapsed === value) return;
+
+        setItems(withIds(adapter.expand(value)));
+        setExpandedId(null);
     }, [value, adapter]);
 
     const commit = useCallback((draft: TokenAtomicItem[]) => {
         setItems(draft);
+        internalCommitRef.current = true;
         onChange(adapter.collapse(draft));
     }, [onChange, adapter]);
 
+    const findIndexById = useCallback(
+        (id: string) => items.findIndex(item => item._id === id),
+        [items]
+    );
+
     const editAt = useCallback((index: number, text: string) => {
-        commit(items.map((item, i) => i === index ? { ...item, text: text.trim() } : item));
+        commit(items.map((item, i) => 
+            i === index ? { ...item, text: text.trim() } : item
+        ));
     } , [items, commit]);
 
-    const removeAt = useCallback((index: number) => {
-        const next = items.slice();
-        next.splice(index, 1);
+    const removeById = useCallback((id: string) => {
+        const next = items.filter(item => item._id !== id);
         commit(next);
-        setExpandedIndex((current) => (current === index ? null : current != null && current > index ? current - 1 : current));
+        setExpandedId(current => (current === id ? null : current));
+
     }, [items, commit]);
 
-    const moveBy = useCallback((index: number, delta: number) => {
+    const moveById = useCallback((id: string, delta: number) => {
+        const index = findIndexById(id);
+        if (index === -1) return;
         const target = index + delta;
-        if (index < 0 || index >= items.length) return;
         if (target < 0 || target >= items.length) return;
+
         if (adapter.canMove && !adapter.canMove(items, index, delta)) return;
 
-        const item = items[index];
-        if (!item) return;
+        const next = [...items];
+        const [moved] = next.splice(index, 1);
+        if (!moved) return;
+        next.splice(target, 0, moved);
+
+        commit(next);
+    }, [items, commit, findIndexById, adapter]);
+
+    const duplicateById = useCallback((id: string) => {
+        const index = findIndexById(id);
+        if (index === -1) return;
         
-        const next = items.slice();
-        next.splice(index, 1);
-        next.splice(target, 0, item);
+        const next = [ ...items ];
+        const original = next[index];
+        if (!original) return;
 
+        const clone: TokenAtomicItem = { ...original, _id: crypto.randomUUID() };
+        next.splice(index + 1, 0, clone);
+        
         commit(next);
-        setExpandedIndex((current) => {
-            if (current === index) return target;
-            if (current === target) return index;
-            return current;
-        });
-    }, [items, commit, adapter]);
-
-    const duplicateAt = useCallback((index: number) => {
-        const item = items[index];
-        if (!item) return;
-        const next = items.slice();
-        next.splice(index + 1, 0, { ...item });
-        commit(next);
-        setExpandedIndex(index + 1);
-    }, [items, commit]);
+        setExpandedId(clone._id);
+    }, [items, commit, findIndexById]);
 
     const addNamedToken = useCallback(() => {
         const raw = addText.trim();
@@ -110,40 +128,49 @@ export function TokenEditor({
 
         // Accept "[a b]" or "a b"; strip outer brackets if present
         const inner = raw.startsWith('[') && raw.endsWith(']') 
-                ? raw.slice(1, -1).trim()
-                : raw.replace(/^\[|\]$/g, '').trim();
+            ? raw.slice(1, -1).trim()
+            : raw.replace(/^\[|\]$/g, '').trim();
 
         const names = inner.split(/\s+/).filter(Boolean);
         if (!names.length) return;
 
-        const insertionIndex = expandedIndex != null ? expandedIndex + 1 : items.length;
+        const insertionIndex =
+            expandedId ? items.findIndex(item => item._id === expandedId) + 1 : items.length;
         const gid = items.reduce((max, item) => Math.max(max, item.groupId ?? 0), 0) + 1;
         
         const next = items.slice();
         next.splice(
             insertionIndex,
             0,
-            ...names.map(name => ({ kind: 'name' as const, text: name, groupId: gid }))
+            ...names.map(name => ({
+                kind: 'name' as const,
+                text: name,
+                groupId: gid,
+                _id: crypto.randomUUID(),
+            }))
         );
 
         commit(next);
         setAddText('');
-        setExpandedIndex(insertionIndex + names.length - 1);
-    }, [addText, expandedIndex, items, commit]);
+        const lastAdded = next[insertionIndex + names.length - 1];
+        if (lastAdded?._id) setExpandedId(lastAdded._id);
+    }, [addText, expandedId, items, commit]);
 
     const addRawToken = useCallback(() => {
         const text = addText.trim();
         if (!text) return;
-
-        const insertionIndex = expandedIndex != null ? expandedIndex + 1 : items.length;
+        const insertionIndex =
+            expandedId ? items.findIndex(item => item._id === expandedId) + 1 : items.length;
         const next = items.slice();
 
-        next.splice(insertionIndex, 0, { kind: 'raw', text });
+        next.splice(insertionIndex, 0, { kind: 'raw', text, _id: crypto.randomUUID() });
 
         commit(next);
         setAddText('');
-        setExpandedIndex(insertionIndex);
-    }, [addText, expandedIndex, items, commit]);
+
+        const newToken = next[insertionIndex];
+        if (newToken?._id) setExpandedId(newToken._id);
+    }, [addText, expandedId, items, commit]);
 
     // keyboard: Enter = add size; Cmd/Ctrl+Enter = add name; Esc = collapse
     const onAddKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -152,10 +179,23 @@ export function TokenEditor({
             if (event.metaKey || event.ctrlKey) addNamedToken();
             else addRawToken();
         }
-        if (event.key === 'Escape') setExpandedIndex(null);
+        if (event.key === 'Escape') setExpandedId(null);
     }, [addRawToken, addNamedToken]);
 
+    useEffect(() => {
+        if (expandedId && !items.some(i => i._id === expandedId)) {
+            setExpandedId(null);
+        }
+    }, [items, expandedId]);
+
     const hasItems = items.length > 0;
+
+    const handleToggleExpand = useCallback((id: string) => {
+        setExpandedId(prev => {
+            const next = prev === id ? null : id;
+            return next;
+        });
+    }, []);
 
     return (
         <div className="costered-blocks--token-editor">
@@ -195,22 +235,24 @@ export function TokenEditor({
                         {labels.emptyState}
                     </div>
                 )}
-                { items.map((item, index) => {
-                    const isExpanded = expandedIndex === index;
+                {items.map((item, index) => {
+                    const key = item._id;
+                    const isExpanded = expandedId === item._id;
                     const typeClass = item.kind === 'name' ? 'label-token' : 'value-token';
                     return (
-                        <Fragment key={`token-${index}`}>
+                        <Fragment key={key}>
                             <Token
-                                key={`token-${index}`} //shuts up React warning about non-unique keys
+                                key={key}
+                                tokenId={item._id}
                                 index={index}
                                 value={item.text}
                                 isExpanded={isExpanded}
-                                onToggle={(i, open) => setExpandedIndex(open ? i : null)}
-                                onRemove={removeAt}
+                                onToggle={() => handleToggleExpand(item._id)}
+                                onRemove={() => removeById(item._id)}
                                 onChange={editAt}
-                                onDuplicate={(i) => duplicateAt(i)}
-                                onMoveLeft={(i) => moveBy(i, -1)}
-                                onMoveRight={(i) => moveBy(i, 1)}
+                                onDuplicate={() => duplicateById(item._id)}
+                                onMoveLeft={() => moveById(item._id, -1)}
+                                onMoveRight={() => moveById(item._id, 1)}
                                 floatingEditor={floatingEditor}
                                 popoverPlacement={popoverPlacement}
                                 popoverWidth={popoverWidth}

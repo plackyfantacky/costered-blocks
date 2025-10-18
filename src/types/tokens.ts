@@ -4,6 +4,7 @@ export type TokenAtomicItem = {
     groupId?: number;
     row?: number;
     col?: number;
+    _id: string; // unique identifier
 }
 
 export interface TokenModelAdapter<Persisted> {
