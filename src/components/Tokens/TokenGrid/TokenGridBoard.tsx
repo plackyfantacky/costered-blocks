@@ -48,8 +48,7 @@ function definedTokenLabels(src: {
     return out;
 }
 
-
-export function GridBoard({
+export default function TokenGridBoard({
     matrix,
     columnData,
     rowData,
@@ -121,6 +120,80 @@ export function GridBoard({
 
     const popoverWidth = gridRef.current?.offsetWidth;
 
+    // compatibility handlers for new adapter API
+    const toIndex = useCallback((id: string): number => {
+        const num = Number.parseInt(id, 10);
+        return Number.isFinite(num) ? num : -1;
+    }, []);
+
+    // onToggle: Token calls with no args, so close over the cell's index
+    const makeToggleHandler = useCallback(
+        (index: number) => () => {
+            handleToggle(index);
+        },
+        [handleToggle]
+    );
+
+    // onChange: Token provides (index: number, next: string)
+    const handleTokenChangeByIndex = useCallback(
+        (index: number, next: string) => {
+            const [cellX, cellY] = xyFromIndex(index);
+            setCell(cellX, cellY, next);
+        },
+        [xyFromIndex, setCell]
+    );
+
+    const handleTokenRemoveById = useCallback(
+        (id: string) => {
+            const index = toIndex(id);
+            if (index < 0) return;
+            const [cellX, cellY] = xyFromIndex(index);
+            setCell(cellX, cellY, emptyToken);
+            setExpandedIndex(null);
+        },
+        [xyFromIndex, setCell, emptyToken]
+    );
+
+    const handleTokenMoveLeftById = useCallback(
+        (id: string) => {
+            const index = toIndex(id);
+            if (index < 0) return;
+            moveLeftFromIndex(index);
+        },
+        [moveLeftFromIndex]
+    );
+
+    const handleTokenMoveRightById = useCallback(
+        (id: string) => {
+            const index = toIndex(id);
+            if (index < 0) return;
+            moveRightFromIndex(index);
+        }, 
+        [moveRightFromIndex]
+    );
+
+    // Token calls onDuplicate(id: string)
+    const handleTokenDuplicateById = useCallback(
+        (id: string) => {
+            const index = toIndex(id);
+            if (index < 0) return;
+            const [cellX, cellY] = xyFromIndex(index);
+
+            // read current token from the current matrix snapshot
+            const current = rowsArray[cellY]?.[cellX] ?? emptyToken;
+            const targetX = cellX + 1;
+
+            if (targetX >= safeCols) {
+                // out of bounds: skip (or you could choose to resize here)
+                return;
+            }
+
+            setCell(targetX, cellY, current === emptyToken ? '' : current);
+            setExpandedIndex(indexFromXY(targetX, cellY));
+        },
+        [toIndex, xyFromIndex, rowsArray, emptyToken, safeCols, setCell, indexFromXY]
+    );
+
     return (
         <div className="costered-blocks--token-grid--area" ref={gridRef}>
             {/* header row: column controls */}
@@ -177,22 +250,16 @@ export function GridBoard({
                         return (
                             <div key={`cell-${x}-${y}`} className="costered-blocks--token-grid--cell">
                                 <Token
+                                    tokenId={String(index)}
                                     index={index}
                                     value={inputValue}
                                     isExpanded={expandedIndex === index}
-                                    onToggle={handleToggle}
-                                    onRemove={(remove_index) => {
-                                        const [cellX, cellY] = xyFromIndex(remove_index);
-                                        setCell(cellX, cellY, emptyToken);
-                                        setExpandedIndex(null);
-                                    }}
-                                    onChange={(change_index, next) => { 
-                                        const [cellX, cellY] = xyFromIndex(change_index);
-                                        setCell(cellX, cellY, next);
-                                        console.log({change_index, cellX, cellY, next});
-                                     }}
-                                    onMoveLeft={moveLeftFromIndex}
-                                    onMoveRight={moveRightFromIndex}
+                                    onToggle={makeToggleHandler(index)}
+                                    onChange={handleTokenChangeByIndex}
+                                    onRemove={handleTokenRemoveById}
+                                    onMoveLeft={handleTokenMoveLeftById}
+                                    onMoveRight={handleTokenMoveRightById}
+                                    onDuplicate={handleTokenDuplicateById}
                                     emptyPlaceholder={emptyToken}
                                     floatingEditor={true}
                                     {...(popoverWidth != null ? { popoverWidth } : {})}

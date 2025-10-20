@@ -44,13 +44,15 @@ export function TokenEditor({
         duplicate: L('duplicate', '#Duplicate#'),
     }), [L]);
 
-    const withIds = (list: TokenAtomicItem[]) =>
-        list.map(item => (item._id ? item : { ...item, _id: crypto.randomUUID() }));
+    const withIds = (list: Omit<TokenAtomicItem, '_id'>[] | TokenAtomicItem[]): TokenAtomicItem[] => {
+        return list.map((item) => {
+            if ('_id' in item && item._id) return item;
+            return { ...item, _id: crypto.randomUUID() };
+        });
+    }
 
     const [items, setItems] = useState<TokenAtomicItem[]>(() => withIds(adapter.expand(value)));
-    
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    
     const [addText, setAddText] = useState<string>('');
 
     useEffect(() => {

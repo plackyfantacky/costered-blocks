@@ -1,13 +1,16 @@
 import { splitTopLevel, collapseAdjacentNamedLines } from '@utils/gridUtils';
 import type { TokenAtomicItem, TokenModelAdapter, PersistedTracks } from "@types";
 
-export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks> = {
-    expand(persisted: PersistedTracks): TokenAtomicItem[] {
+type TokenAtomicBare = Omit<TokenAtomicItem, '_id'>;
+
+export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks, TokenAtomicBare> = {
+    expand(persisted: PersistedTracks): TokenAtomicBare[] {
         const collapsed = collapseAdjacentNamedLines(persisted);
         const tokens = splitTopLevel(collapsed);
 
         let nextGroupId = 1;
-        const atomic: TokenAtomicItem[] = [];
+        const atomic: TokenAtomicBare[] = [];
+
         for (const tok of tokens) {
             // bracket group => [a b] -> 'name' items with same groupId
             const match = tok.match(/^\[(.*?)\]$/);
@@ -60,7 +63,7 @@ export const TracksTokensAdapter: TokenModelAdapter<PersistedTracks> = {
         if (index <= 0) return items;
         const prev = items[index - 1];
         const current = items[index];
-        if(!prev || !current) return items;
+        if (!prev || !current) return items;
         if (prev.kind !== 'name' || current.kind !== 'name') return items;
 
         const next = items.slice();

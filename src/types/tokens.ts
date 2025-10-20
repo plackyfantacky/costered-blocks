@@ -7,12 +7,12 @@ export type TokenAtomicItem = {
     _id: string; // unique identifier
 }
 
-export interface TokenModelAdapter<Persisted> {
-    expand(persisted: Persisted): TokenAtomicItem[];
-    collapse(items: readonly TokenAtomicItem[]): Persisted;
+export interface TokenModelAdapter<Token, Item extends Partial<TokenAtomicItem> = TokenAtomicItem> {
+    expand(persisted: Token): Item[];
+    collapse(items: TokenAtomicItem[]): Token;
     mergeWithPrev?(item: TokenAtomicItem[], index: number): TokenAtomicItem[];
     clearGroup?(item: TokenAtomicItem[], index: number): TokenAtomicItem[];
-    canMove?(items: readonly TokenAtomicItem[], index: number, delta: number): boolean; 
+    canMove?(items: TokenAtomicItem[], index: number, delta: number): boolean; 
 }
 
 /** Canonical persisted shapes we deal with. */

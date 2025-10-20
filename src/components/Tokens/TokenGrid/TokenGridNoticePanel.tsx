@@ -35,7 +35,7 @@ type Props = {
     labels?: LabelsShape;
 };
 
-export function NoticePanel({ 
+export default function TokenGridNoticePanel({ 
     clientId,
     columnData,
     rowData,
