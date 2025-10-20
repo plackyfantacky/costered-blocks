@@ -103,42 +103,110 @@ export const composePlacementSimple = (
  */
 export const parsePlacementAdvanced = (
     input: unknown
-): { start: string; span: string; end: string } => {
-    const output = { start: '', span: '', end: '' };
+): { 
+    start: string; 
+    span: string; 
+    end: string;
+    startType: 'auto' | 'number' | 'named';
+    endType: 'auto' | 'number' | 'named' | 'span';
+} => {
     const value = String(input ?? '').trim();
-    if (!value) return output;
+    const empty = { start: '', span: '', end: '', startType: 'auto', endType: 'auto' } as const;
+    if (!value) return { ...empty };
 
     const parts = value.split('/').map((part) => part.trim());
-    if (parts.length === 1) {
+    const left = parts[0] ?? '';
+    const right = parts[1] ?? '';
 
-        if (/^span\s+\d+$/i.test(parts[0]!)) output.span = parts[0]!.replace(/^span\s+/i, '');
-        else output.start = parts[0]!;
-        return output;
+    const classify = (token: string): 'auto' | 'number' | 'named' => {
+        if (!token || token === 'auto') return 'auto';
+        if (/^-?\d+$/.test(token)) return 'number';
+        return 'named';
     }
-    const left = parts[0]!
-    const right = parts[1]!;
-    output.start = left || 'auto';
-    const m = /^span\s+(\d+)$/i.exec(right);
-    if (m) output.span = m[1]!;
-    else output.end = right;
-    return output;
+
+    // span on right (e.g. "start / span 4" or "column-x / span 4")
+    const spanRight = /^span\s*(-?\d+)$/i.exec(right);
+    if (spanRight) {
+        const spanValue = String(spanRight?.[1] ?? '').trim();
+        return {
+            start: left || 'auto',
+            span: spanValue,
+            end: '',
+            startType: classify(left),
+            endType: 'span',
+        };
+    }
+
+    // span on the left (rare but spec-valid)
+    const spanLeft = /^span\s*(-?\d+)$/i.exec(left);
+    if (spanLeft) {
+        const spanValue = String(spanLeft?.[1] ?? '').trim();
+        return {
+            start: 'auto',
+            span: spanValue,
+            end: '',
+            startType: 'auto',
+            endType: 'span',
+        };
+    }
+
+    // named pair: "name-a / name-b"
+    const namedPair = /^([A-Za-z_][\w-]*)\s*\/\s*([A-Za-z_][\w-]*)$/.exec(value);
+    if (namedPair) {
+        const startVal = String(namedPair?.[1] ?? '').trim();
+        const endVal = String(namedPair?.[2] ?? '').trim();
+        return {
+            start: startVal,
+            span: '',
+            end: endVal,
+            startType: 'named',
+            endType: 'named',
+        };
+    }
+
+    // explisit start / end.
+    if (parts.length > 1) {
+        return {
+            start: left || 'auto',
+            span: '',
+            end: right || 'auto',
+            startType: classify(left),
+            endType: classify(right),
+        };
+    }
+
+    // single token
+    if (/^span\s+\d+$/i.test(left)) {
+        return { start: 'auto', span: left.replace(/^span\s+/i, ''), end: '', startType: 'auto', endType: 'span' };
+    }
+    return { start: left, span: '', end: '', startType: classify(left), endType: 'auto' };
 }
 
 /**
  * Compose a CSS placement string from advanced shorthand.
  */
-export const composePlacementAdvanced = (
-    {start, span, end}: {start?: unknown; span?: unknown; end?: unknown},
-    {mode = 'span', collapseSpanOne = true}: {mode?: 'span' | 'end', collapseSpanOne?: boolean} = {}
-): string => {
-    const outputStart = String(start ?? '').trim() || 'auto';
-    if (mode === 'end') {
-        const outputEnd = String(end ?? '').trim() || 'auto';
-        return `${outputStart} / ${outputEnd}`;
+export function composePlacementAdvanced(
+    mode: 'span' | 'end',
+    parts: { start?: string | number; end?: string | number; span?: string | number }
+): string {
+    const start = parts.start ?? 'auto';
+    const end = parts.end;
+    const span = parts.span;    
+
+    // if the end looks like a named line, honour it directly
+    if (typeof end === 'string' && /^[A-Za-z_]/.test(end)) {
+        return `${start} / ${end}`;
     }
-    const num = toInt(span, 1);
-    if (collapseSpanOne && num === 1 && outputStart !== 'auto') return outputStart; // "2 / span 1" -> "2"
-    return `${outputStart} / span ${num}`;
+
+    if (mode === 'span') {
+        // positive-only if start is named (spec)
+        let num = Number.isFinite(+span!) ? Math.trunc(+span!) : 1;
+        if (typeof start === 'string' && !/^-?\d+$/.test(start) && num < 0) num = Math.abs(num);
+        return `${start} / span ${num}`;
+    }
+
+    const endVal = (end ?? 'auto');
+    return `${start} / ${endVal}`;
 }
 
 /**
@@ -176,3 +244,39 @@ export const isValidGridAreaName = (input: unknown): boolean => {
 // Normalise: return a valid name or '' (caller decides how to handle '')
 export const normaliseGridAreaName = (value: unknown): string => 
     isValidGridAreaName(value) ? String(value).trim() : '';
+
+/**
+ * Handle span changes, skipping 0 while allowing positive and negative integers.
+ * If the user reaches 0, we nudge them to 1 or -1 depending on direction.
+ */
+export function handleSpanChangeSkippingZero(
+    next: number | undefined,
+    lastRef: { current: number },
+    cap: number,
+    save?: (span: number) => void,
+    start?: string | number
+): number {
+    let span = toInt(next, 1);
+    const last = lastRef.current;
+
+    if (!Number.isFinite(span)) span = 1;
+
+    if (span === 0) {
+        // Nudge away from zero
+        span = last > 0 ? -1 : 1;
+    }
+
+    // Prevent invalid negative spans for named lines
+    if (typeof start === 'string' && !/^\d+$/.test(start) && span < 0) {
+        span = Math.abs(span);
+    }
+
+    span = clamp(span, -cap, cap);
+    lastRef.current = span;
+
+    if (typeof save === 'function') {
+        save(span);
+    }
+
+    return span;
+}

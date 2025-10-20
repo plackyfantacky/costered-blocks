@@ -26,8 +26,6 @@ export function GridAxisTracks({
     const unsavedCols = useUnsavedAttr(costeredId, 'gridTemplateColumns', 'tracks');
     const unsavedRows = useUnsavedAttr(costeredId, 'gridTemplateRows', 'tracks');
 
-    //const { activeKey, lastEditedKey, markEdited } = usePanelEditing<'simple' | 'tracks'>();
-
     const model = (useGridModel(clientId) as GridModel | null) ?? null;
     const col = (model?.columns ?? null) as GridAxisModel | null;
     const row = (model?.rows ?? null) as GridAxisModel | null;

@@ -36,15 +36,15 @@ export function useGridItemWriter(clientId: string) {
     //shorthands
     const writeColumn = useCallback((mode: Mode, p: Payload) => {
         const value = mode === 'end'
-            ? composePlacementAdvanced({ start: p.start, end: p.end }, { mode: 'end' })
-            : composePlacementAdvanced({ start: p.start, span: p.span }, { mode: 'span' });
+            ? composePlacementAdvanced('end', { start: p.start as any, end: p.end as any })
+            : composePlacementAdvanced('span', { start: p.start as any, span: p.span as any });
         set('gridColumn', value);
     }, [set]);
 
     const writeRow = useCallback((mode: Mode, p: Payload) => {
         const value = mode === 'end'
-            ? composePlacementAdvanced({ start: p.start, end: p.end }, { mode: 'end' })
-            : composePlacementAdvanced({ start: p.start, span: p.span }, { mode: 'span' });
+            ? composePlacementAdvanced('end', { start: p.start as any, end: p.end as any })
+            : composePlacementAdvanced('span', { start: p.start as any, span: p.span as any });
         set('gridRow', value);
     }, [set]);
 

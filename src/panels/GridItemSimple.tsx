@@ -6,37 +6,13 @@ import { Flex, FlexBlock, RangeControl } from '@wordpress/components';
 import { LABELS } from "@labels";
 
 import { useAttrGetter, useAttrSetter, useParentGridMeta } from '@hooks';
-import { clamp, toInt, parsePlacementSimple, composePlacementSimple, isGridPlacement } from '@utils/gridPlacement';
+import { clamp, toInt, parsePlacementSimple, composePlacementSimple, isGridPlacement, handleSpanChangeSkippingZero } from '@utils/gridPlacement';
 
 type Props = {
     clientId: string | null;
 };
 
 const VIRTUAL_TRACKS = 24; // a sane amount
-
-/**
- * Handle span changes, skipping 0 while allowing positive and negative integers.
- * If the user reaches 0, we nudge them to 1 or -1 depending on direction.
- */
-function handleSpanChangeSkippingZero(
-    next: number | undefined,
-    lastRef: { current: number },
-    cap: number,
-    save: (span: number) => void
-) {
-    let span = toInt(next, 1);
-    const last = lastRef.current;
-
-    if (span === 0) {
-        // Nudge away from zero
-        span = last > 0 ? -1 : 1;
-    }
-
-    span = clamp(span, -cap, cap);
-    lastRef.current = span;
-    save(span);
-}
-
 
 export function GridItemSimple({ clientId }: Props) {
     if (!clientId) return null;

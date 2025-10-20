@@ -175,17 +175,6 @@ export function GridAxisSimple({
             <fieldset className="costered-blocks--fieldset costered-blocks--grid-panel-simple--axis-controls">
                 <legend>{LABELS.gridControls.simplePanel.columns}</legend>
                 <Flex direction="column" gap={4} className={"costered-blocks--grid-panel-simple--axis-controls-inner"}>
-                    <Flex direction="row" justify="space-between" align="center">
-                        {/* <GridAxisAside
-                            axis="columns"
-                            canClear={!!col?.template}
-                            onClear={clearCols}
-                            owner={model.activePane.columns ?? null}
-                            here="simple"
-                            label={LABELS.gridControls.simplePanel.columnsClear}
-                            disabled={colDisabled}
-                        /> */}
-                    </Flex>
                     <RangeControl
                         min={0}
                         max={12}
@@ -227,17 +216,6 @@ export function GridAxisSimple({
             <fieldset className="costered-blocks--fieldset costered-blocks--grid-panel-simple--axis-controls">
                 <legend>{LABELS.gridControls.simplePanel.rows}</legend>
                 <Flex direction="column" gap={4} className={"costered-blocks--grid-panel-simple--axis-controls-inner"}>
-                    <Flex direction="row" justify="space-between" align="center">
-                        {/* <GridAxisAside
-                            axis="rows"
-                            canClear={!!row.template}
-                            onClear={clearRows}
-                            owner={model.activePane.rows}
-                            here="simple"
-                            label={LABELS.gridControls.simplePanel.rowsClear}
-                            disabled={rowDisabled}
-                        /> */}
-                    </Flex>
                     <RangeControl
                         min={0}
                         max={12}

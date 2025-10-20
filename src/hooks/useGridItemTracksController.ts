@@ -28,14 +28,25 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
     const columnsCount = parentMeta?.columns ?? 0;
     const rowsCount = parentMeta?.rows ?? 0;
 
-    const col = useMemo(() => parsePlacementAdvanced(get('gridColumn')), [get]);
-    const row = useMemo(() => parsePlacementAdvanced(get('gridRow')), [get]);
+    const colValue = get('gridColumn');
+    const rowValue = get('gridRow');
+
+    const col = useMemo(() => parsePlacementAdvanced(colValue), [colValue]);
+    const row = useMemo(() => parsePlacementAdvanced(rowValue), [rowValue]);
 
     const inferColMode: Mode = col.end ? 'end' : 'span';
     const inferRowMode: Mode = row.end ? 'end' : 'span';
 
     const [colMode, setColMode] = useState<Mode>(inferColMode);
     const [rowMode, setRowMode] = useState<Mode>(inferRowMode);
+
+    useEffect(() => {
+        get('gridColumn'); // force selector subscription
+    }, [colMode, get]);
+
+    useEffect(() => {
+        get('gridRow'); // force selector subscription
+    }, [rowMode, get]);
 
     useEffect(() => { setColMode(inferColMode); }, [inferColMode]);
     useEffect(() => { setRowMode(inferRowMode); }, [inferRowMode]);
@@ -45,23 +56,6 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
     const namedRowLines = useMemo(() => extractNamedLines(parentMeta.rowTemplate), [parentMeta.rowTemplate]);
     const hasNamedColLines = namedColLines.length > 0;
     const hasNamedRowLines = namedRowLines.length > 0;
-
-    // Mode inference for inputs
-    const startMode = (token: unknown, hasNames: boolean) => 
-        hasNames ? (isIntToken(token) ? 'number' : 'named') : 'number';
-
-    const endModeInferred = (token: unknown) => 
-        token ? (isIntToken(token) ? 'number' : (token === 'auto' ? 'auto' : 'named')) : 'number';
-
-    const endModeUI = (token: unknown, hasNames: boolean) => {
-        const mode = endModeInferred(token);
-        return hasNames ? mode : (mode === 'named' ? 'number' : mode);
-    };
-
-    const colStartModeUI = startMode(col.start, hasNamedColLines);
-    const rowStartModeUI = startMode(row.start, hasNamedRowLines);
-    const colEndModeUI = endModeUI(col.end, hasNamedColLines);
-    const rowEndModeUI = endModeUI(row.end, hasNamedRowLines);
 
     // Span caps based on parent size and start position
     const colSpanCap = useMemo(() => {
@@ -77,8 +71,8 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
     }, [rowsCount, row.start]);
 
     // Drafts for "0 is invalid" inputs    
-    const [colEndDraft, setColEndDraft] = useState<number | '' | null>(null);
-    const [rowEndDraft, setRowEndDraft] = useState<number | '' | null>(null);
+    const [colEndDraft, setColEndDraft] = useState<number | null>(null);
+    const [rowEndDraft, setRowEndDraft] = useState<number | null>(null);
     useEffect(() => { setColEndDraft(null); }, [get('gridColumn')]);
     useEffect(() => { setRowEndDraft(null); }, [get('gridRow')]);
 
@@ -96,24 +90,34 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
     }, [col.end, col.span, writeColumn]);
 
     const onColSpan = useCallback((value: unknown) => {
-        const span = clamp(toInt(value, 1), 1, colSpanCap);
-        writeColumn(colMode, { start: col.start || 'auto', span });
+        const num = clamp(toInt(value, 1), 1, colSpanCap);
+        writeColumn('span', { start: col.start || 'auto', span: num });
     }, [col.start, colSpanCap, writeColumn]);
 
     const onColEndNumber = useCallback((value: unknown) => {
         const num = toInt(value, 0);
         setColEndDraft(num);
-        if (value === 0) return; // don’t write invalid 0; show notice
-        writeColumn(colMode, { start: col.start || 'auto', end: toSignedLine(value, 1) });
+        if (num === 0) return; // don’t write invalid 0; show notice
+            
+        if (colMode === 'span' || col.endType === 'span') {
+            onColSpan(num);
+        } else {
+            writeColumn('end', { 
+                start: col.start || 'auto', 
+                end: toSignedLine(value, 1) 
+            });
+        }
+
         setColEndDraft(null);
-    }, [col.start, writeColumn]);
+    }, [colMode, col.endType, col.start, onColSpan, writeColumn]);
 
     const onColEndNamed = useCallback((value: unknown) => {
-        writeColumn(colMode, { start: col.start || 'auto', end: String(value || 'auto').trim() || 'auto' });
+        const name = String(value || 'auto').trim() || 'auto';
+        writeColumn('end', { start: col.start || 'auto', end: name });
     }, [col.start, writeColumn]);
 
     const onColEndAuto = useCallback(() => {
-        writeColumn(colMode, { start: col.start || 'auto', end: 'auto' });
+        writeColumn('end', { start: col.start || 'auto', end: 'auto' });
     }, [col.start, writeColumn]);
 
     //row handlers
@@ -131,25 +135,34 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
     }, [row.end, row.span, rowMode, writeRow]);
 
     const onRowSpan = useCallback((value: unknown) => {
-        const span = clamp(toInt(value, 1), 1, rowSpanCap);
-        writeRow(rowMode, { start: row.start || 'auto', span });
+        const num = clamp(toInt(value, 1), 1, rowSpanCap);
+        writeRow('span', { start: row.start || 'auto', span: num });
     }, [row.start, rowSpanCap, writeRow]);
 
     const onRowEndNumber = useCallback((value: unknown) => {
         const num = toInt(value, 0);
         setRowEndDraft(num);
-        if (value === 0) return; // don’t write invalid 0; show notice
-        writeRow(rowMode, { start: row.start || 'auto', end: toSignedLine(value, 1) });
+        if (num === 0) return; // don’t write invalid 0; show notice
+        
+        if (rowMode === 'span' || row.endType === 'span') {
+            onRowSpan(num);
+        } else {
+            writeRow('end', { 
+                start: row.start || 'auto', 
+                end: toSignedLine(value, 1) 
+            });
+        }
         setRowEndDraft(null);
     }, [row.start, rowMode, writeRow]);
 
     const onRowEndNamed = useCallback((value: unknown) => {
-        writeRow(rowMode, { start: row.start || 'auto', end: String(value || 'auto').trim() || 'auto' });
-    }, [row.start, rowMode, writeRow]);
-
+        const name = String(value || 'auto').trim() || 'auto';
+        writeRow('end', { start: row.start || 'auto', end: name });
+    }, [row.start, writeRow]);
+    
     const onRowEndAuto = useCallback(() => {
-        writeRow(rowMode, { start: row.start || 'auto', end: 'auto' });
-    }, [row.start, rowMode, writeRow]);
+        writeRow('end', { start: row.start || 'auto', end: 'auto' });
+    }, [row.start, writeRow]);
 
     // disable if using grid-area
     const disabledLines = hasArea;
@@ -161,8 +174,8 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
         column: {
             values: { ...col },
             modes: {
-                uiStart: (hasNamedColLines ? (isIntToken(col.start) ? 'number' : 'named') : 'number'),
-                uiEnd: (col.end ? (isIntToken(col.end) ? 'number' : (String(col.end) === 'auto' ? 'auto' : 'named')) : 'number'),
+                uiStart: col.startType,
+                uiEnd: col.endType,
                 mode: colMode,
             },
             setMode: setColMode,
@@ -181,8 +194,8 @@ export function useGridItemTracksController({ clientId, setMany, parentMeta }: P
         row: {
             values: { ...row },
             modes: {
-                uiStart: (hasNamedRowLines ? (isIntToken(row.start) ? 'number' : 'named') : 'number'),
-                uiEnd: (row.end ? (isIntToken(row.end) ? 'number' : (String(row.end) === 'auto' ? 'auto' : 'named')) : 'number'),
+                uiStart: row.startType,
+                uiEnd: row.endType,
                 mode: rowMode,
             },
             setMode: setRowMode,

@@ -1,4 +1,4 @@
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { Notice, Flex, FlexBlock } from '@wordpress/components';
 
 import { LABELS } from '@labels';
@@ -9,7 +9,7 @@ import {
     useScopedKey,
     useUIPreferences
 } from '@hooks';
-import { isIntToken, toInt } from "@utils/gridPlacement";
+import { handleSpanChangeSkippingZero, isIntToken, toInt } from "@utils/gridPlacement";
 
 import {
     AxisStartNumber,
@@ -22,8 +22,8 @@ import {
 import CustomToggleGroup from '@components/CustomToggleGroup';
 import { CustomSelectControl as SelectControl } from '@components/CustomSelectControl';
 
-type StartMode = 'number' | 'named';
-type EndMode = 'auto' | 'number' | 'named';
+type StartMode = 'number' | 'named' ;
+type EndMode = 'auto' | 'number' | 'named' | 'span';
 
 type Ctrl = ReturnType<typeof useGridItemTracksController> | null;
 type EndChangeMode = 'span' | 'end';
@@ -91,31 +91,50 @@ export function GridItemTracks({
     }, [ctrl.column.values, ctrl.column.named, ctrl.column.handlers, setGridColStartMode]);
 
     const onColEndChangeMode = useCallback((mode: EndMode | string) => {
+
         const nextMode = (mode as EndMode);
         const { end: colEnd, start: colStart } = ctrl.column.values;
         const { onEndAuto, onEndNumber, onEndNamed } = ctrl.column.handlers;
         const { hasLines, lines } = ctrl.column.named;
 
-        if (nextMode === 'auto') { 
-            onEndAuto(); return; 
-        } else if (nextMode === 'number') {
-            const fallback = isIntToken(colEnd) 
-                ? toInt(colEnd, 1) 
-                : (isIntToken(colStart) ? toInt(colStart, 1) : 1);
-            onEndNumber(fallback);
-        } else {
-            if (hasLines) {
-                const fallback = 
-                    (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd) 
-                    ? String(colEnd) 
-                    : (lines[0] ?? '');
-                onEndNamed(fallback);
-            } else {
-                onEndNumber(1);
+        switch (nextMode) {
+            case 'auto':
+                onEndAuto();
+                break;
+            case 'number': {
+                const fallback = isIntToken(colEnd)
+                    ? toInt(colEnd, 1)
+                    : (isIntToken(colStart) ? toInt(colStart, 1) : 1);
+                onEndNumber(fallback);
+                break;
+            }
+            case 'named': {
+                if (hasLines) {
+                    const fallback =
+                        (!isIntToken(colEnd) && colEnd !== 'auto' && colEnd)
+                            ? String(colEnd)
+                            : (lines[0] ?? '');
+
+                    console.log('fallback for col end named:', fallback);
+                    onEndNamed(fallback);
+                } else {
+                    onEndNumber(1);
+                }
+                break;
+            }
+            case 'span': {
+                // Switch to explicit span mode ("start / span n")
+                ctrl.column.setMode('span');
+                const fallbackSpan =
+                    colEnd && isIntToken(colEnd)
+                        ? Math.max(1, toInt(colEnd, 1))
+                        : 1;
+                ctrl.column.handlers.onSpan(fallbackSpan);
+                break;
             }
         }
         setGridColEndMode(nextMode);
-    }, [ctrl.column.values, ctrl.column.named, ctrl.column.handlers]);
+    }, [ctrl.column.values, ctrl.column.named, ctrl.column.handlers, setGridColEndMode]);
 
     /* ----- Row Mode Switchers ----- */
 
@@ -163,6 +182,24 @@ export function GridItemTracks({
             }
         }
     }, [ctrl.row.values, ctrl.row.named, ctrl.row.handlers]);
+
+    useEffect(() => {
+        console.group('GridItemTracks → col changes');
+        // console.log('gridColEndMode:', gridColEndMode);
+        // console.log('col controller:', ctrl.column);
+        console.log('GridItemTracks render → ctrl.column.modes.mode:', ctrl.column.modes.mode);
+        console.groupEnd();
+    }, [ctrl.column, gridColEndMode]);
+
+    const isColSpanMode =
+        ctrl.column.modes.mode
+            ? ctrl.column.modes.mode === 'span'
+            : ctrl.column.modes.uiEnd === 'span';
+
+    const isRowSpanMode =
+        ctrl.row.modes.mode === 'span'
+            ? ctrl.row.modes.mode === 'span'
+            : ctrl.row.modes.uiEnd === 'span';
 
     return (
         <Flex direction="column" gap={4} className="costered-blocks-grid-item-tracks--panel">
@@ -234,7 +271,7 @@ export function GridItemTracks({
                             </CustomToggleGroup>
                         </FlexBlock>
                         {/* Span vs End inputs */}
-                        {ctrl.column.modes.mode === 'span' ? (
+                        {isColSpanMode ? (
                             <FlexBlock>
                                 <AxisSpan
                                     label={LABELS.gridItemsControls.tracksPanel.columns.spanNumber}
@@ -253,7 +290,7 @@ export function GridItemTracks({
                                         <SelectControl
                                             label={LABELS.gridItemsControls.tracksPanel.columns.trackEndMode}
                                             value={gridColEndMode}
-                                            onChange={(mode) => onColEndChangeMode(mode)} // this handler is locally defined
+                                            onChange={onColEndChangeMode} 
                                             disabled={ctrl.disabledLines}
                                         >
                                             <SelectControl.Option value="auto">{LABELS.gridItemsControls.tracksPanel.columns.endAuto}</SelectControl.Option>
@@ -263,7 +300,14 @@ export function GridItemTracks({
                                             )}
                                         </SelectControl>
                                     </FlexBlock>
-                                    {ctrl.column.modes.uiEnd === 'number' && (
+                                    {!isColSpanMode && gridColEndMode === 'auto' && (
+                                        <FlexBlock>
+                                            <Notice status="info" isDismissible={false}>
+                                                {LABELS.gridItemsControls.tracksPanel.columns.endAutoNotice}
+                                            </Notice>
+                                        </FlexBlock>
+                                    )}
+                                    {!isColSpanMode && gridColEndMode === 'number' && (
                                         <FlexBlock>
                                             <AxisEndNumber
                                                 label={LABELS.gridItemsControls.tracksPanel.columns.endNumber}
@@ -276,7 +320,7 @@ export function GridItemTracks({
                                             />
                                         </FlexBlock>
                                     )}
-                                    {ctrl.column.modes.uiEnd === 'named' && (
+                                    {!isColSpanMode && gridColEndMode === 'named' && (
                                         <FlexBlock>
                                             <AxisEndNamed
                                                 label={LABELS.gridItemsControls.tracksPanel.columns.endNamed}
@@ -298,7 +342,7 @@ export function GridItemTracks({
                 </FlexBlock>
             </fieldset>
             {/* Rows placement */}
-            <fieldset className="costered-blocks-grid-item-tracks-controls--rows">
+            <fieldset className="costered-blocks--fieldset costered-blocks-grid-item-tracks-controls--rows">
                 <legend className="components-base-control__label">{LABELS.gridItemsControls.tracksPanel.rows.legend}</legend>
                 <FlexBlock className={'costered-blocks-grid-item-tracks-controls--row-placement'}>
                     <Flex direction="column" gap={4}>
@@ -360,7 +404,7 @@ export function GridItemTracks({
                             </CustomToggleGroup>
                         </FlexBlock>
                         {/* Span vs End inputs */}
-                        {ctrl.row.modes.mode === 'span' ? (
+                        {isRowSpanMode ? (
                             <FlexBlock>
                                 <AxisSpan
                                     label={LABELS.gridItemsControls.tracksPanel.rows.spanNumber}
@@ -389,7 +433,14 @@ export function GridItemTracks({
                                             )}
                                         </SelectControl>
                                     </FlexBlock>
-                                    {ctrl.row.modes.uiEnd === 'number' && (
+                                    {!isRowSpanMode && gridRowEndMode === 'auto' && (
+                                        <FlexBlock>
+                                            <Notice status="info" isDismissible={false}>
+                                                {LABELS.gridItemsControls.tracksPanel.rows.endAutoNotice}
+                                            </Notice>
+                                        </FlexBlock>
+                                    )}
+                                    {!isRowSpanMode && gridRowEndMode === 'number' && (
                                         <FlexBlock>
                                             <AxisEndNumber
                                                 label={LABELS.gridItemsControls.tracksPanel.rows.endNumber}
@@ -402,7 +453,7 @@ export function GridItemTracks({
                                             />
                                         </FlexBlock>
                                     )}
-                                    {ctrl.row.modes.uiEnd === 'named' && (
+                                    {!isRowSpanMode && gridRowEndMode === 'named' && (
                                         <FlexBlock>
                                             <AxisEndNamed
                                                 label={LABELS.gridItemsControls.tracksPanel.rows.endNamed}
