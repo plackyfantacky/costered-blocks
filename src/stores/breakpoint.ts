@@ -33,10 +33,10 @@ const config = { reducer, actions, selectors };
 const store = createReduxStore(REDUX_STORE_KEY, config);
 
 try {
-    if(typeof register === 'function' && register.length === 1) {
+    if (typeof register === 'function' && register.length === 1) {
         // @ts-ignore
         register(store);
-    } else if(typeof register === 'function' && register.length === 2) {
+    } else if (typeof register === 'function' && register.length === 2) {
         (register as unknown as (name: string, s: unknown) => void)(REDUX_STORE_KEY, store);
     } else if (typeof register === 'function') {
         // @ts-ignore

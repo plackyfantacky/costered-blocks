@@ -53,7 +53,7 @@ export function splitTopLevel(input: unknown): string[] {
         if (character === '(') { braces++; buffer += character; continue; }
         if (character === ')') { braces = Math.max(0, braces - 1); buffer += character; continue; }
         if (character === '[') { 
-            if(braces === 0 && bracket === 0 && buffer.trim()) pushBuffer();
+            if (braces === 0 && bracket === 0 && buffer.trim()) pushBuffer();
             bracket++; buffer += character; continue; 
         }
         if (character === ']') { bracket = Math.max(0, bracket - 1); buffer += character; continue; }

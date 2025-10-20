@@ -46,7 +46,7 @@ export function useAttrGetter(clientId: string | null) {
 
     const getMany = useCallback(
         (keys: readonly string[], options?: CascadeOptions): Record<string, CSSPrimitive | undefined> => {
-            if(!attributes?.$getMany) {
+            if (!attributes?.$getMany) {
                 return Object.fromEntries(keys.map((key) => [key, undefined] )) as Record<string, CSSPrimitive | undefined>;
             }
             return attributes.$getMany([...keys], options);

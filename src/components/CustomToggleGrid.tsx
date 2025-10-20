@@ -64,7 +64,7 @@ function CustomToggleGridBase({
     const handleChange = useCallback((next: ToggleValue) => onChange(next), [onChange]);
 
     const computedTemplate = useMemo<React.CSSProperties>(() => {
-        if(gridTemplateColumns) return gridTemplateColumns;
+        if (gridTemplateColumns) return gridTemplateColumns;
         const width = typeof minItemWidth === 'number' ? `${minItemWidth}px` : String(minItemWidth);
         return { '--cb-grid-template-columns': `repeat(${columns}, minmax(${width}, 1fr))` } as React.CSSProperties;
     },

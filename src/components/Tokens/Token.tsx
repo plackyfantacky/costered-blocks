@@ -130,7 +130,7 @@ export default function Token({
 
     const handleFocusOutside = useCallback((event: FocusEvent) => {
         const next = event?.relatedTarget as Node | null;
-        if(next && chipRef.current?.contains(next)) { 
+        if (next && chipRef.current?.contains(next)) { 
             return
         }
         event.stopPropagation();

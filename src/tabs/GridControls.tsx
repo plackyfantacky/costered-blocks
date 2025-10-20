@@ -25,7 +25,7 @@ import { MaterialSymbolsBackgroundGridSmall as GridIcon } from "@assets/icons";
 
 const GridControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();
-    if(!clientId) return null;
+    if (!clientId) return null;
 
     const name = selectedBlock?.name;
     const safeBlockName = useSafeBlockName(name, clientId);

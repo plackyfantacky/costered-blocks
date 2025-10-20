@@ -56,7 +56,7 @@ function PanelToggleBase<Key extends string>({
     const handleChange = useCallback(
         (next: string) => {
             const ok = isValid(next);
-            if(ok && next !== value) onChange(next as Key);
+            if (ok && next !== value) onChange(next as Key);
         },
         [onChange, value, isValid]
     );

@@ -325,7 +325,7 @@ function costered_write_css_file($css, $post_id = 0) {
         return [null, null, null];
     }
 
-    if(!is_writable($base_dir)) {
+    if (!is_writable($base_dir)) {
         return [null, null, null];
     }
     

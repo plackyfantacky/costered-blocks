@@ -20,7 +20,7 @@ export function composeExclusiveGridStyle(
     const { gridArea, gridColumn, gridRow } = input || {};
 
     
-    if(isNonEmpty(gridArea)) {
+    if (isNonEmpty(gridArea)) {
         style.gridArea = String(gridArea);
         return style; // bail: do not include longhands if shorthand is present
     }

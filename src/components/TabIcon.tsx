@@ -21,7 +21,7 @@ export default function TabIcon({ name, size = 24, style = {} }: TabIconProps) {
     
     const blockType: any = getBlockType(name);
     const icon: string | ReactNode | BlockIconObject | undefined = blockType?.icon;
-    if(!icon) return <UnknownIcon style={{ fontSize: size, width: size, height: size, ...style }} />;
+    if (!icon) return <UnknownIcon style={{ fontSize: size, width: size, height: size, ...style }} />;
 
     
     // If the icon is a dashicons icon, render it as a span with the appropriate class
