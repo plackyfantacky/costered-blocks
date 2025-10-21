@@ -184,7 +184,7 @@ export default function TokenGridBoard({
             const targetX = cellX + 1;
 
             if (targetX >= safeCols) {
-                // out of bounds: skip (or you could choose to resize here)
+                // out of bounds: skip
                 return;
             }
 

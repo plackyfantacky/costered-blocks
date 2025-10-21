@@ -15,7 +15,7 @@ import type { GridAxisModeKey, VisibilityCtx } from "@types";
 
 import { UnsavedIcon } from "@components/UnsavedIcon";
 import GapControls from "@components/composite/GapControls";
-import TokenGrid from "@components/Tokens/TokenGrid";
+import { TokenGrid } from "@components/Tokens/TokenGrid";
 import PanelToggle from "@components/composite/PanelToggle";
 import SubGridToggle from "@components/composite/SubGridToggle";
 
@@ -154,7 +154,7 @@ const GridControls = () => {
                     </FlexBlock>
                 </Flex>
             </PanelBody>
-            {/* <PanelBody
+            <PanelBody
                 title={LABELS.gridControls.areasPanel.title}
                 className="costered-blocks--grid-controls--template-areas-inner"
                 initialOpen={gridTemplateAreasPanelOpen}
@@ -194,7 +194,7 @@ const GridControls = () => {
                         />
                     </Modal>
                 )}
-            </PanelBody> */}
+            </PanelBody>
         </Panel>
     );
 };

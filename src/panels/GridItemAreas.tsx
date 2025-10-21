@@ -23,7 +23,7 @@ export function GridItemAreas({
     // Guard gridArea *before* saving
     const writeGridArea = useCallback((raw?: string) => {
         const name = normaliseGridAreaName(raw ?? '');
-        // Only set if it's a valid name; otherwise do nothing (or clear if you prefer)
+        // Only set if it's a valid name; otherwise do nothing
         setMany({
             'gridArea': name,
             //TODO: don't use undefined here -> it gets saved as a string and that breaks everything

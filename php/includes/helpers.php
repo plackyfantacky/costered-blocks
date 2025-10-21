@@ -128,7 +128,7 @@ function costered_inject_data_attr($html, $uid) {
     $offset = $match[0][1];
     $escaped = htmlspecialchars((string)$uid, ENT_QUOTES, 'UTF-8');
 
-    // If it already has data-costered, leave it (or replace it if you prefer)
+    // If it already has data-costered, leave it (or replace it)
     if (stripos($tag, 'data-costered=') !== false) {
         // Replace existing value
         $new_tag = preg_replace('/\sdata-costered=("|\')[^"\']*\1/i', ' data-costered="' . $escaped . '"', $tag, 1);

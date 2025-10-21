@@ -8,8 +8,6 @@ import TokenGridNoticePanel from './TokenGridNoticePanel';
 import { LABELS as DEFAULT_LABELS } from '@labels';
 import { toCount } from '@utils/gridUtils';
 
-import type { Matrix, ColumnInfo, RowInfo } from '@types';
-
 type Props = {
     clientId: string;
     labels?: {
@@ -28,7 +26,8 @@ export default function TokenGrid({
         rowData,
         setCell,
         resize: resizeObj,
-        clear
+        clear,
+        resetToTrackCount,
     } = useTokenAreas(clientId);
 
     const tokenGridLabels = useMemo(
@@ -42,7 +41,7 @@ export default function TokenGrid({
     );
 
     const resize = useCallback((cols: number, rows: number) => {
-        resizeObj({ cols, rows });
+        resizeObj(cols, rows);
     }, [resizeObj]);
 
     const areaCols = Array.isArray(matrix) && Array.isArray(matrix[0]) ? matrix[0].length : 0;
@@ -52,18 +51,19 @@ export default function TokenGrid({
     const trackRows = toCount((rowData as any)?.count ?? rowData);
 
     const mismatch = 
-        areaCols || areaRows || trackCols || trackRows
-            ? areaCols !== trackCols || areaRows !== trackRows
-            : false;
+        areaCols > 0 && areaRows > 0 && trackCols > 0 && trackRows > 0 &&
+        (areaCols !== trackCols || areaRows !== trackRows);
+
+    const gridMatrix = useMemo(() => ({ resize }), [resize]);
 
     return (
         <Flex direction="column" gap={2} className="costered-blocks--token-grid-component">
             {mismatch && (
                 <TokenGridNoticePanel
                     clientId={clientId}
-                    columnData={trackCols}
-                    rowData={trackRows}
-                    gridMatrix={{ resize }}
+                    columnData={columnData}
+                    rowData={rowData}
+                    gridMatrix={gridMatrix}
                     labels={tokenGridNoticeLabels}
                 />
             )}

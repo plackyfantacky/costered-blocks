@@ -136,6 +136,8 @@ export default function Token({
         event.stopPropagation();
     }, []);
 
+    const isActiveClassName = isExpanded ? 'is-active' : ''; 
+ 
     const EditorPanel = (
         <div id={`costered-blocks--token--panel-${index}`} className={tokenEditorClassnames}>
             <TextControl
@@ -210,7 +212,7 @@ export default function Token({
             {/* Floating panel (opt-in) */}
             {floatingEditor && chipRef.current && (
                 <Popover
-                    className="costered-blocks--token--popover"
+                    className={`costered-blocks--token--popover ${isActiveClassName}`}
                     anchor={chipRef.current}
                     placement={popoverPlacement} // e.g. 'bottom-start', 'right-start'
                     onClose={() => onToggle()}

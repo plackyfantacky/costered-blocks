@@ -36,24 +36,37 @@ export function composeMatrixToAreas(matrix: Matrix, emptyToken: string = '.'): 
 
 /**
  * Ensure rectangular shape and minimum size; fill with emptyToken.
+ * 
+ * the order of targetRows and targetCols is intentional here. do not rearrange. 
+ * or do. I don't care. The UI controls (+/-) will swap columns for rows. You've been warned.
  */
 export function ensureSize(
-    matrix: Matrix | unknown,
-    cols: number,
-    rows: number,
+    matrix: Matrix,
+    targetRows: number, // outer array (of rows)
+    targetCols: number, // inner array (of columns)
     emptyToken: string = '.'
 ): Matrix {
-    const src = (Array.isArray(matrix) ? (matrix as Matrix) : []) as Matrix;
-    const C = Math.max(1, Math.trunc(cols));
-    const R = Math.max(1, Math.trunc(rows));
-    return Array.from({ length: R }, (_, ry) =>
-        Array.from({ length: C }, (_, cx) => src[ry]?.[cx] ?? emptyToken)
-    );
+    const rows = [...matrix]
+
+    while(rows.length < targetRows)  rows.push(Array(targetCols).fill(emptyToken));
+    while(rows.length > targetRows) rows.pop();
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = [...(rows[i] ?? [])];
+        if (row.length < targetCols) {
+            while (row.length < targetCols) row.push(emptyToken);
+        } else if (row.length > targetCols) {
+            row.length = targetCols;
+        }
+        rows[i] = row;
+    }
+    
+    return rows;
 }
 
 /**
  * Create a new empty matrix.
  */
 export function createEmptyMatrix(cols: number, rows: number, emptyToken: string = '.'): Matrix {
-    return ensureSize([], cols, rows, emptyToken);
+    return ensureSize([], rows, cols, emptyToken); //ignore the reversed column/row order. you didn't see anything.
 }

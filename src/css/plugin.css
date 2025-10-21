@@ -387,6 +387,7 @@ fieldset.costered-blocks--fieldset {
 
 /* TokenGrid */
 .costered-blocks--token-grid-component {
+
     .costered-blocks--token-grid--area {
         display: flex;
         flex-direction: column;
@@ -486,6 +487,12 @@ fieldset.costered-blocks--fieldset {
 }
 
 .costered-blocks--token--popover {
+
+    &:not(.is-active) .components-popover__content {
+        /* popovers render outside of the normal flow, and when collapsed,
+        the box-shadow shows as a little grey dot over the top of everything */
+        box-shadow: none;
+    }
 
     .costered-blocks--token--panel {
         display:flex;

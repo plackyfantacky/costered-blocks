@@ -1,6 +1,5 @@
 import { sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { useState, useCallback } from "@wordpress/element";
+import { useState, useCallback, useEffect } from "@wordpress/element";
 
 import {
     Button, 
@@ -11,8 +10,13 @@ import {
     __experimentalHeading as Heading
 } from '@wordpress/components';
 
-import { extendTrackTemplate, shrinkTrackTemplate } from '@utils/gridUtils';
-import { useAttrSetter, useGridStoreAreasIO, useGridModel } from '@hooks';
+import { 
+    countTracks, 
+    extendTrackTemplate, 
+    shrinkTrackTemplate, 
+    toCount
+ } from '@utils/gridUtils';
+import { useAttrSetter, useGridModel } from '@hooks';
 import { LABELS as DEFAULT_LABELS } from "@labels";
 import { DEFAULT_GRID_UNIT } from '@config';
 
@@ -45,28 +49,30 @@ export default function TokenGridNoticePanel({
     if (!clientId) return null;
 
     const { set } = useAttrSetter(clientId ?? '');
-
-    const { trackColumnCount, trackRowCount } = useGridStoreAreasIO(clientId);
     const model = useGridModel(clientId);
 
     // ConfirmDialog state
     const [isConfirmOpen, setConfirmOpen] = useState(false);
-
-    const asCount = (val: CountLike): number => 
-        val && typeof val === 'object' ? val.count ?? 0 : Number(val) || 0;
-
-    const asUnit = (val: CountLike, fallback: string): string => 
-        val && typeof val === 'object' && val.unit ? val.unit : fallback;
 
     // Normalised sizes (areas)
     const areaCols = Number(columnData) || 0;
     const areaRows = Number(rowData) || 0;
 
     // Normalised sizes (tracks)
-    const trackCols = asCount(trackColumnCount);
-    const trackRows = asCount(trackRowCount);
-    const colUnit = asUnit(trackColumnCount, DEFAULT_GRID_UNIT); // e.g. '1fr'
-    const rowUnit = asUnit(trackRowCount, 'auto');
+    const colInfo = countTracks(model?.columns?.template ?? '');
+    const rowInfo = countTracks(model?.rows?.template ?? '');
+    const trackCols = toCount((colInfo as any)?.count ?? colInfo); // e.g. '1fr'
+    const trackRows = toCount((rowInfo as any)?.count ?? rowInfo);
+
+    const colUnit =
+        typeof colInfo === 'object' && 'unit' in colInfo && colInfo.unit
+            ? colInfo.unit
+            : DEFAULT_GRID_UNIT;
+
+    const rowUnit =
+        typeof rowInfo === 'object' && 'unit' in rowInfo && rowInfo.unit
+            ? rowInfo.unit
+            : DEFAULT_GRID_UNIT;
 
     const columnsMismatch = areaCols !== trackCols;
     const rowsMismatch = areaRows !== trackRows;
@@ -94,7 +100,7 @@ export default function TokenGridNoticePanel({
             ? extendTrackTemplate(curRows, areaRows, rowUnit)
             : curRows;
 
-        // Optional: bail if nothing changes
+        // bail if nothing changes
         if (nextColumns === curCols && nextRows === curRows) return;
 
         set('gridTemplateColumns', nextColumns);
@@ -119,6 +125,10 @@ export default function TokenGridNoticePanel({
             performShrink();
         }
     }, [model, performShrink]);
+
+    useEffect(() => {
+        console.log('[Mismatch check]', { areaCols, areaRows, trackCols, trackRows });
+    }, [areaCols, areaRows, trackCols, trackRows]);
 
     if (!columnsMismatch && !rowsMismatch) return null;
 
