@@ -184,10 +184,10 @@ export function GridItemTracks({
     }, [ctrl.row.values, ctrl.row.named, ctrl.row.handlers]);
 
     useEffect(() => {
-        console.group('GridItemTracks → col changes');
+        console.group('GridItemTracks -> col changes');
         // console.log('gridColEndMode:', gridColEndMode);
         // console.log('col controller:', ctrl.column);
-        console.log('GridItemTracks render → ctrl.column.modes.mode:', ctrl.column.modes.mode);
+        console.log('GridItemTracks render -> ctrl.column.modes.mode:', ctrl.column.modes.mode);
         console.groupEnd();
     }, [ctrl.column, gridColEndMode]);
 

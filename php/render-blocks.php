@@ -13,6 +13,7 @@ add_filter('render_block', function($block_content, $block) {
     $attrs = $block['attrs'];
     $allowed = costered_get_attributes_map();
     $costered = costered_ensure_shape($attrs['costered'] ?? null);  
+    $blockName = $block['blockName'] ?? '';
 
     // Get a selector UID (saved if present; else ephemeral so CSS can be buffered now)
     $uid = costered_resolve_block_uid($attrs, /* allow_fallback */ true);
@@ -101,14 +102,15 @@ add_filter('render_block', function($block_content, $block) {
         return $output;
     };
 
-    $stylesByBp = [
+    // always returns 'desktop' filled; 'tablet' and 'mobile' may be empty
+    $stylesByBreakpoint = [
         'desktop' => $mapCamelToKebab($desktop),
         'tablet'  => $mapCamelToKebab($tablet),
         'mobile'  => $mapCamelToKebab($mobile),
     ];
 
     // Build CSS and add to the shared buffer
-    $css = costered_build_css_for_uid($uid, $stylesByBp);
+    $css = costered_build_css_for_uid_pretty($uid, $stylesByBreakpoint, $blockName);
 
     if ($css === '') {
         error_log('costered: no CSS for uid ' . var_export($uid, true));
@@ -139,7 +141,7 @@ add_filter('block_type_metadata_settings', function($settings, $metadata) {
         $settings['supports'] = [];
     }
 
-    // nuke the attrs.layout object (which is used for the default block layout constols)
+    // nuke the attrs.layout object (which is used for the default block layout controls)
     $settings['supports']['layout'] = false;
     return $settings;
 }, 10, 2);

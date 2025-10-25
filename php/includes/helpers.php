@@ -162,15 +162,15 @@ function costered_is_unset_like($value) {
     return $value === null || $value === '' || $value === 'null' || $value === 'undefined';
 }
 
-/** camelCase → kebab-case for CSS props */
+/** camelCase -> kebab-case for CSS props */
 function costered_camel_kebab($key) {
     return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', (string) $key));
 }
 
 /**
  * Read a value from the responsive shape.
- * $raw = true  → read ONLY the given $breakpoint bucket
- * $raw = false → cascade upwards (mobile→tablet→desktop)
+ * $raw = true  -> read ONLY the given $breakpoint bucket
+ * $raw = false -> cascade upwards (mobile->tablet->desktop)
  */
 function costered_get($attrs, $key, $breakpoint = 'desktop', $raw = true) {
     $shaped = costered_ensure_shape(isset($attrs['costered']) ? $attrs['costered'] : null);
@@ -189,31 +189,14 @@ function costered_get($attrs, $key, $breakpoint = 'desktop', $raw = true) {
 }
 
 /** Turn an assoc array of camelCase => value into a CSS declaration string */
-function costered_style_string($camel_array) {
+function costered_style_string($camel_array, $indent = "    ") {
     $output = [];
     foreach ($camel_array as $key => $value) {
         if (costered_is_unset_like($value)) continue;
-        $output[] = costered_camel_kebab($key) . ': ' . trim((string) $value) . ';';
+        $output[] = $indent . costered_camel_kebab($key) . ': ' . trim((string) $value) . ';';
     }
-    return implode(' ', $output);
-}
-
-/**
- * Build desktop/tablet/mobile CSS blocks for a selector.
- * $stylesByBp: ['desktop'=>[prop=>val], 'tablet'=>[...], 'mobile'=>[...]]
- */
-function costered_build_css_for_selector($selector, $stylesByBp) {
-    $css = '';
-    if (!empty($stylesByBp['desktop'])) {
-        $css .= $selector . ' { ' . costered_style_string($stylesByBp['desktop']) . " }\n";
-    }
-    if (!empty($stylesByBp['tablet'])) {
-        $css .= "@media (min-width: 783px) and (max-width: 1024px) { {$selector} { " . costered_style_string($stylesByBp['tablet']) . " } }\n";
-    }
-    if (!empty($stylesByBp['mobile'])) {
-        $css .= "@media (max-width: 782px) { {$selector} { " . costered_style_string($stylesByBp['mobile']) . " } }\n";
-    }
-    return $css;
+    if (empty($output)) return '';
+    return implode("\n", $output) . "\n";
 }
 
 /**
@@ -242,64 +225,6 @@ function costered_styles_add($css) {
     if (is_string($css) && $css !== '') {
         $GLOBALS['costered_css_buffer'][] = $css;
     }
-}
-
-function costered_styles_output() {
-    //error_log('costered: styles_output fired');
-    $buffer = $GLOBALS['costered_css_buffer'] ?? null;
-
-    if (empty($buffer)) {
-        //error_log('costered: styles_output fired (buffer empty)');
-        return;
-    }
-
-    $joined = implode("\n", array_unique($buffer));
-
-    if ($joined === '') {
-        //error_log('costered: styles_output fired (joined empty)');
-        return;
-    }
-
-    //error_log('costered: styles_output printed ' . strlen($joined) . ' bytes');
-    echo "<style id=\"costered-blocks-styles\">\n{$joined}\n</style>";
-}
-
-/**
- * Build CSS for a single block uid across breakpoints.
- * $stylesByBp = ['desktop'=>[prop=>val], 'tablet'=>[...], 'mobile'=>[...]]
- */
-function costered_build_css_for_uid($uid, array $stylesByBp) {
-    if (!is_string($uid) || $uid === '') return '';
-    $selector = '[data-costered="' . esc_attr($uid) . '"]';
-    $css = '';
-
-    $breakpoint = costered_get_breakpoints();
-    $mobileMax = $breakpoint['mobile']; // e.g. 782
-    $tabletMax = $breakpoint['tablet']; // e.g. 1024
-    $tabletMin = $mobileMax + 1;
-
-    // Desktop as base (no media)
-    if (!empty($stylesByBp['desktop'])) {
-        $css .= $selector . ' { ' . costered_style_string($stylesByBp['desktop']) . " }\n";
-    }
-
-    // Tablet range
-    if (!empty($stylesByBp['tablet'])) {
-        $decls = costered_style_string($stylesByBp['tablet']);
-        if ($decls !== '') {
-            $css .= "@media (min-width: {$tabletMin}px) and (max-width: {$tabletMax}px) { {$selector} { {$decls} } }\n";
-        }
-    }
-
-    // Mobile max
-    if (!empty($stylesByBp['mobile'])) {
-        $decls = costered_style_string($stylesByBp['mobile']);
-        if ($decls !== '') {
-            $css .= "@media (max-width: {$mobileMax}px) { {$selector} { {$decls} } }\n";
-        }
-    }
-    
-    return $css;
 }
 
 /**
@@ -378,4 +303,162 @@ function costered_print_collected_css_link() {
     }
 
     echo '<link id="costered-blocks-stylesheet" rel="stylesheet" href="' . esc_url($url) . '?ver=' . esc_attr($version) . "\" />\n";
+}
+
+/**
+ * Checks the current blockName against a list of blocks that need strengthened selectors.
+ * If the block is in the list, it needs multiple selectors (e.g core/button needs .wp-block-button__link AND .wp-element-button).
+ * Returns the original selector as-is or as an array ready for further processing.
+ * 
+ * @param string $selector      The base selector to strengthen e.g '[data-costered="UID"]'.
+ * @param string $block_name    The block name (e.g. 'core/button').
+ * @return string|array         The strengthened selector(s).
+ */
+function costered_return_selector_or_selector_array(string $block_name, string $selector) {
+    $special_blocks = [
+        'core/button' => [
+            '.wp-block-buttons > ' . $selector . ' .wp-block-button__link',
+            '.wp-block-buttons > ' . $selector . ' .wp-element-button'
+        ],
+    ];
+
+    return $special_blocks[$block_name] ?? $selector;
+}
+
+/**
+ * Join one selector or an array of selectors into a pretty, comma-separated list.
+ *
+ * @param string|array<int,string>      $selectorOrArray
+ * @param string                        $lineIndent - Indent to prefix on each selector line.
+ * @return string
+ */
+function costered_join_selectors(string|array $selectorOrArray, string $lineIndent = ''): string {
+    if (is_string($selectorOrArray)) {
+        return ($lineIndent !== '' ? $lineIndent : '') . $selectorOrArray;
+    }
+    $list = array_values(array_filter(array_map('trim', $selectorOrArray), 'strlen'));
+    if (!$list) return '';
+    return $lineIndent . implode(",\n{$lineIndent}", $list);
+}
+
+/**
+ * Render a single CSS rule block (no @media yet), pretty-printed.
+ *
+ * @param string|array<int,string>      $selectorOrArray
+ * @param array<string,string>          $declarationMap - camelCase => value
+ * @param string                        $baseIndent
+ * @return string
+ */
+function costered_render_rule_block(string|array $selectorOrArray, array $declarationMap, string $baseIndent = ''): string {
+    if (empty($declarationMap)) return '';
+    $selector = costered_join_selectors($selectorOrArray, $baseIndent);
+    $css = "{$selector} {\n";
+    $css .= costered_style_string($declarationMap, $baseIndent . '    ');
+    $css .= "{$baseIndent}}\n";
+    return $css;
+}
+
+
+/**
+ * Build pretty CSS for desktop/tablet/mobile buckets for the given selector(s).
+ * Uses dynamic breakpoints from costered_get_breakpoints().
+ *
+ * @param string|array<int,string>      $selectorOrArray
+ * @param array                         $stylesByBreakpoint
+ * @param string                        $baseIndent
+ * @return string
+ */
+function costered_build_css_pretty_for_selectors(string|array $selectorOrArray, array $stylesByBreakpoint, string $baseIndent = ''): string {
+    $blocks = [];
+
+    $breakpoints   = costered_get_breakpoints();
+    $mobileMaxPx   = (int)($breakpoints['mobile'] ?? 782);
+    $tabletMaxPx   = (int)($breakpoints['tablet'] ?? 1024);
+    $tabletMinPx   = $mobileMaxPx + 1;
+
+    // Desktop (no media)
+    if (!empty($stylesByBreakpoint['desktop'])) {
+
+        $blocks[] = costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['desktop'], $baseIndent);
+    }   
+
+    // Tablet
+    if (!empty($stylesByBreakpoint['tablet'])) {
+        $css = "@media (min-width: {$tabletMinPx}px) and (max-width: {$tabletMaxPx}px) {\n";
+        $css .= costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['tablet'], $baseIndent . '    ');
+        $css .= "}\n";
+        $blocks[] = $css;
+    }
+
+    // Mobile
+    if (!empty($stylesByBreakpoint['mobile'])) {
+        $css = "@media (max-width: {$mobileMaxPx}px) {\n";
+        $css .= costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['mobile'], $baseIndent . '    ');
+        $css .= "}\n";
+        $blocks[] = $css;
+    }
+
+    return costered_join_css_blocks($blocks);
+}
+
+/**
+ * Build pretty CSS for a block UID, strengthening selectors when needed.
+ * - By default, all declarations go to the base selector: [data-costered="UID"].
+ * - If costered_return_selector_or_selector_array() returns stronger selector(s)
+ *   (e.g. core/button -> descendant anchor selectors), margin* stays on the wrapper,
+ *   everything else goes to the strengthened selector(s).
+ *
+ * @param string        $uid
+ * @param array         $stylesByBreakpoint
+ * @param string        $blockName
+ * @return string
+ */
+function costered_build_css_for_uid_pretty(string $uid, array $stylesByBreakpoint, string $blockName = ''): string {
+    if ($uid === '') return '';
+
+    $baseWrapperSelector         = '[data-costered="' . esc_attr($uid) . '"]';
+    $strengthenedSelectorOrList  = costered_return_selector_or_selector_array($blockName, $baseWrapperSelector);
+
+    // No special handling -> everything on the wrapper selector.
+    if ($strengthenedSelectorOrList === $baseWrapperSelector) {
+        return costered_build_css_pretty_for_selectors($baseWrapperSelector, $stylesByBreakpoint);
+    }
+
+    // Split: margin* -> wrapper; everything else -> strengthened selector(s).
+    $wrapperDeclarationsByBreakpoint = ['desktop'=>[], 'tablet'=>[], 'mobile'=>[]];
+    $innerDeclarationsByBreakpoint   = ['desktop'=>[], 'tablet'=>[], 'mobile'=>[]];
+
+    foreach (['desktop','tablet','mobile'] as $breakpointKey) {
+        foreach (($stylesByBreakpoint[$breakpointKey] ?? []) as $propName => $propValue) {
+            $propLower = strtolower($propName);
+            if ($propLower === 'margin' || str_starts_with($propLower, 'margin-')) {
+                $wrapperDeclarationsByBreakpoint[$breakpointKey][$propName] = $propValue;
+            } else {
+                $innerDeclarationsByBreakpoint[$breakpointKey][$propName] = $propValue;
+            }
+        }
+    }
+
+    $outer_css = costered_build_css_pretty_for_selectors($baseWrapperSelector, $wrapperDeclarationsByBreakpoint);
+    $inner_css = costered_build_css_pretty_for_selectors($strengthenedSelectorOrList, $innerDeclarationsByBreakpoint);
+
+    return costered_join_css_blocks([$outer_css, $inner_css]);
+}
+
+/**
+ * Join CSS blocks with exactly one blank line between non-empty blocks,
+ * and exactly one trailing newline at the end.
+ *
+ * @param string[] $blocks
+ * @return string
+ */
+function costered_join_css_blocks(array $blocks): string {
+    $output = '';
+    foreach ($blocks as $block) {
+        $block = rtrim((string)$block);   // strip trailing newlines/whitespace
+        if ($block === '') continue;      // skip empties
+        if ($output !== '') $output .= "\n\n";  // one blank line between blocks
+        $output .= $block;
+    }
+    return $output === '' ? '' : ($output . "\n");
 }

@@ -42,7 +42,7 @@ Purpose: Help AI coding agents work effectively in this WordPress plugin. Keep r
 - Adjusting core block behavior: see `php/render-blocks.php` (layout supports) and customized JS under `src/blocks/**` and `src/filters/**`.
 
 ## Integration points
-- WordPress packages are treated as globals in the bundles (e.g., `@wordpress/data` → `wp.data`). See the externals/global map in `node/dev.config.mjs`. Do not bundle React or WP packages.
+- WordPress packages are treated as globals in the bundles (e.g., `@wordpress/data` -> `wp.data`). See the externals/global map in `node/dev.config.mjs`. Do not bundle React or WP packages.
 - Editor registration happens via `wp.plugins.registerPlugin` in `src/editor/plugin-sidebar.js`. Sidebar name is `costered-blocks-sidebar`.
 - PHP constants `COSTERED_BLOCKS_URL` and `COSTERED_BLOCKS_PATH` are used for paths/URLs if needed.
 

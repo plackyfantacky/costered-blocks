@@ -152,7 +152,7 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
     //grid column
     const col = String(read(GRID_COLUMN_ATTR) ?? '').trim();
     if (col) {     
-        // handle "X / span -N" → "X - N / X"
+        // handle "X / span -N" -> "X - N / X"
         const match = col.match(/^(\d+)\s*\/\s*span\s*(-?\d+)$/i);
         if (match) {
             const start = parseInt(match[1]!, 10);
@@ -173,7 +173,7 @@ function buildMirror(attributes: Partial<AugmentedAttributes> = {}) {
     //grid row
     const row = String(read(GRID_ROW_ATTR) ?? '').trim();
     if (row) { 
-        // handle "X / span -N" → "X - N / X"
+        // handle "X / span -N" -> "X - N / X"
         const match = row.match(/^(\d+)\s*\/\s*span\s*(-?\d+)$/i);
         if (match) {
             const start = parseInt(match[1]!, 10);

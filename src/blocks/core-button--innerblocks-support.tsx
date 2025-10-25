@@ -22,10 +22,6 @@ type ButtonEditProps = {
     setAttributes: (next: Partial<ButtonAttrs>) => void;
 }
 
-type ButtonSaveProps = {
-    attributes: ButtonAttrs;
-}
-
 type BlockSettings = BlockConfiguration<ButtonAttrs>; 
 
 type SplitArg = {
@@ -34,13 +30,12 @@ type SplitArg = {
 } & Record<string, unknown>;
 
 type SplitResult = {
-    outerProps: {
+    outerClassNames: {
         className?: string;
         [key: string]: unknown;
     };
-    innerProps: {
+    innerClassNames: {
         className?: string;
-        style?: React.CSSProperties;
         [key: string]: unknown;
     };
 };
@@ -55,14 +50,23 @@ addFilter(
     (settings: BlockSettings, name?: string) => {
         if (name !== 'core/button') return settings;
 
+        const prevSupports = (settings.supports as Record<string, any>) ?? {};
+        const prevSpacing = (prevSupports.spacing as Record<string, any>) ?? {};
+
         return {
             ...settings,
             supports: {
-                ...(settings.supports as Record<string, unknown> | undefined),
+                ...prevSupports,
                 innerBlocks: true,
                 color: true,
                 background: true,
-                textColor:true
+                textColor:true,
+                spacing: {
+                    ...prevSpacing,
+                    padding: false,
+                    margin: true,
+
+                },
             },
             attributes: {
                 ...(settings.attributes as Record<string, unknown> | undefined),
@@ -76,28 +80,32 @@ addFilter(
                 }
             },
             edit: ({attributes, setAttributes}: ButtonEditProps) => {
-                
                 const { buttonGap } = attributes;
                 const wrapperRef = useRef<HTMLDivElement | null>(null);
                 
                 useEffect(() => {
                     if (wrapperRef.current) {
-                        const layout = wrapperRef.current.querySelector<HTMLDivElement>(
-                            '.block-editor-block-list__layout'
-                        );
+                        const layout = wrapperRef.current.querySelector<HTMLDivElement>('.block-editor-block-list__layout');
                         if (layout) layout.style.gap = String(buttonGap ?? '');
                     }
                 }, [buttonGap]);
                 
-                const blockProps = useBlockProps({
-                    className: 'cb-button--with-innerblocks',
-                });
+                const raw = useBlockProps({ className: 'cb-button--with-innerblocks',});
 
-                const { outerProps, innerProps } = splitBlockProps(blockProps);
+                const { outerClassName, innerClassName } = splitClassNames(raw.className);
+                const { outerStyle, innerStyle } = splitStyles(raw.style);
+
+                const { className: _omitClass, style: _omitStyle, ...outerRest } = raw;
 
                 return (
-                    <div {...outerProps}>
-                        <div {...innerProps} ref={wrapperRef}>
+                    <div {...outerRest} className={outerClassName} style={outerStyle}>
+                        <div 
+                            className={innerClassName}
+                            style={innerStyle}
+                            role="button"
+                            tabIndex={0}
+                            ref={wrapperRef}
+                        >
                             <InnerBlocks
                                 allowedBlocks={[
                                     'core/image',
@@ -121,19 +129,16 @@ addFilter(
 addFilter(
     'blocks.getSaveElement',
     'costered-blocks/core-button--innerblocks-support-save',
-    (
-        element: any,
-        blockType: { name?: string },
-        attributes: ButtonAttrs
-    ): any => {
+    (element: any, blockType: { name?: string }, attributes: ButtonAttrs): any => {
         if (blockType.name !== 'core/button') return element;
 
-        const rawProps = useBlockProps.save();
-        const { outerProps, innerProps } = splitBlockProps(rawProps as SplitArg);
+        const raw = useBlockProps.save();
+        const { outerClassName, innerClassName } = splitClassNames(String(raw.className || ''));
+        const { outerStyle, innerStyle } = splitStyles(raw.style);
 
         return (
-            <div {...outerProps}>
-                <a href={attributes.url || '#'} {...innerProps }>
+            <div className={outerClassName} style={outerStyle}>
+                <a href={attributes.url || '#'} className={innerClassName} style={innerStyle}>
                     <InnerBlocks.Content />
                 </a>
             </div>
@@ -268,37 +273,106 @@ registerBlockType<{ content?: string }>('costered-blocks/button-text', {
     },
 });
 
-function splitBlockProps({
-    className = '',
-    style,
-    ...rest
-}: SplitArg): SplitResult {
-    const classList = className.trim() ? className.trim().split(/\s+/) : [];
+function splitClassNames(className: string = '') {
+    const classes = className.trim() ? className.trim().split(/\s+/) : [];
 
-    const visualClassNames = new Set<string>();
-    const structuralClassNames: string[] = [];
+    const outerClasses: string[] = [];
+    const innerClasses: string[] = ['wp-block-button__link'];
 
-    for (const cls of classList) {
+    for (const cls of classes) {
+        // editor state classes that must remain on the wrapper
         if (
-            /^has-[\w-]+-(color|background-color)$/.test(cls) ||
-            /^has-(text|background|link)-color$/.test(cls) ||
-            cls.startsWith('is-style-')
+            /^wp-block(?:-|$)/.test(cls) ||
+            cls.startsWith('block-editor') ||
+            cls.startsWith('align') ||
+            cls.startsWith('is-layout') ||
+            cls === 'is-selected' ||
+            cls === 'has-child-selected' ||
+            cls === 'is-hovered' ||
+            cls === 'is-reusable' ||
+            cls === 'is-dragging'
         ) {
-            visualClassNames.add(cls);
-        } else {
-            structuralClassNames.push(cls);
+            outerClasses.push(cls);
+            continue;
         }
+
+        /* --- inner classes (presentation only) --- */
+
+        if (cls.startsWith('is-style-')) { innerClasses.push(cls); continue; }
+        if (
+            cls.startsWith('is-style-') ||
+            /^has-[\w-]+-(color|background-color)$/.test(cls) ||
+            cls === 'has-text-color' ||
+            cls === 'has-background' ||
+            cls === 'has-link-color' ||
+            cls.startsWith('has-border') ||
+            cls.startsWith('has-radius') ||
+            cls.startsWith('has-shadow') ||
+            cls.startsWith('costered-blocks--')
+        ) { innerClasses.push(cls); continue; }
+
+        innerClasses.push(cls);
     }
 
-    const innerBase = {
-        className: ['wp-block-button__link', ...visualClassNames].join(' ')
-    } as { className: string; style?: React.CSSProperties }
+    if (!outerClasses.some((cls) => cls.startsWith('wp-block-button'))) {
+        outerClasses.unshift('wp-block-button');
+    }
 
     return {
-        outerProps: {
-            ...rest,
-            className: structuralClassNames.join(' '),
-        },
-        innerProps: innerBase
+        outerClassName: outerClasses.join(' '),
+        innerClassName: innerClasses.join(' ')
+    };
+}
+
+function splitStyles(style?: React.CSSProperties) {
+    if (!style) return { outerStyle: undefined as React.CSSProperties | undefined, innerStyle: undefined as React.CSSProperties | undefined };
+
+    const outerStyle: Record<string, unknown> = {};
+    const innerStyle: Record<string, unknown> = {};
+
+    const moveToInner = new Set([
+        'padding','paddingTop','paddingRight','paddingBottom','paddingLeft',
+        'gap','columnGap','rowGap',
+        'display',
+        'flex','flexGrow','flexShrink','flexBasis',
+        'justifyContent','justifyItems','justifySelf',
+        'alignContent','alignItems','alignSelf',
+        'placeContent','placeItems','placeSelf',
+        'grid','gridTemplate','gridTemplateAreas',
+        'gridTemplateColumns','gridTemplateRows',
+        'gridAutoFlow','gridAutoColumns','gridAutoRows',
+        'gridColumn','gridColumnStart','gridColumnEnd',
+        'gridRow','gridRowStart','gridRowEnd',
+        'position','top','right','bottom','left','zIndex','inset',
+        'background','backgroundColor','backgroundImage','backgroundSize','backgroundRepeat',
+        'color','border','borderColor','borderWidth','borderStyle','borderRadius',
+        'boxShadow','outline',
+        'width','height','minWidth','minHeight','maxWidth','maxHeight',
+        'transform','transformOrigin','transition','transitionProperty','transitionDuration','transitionTimingFunction','transitionDelay',
+        'font','fontFamily','fontSize','fontWeight','lineHeight','letterSpacing','textTransform','textDecoration',
+    ]);
+
+    for (const [key, value] of Object.entries(style)) {
+        // CSS Custom Properties: send relevant vars to inner
+        if (key.startsWith('--wp--') || key.startsWith('--costered-')) {
+            innerStyle[key] = value;
+            continue;
+        }
+
+        if (key.startsWith('margin')) {
+            outerStyle[key] = value; // flow placement
+            continue;
+        }
+        if (moveToInner.has(key)) {
+            innerStyle[key] = value;
+            continue;
+        }
+        
+        innerStyle[key] = value;
+    }
+
+    return {
+        outerStyle: Object.keys(outerStyle).length ? (outerStyle as React.CSSProperties) : undefined,
+        innerStyle: Object.keys(innerStyle).length ? (innerStyle as React.CSSProperties) : undefined,
     };
 }

@@ -219,7 +219,7 @@ export function withBreakpointStyles(
     nextStyles: StyleMap
 ): BlockAttributes {
     if (!nextStyles || typeof nextStyles !== 'object' || Array.isArray(nextStyles)) {
-        throw new Error('withBreakpointStyles expects a plain object of camelCase CSS properties → string values.');
+        throw new Error('withBreakpointStyles expects a plain object of camelCase CSS properties -> string values.');
     }
     const currentCostered = attrs.costered ?? {};
     const currentBucket = (currentCostered[bp] as BreakpointBucket) ?? { styles: {} as StyleMap };
@@ -257,7 +257,7 @@ export function assertCanonicalCostered(attrs: BlockAttributes | undefined): voi
         if (!isCanonical) {
             // eslint-disable-next-line no-console
             console.error('[Costered] Non-canonical styles detected in', bp, styles);
-            throw new Error('Costered must persist styles as a plain object of camelCase CSS properties → string values.');
+            throw new Error('Costered must persist styles as a plain object of camelCase CSS properties -> string values.');
         }
     }
 }
