@@ -77,15 +77,15 @@ export function DimensionInputGroup({
                 <Flex gap={2} wrap={false} align="stretch" justify="space-between">
                     <CSSMeasurementControl
                         mode={mode}
-                        value={values.width}
-                        onChange={setWidth}
+                        clientId={clientId}
+                        prop="width"
                         label={widthLabel}
                         allowReset
                     />
                     <CSSMeasurementControl
                         mode={mode}
-                        value={values.height}
-                        onChange={setHeight}
+                        clientId={clientId}
+                        prop="height"
                         label={heightLabel}
                         allowReset
                     />

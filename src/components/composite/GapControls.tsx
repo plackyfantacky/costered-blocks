@@ -7,8 +7,6 @@ import { splitGap, joinGap, normalize } from '@utils/gapUtils';
 import { LABELS } from '@labels';
 
 import CSSMeasurementControl from '@components/CSSMeasurementControl';
-import UnitControlInput from "@components/UnitControlInput";
-import TextControlInput from "@components/TextControlInput";
 
 type Props = {
     clientId: string;
@@ -93,9 +91,9 @@ export default function GapControls({ clientId, blockName = null }: Props) {
                                 <CSSMeasurementControl
                                     mode={unitMode}
                                     label={labelText}
-                                    value={inputMode === 'single' ? initialValue : rowPart}
-                                    onChange={setRow}
                                     allowReset
+                                    clientId={clientId}
+                                    prop="gap"
                                 />
                             </FlexItem>
                             {inputMode === 'dual' && (
@@ -103,9 +101,9 @@ export default function GapControls({ clientId, blockName = null }: Props) {
                                     <CSSMeasurementControl
                                         mode={unitMode}
                                         label={LABELS.gapControls.rowLabel}
-                                        value={colPart}
-                                        onChange={setCol}
                                         allowReset
+                                        clientId={clientId}
+                                        prop="gap"
                                     />
                                 </FlexItem>
                             )}

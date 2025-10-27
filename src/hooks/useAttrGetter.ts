@@ -6,14 +6,15 @@ import { useMemo, useCallback } from '@wordpress/element';
 import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, AugmentedAttributes } from '@types';
 import { REDUX_STORE_KEY as BP_STORE } from '@config';
 import { augmentAttributes } from '@utils/breakpointUtils';
+import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 
 type AttributesMap = Record<string, unknown>;
 
 export function useAttrGetter(clientId: string | null) {
     const id: string | undefined = clientId ?? undefined;
+
     const breakpoint = useSelect(
-        (select: any) => select(BP_STORE)?.getBreakpoint?.() || ('desktop' as Breakpoint),
-        []
+        (select: any) => selectActiveBreakpoint(select),
     ) as Breakpoint;
 
     const rawAttributes = useSelect((select: any) => {
@@ -23,10 +24,7 @@ export function useAttrGetter(clientId: string | null) {
     }, [id]);
 
     const attributes = useMemo<AugmentedAttributes | undefined>(
-        () => 
-            rawAttributes
-                ? augmentAttributes(rawAttributes as BlockAttributes, breakpoint)
-                : undefined,
+        () => rawAttributes ? augmentAttributes(rawAttributes as BlockAttributes, breakpoint) : undefined,
         [rawAttributes, breakpoint]
     );
 
@@ -81,8 +79,36 @@ export function useAttrGetter(clientId: string | null) {
         return typeof val === 'string' && (allowed as readonly string[]).includes(val) ? (val as Token) : fallback;
     }
 
+    const getRaw = useCallback(
+        (key: string): CSSPrimitive | undefined => get(key, { raw: true, cascade: false }),
+        [get]
+    );
+
+    const getRawString = useCallback(
+        (key: string, fallback: string = ''): string => {
+            const val = get(key, { raw: true, cascade: false });
+            return typeof val === 'string' ? val : fallback;
+        },
+        [get]
+    );
+
+    const getRawNumber = useCallback(
+        (key: string, fallback: number = 0): number => {
+            const val = get(key, { raw: true, cascade: false });
+            return typeof val === 'number' ? val : fallback;
+        },
+        [get]
+    );
+
     return useMemo(
-        () => ({ get, getAs, getMany, getString, getNumber, getEnum, bp: breakpoint, attributes }),
-        [get, getAs, getMany, getString, getNumber, getEnum, breakpoint, attributes]
+        () => ({ 
+            // raw
+            getRaw, getRawString, getRawNumber, 
+            // cascaded by default
+            get, getAs, getMany, getString, getNumber, getEnum, 
+            bp: breakpoint, 
+            attributes 
+        }),
+        [get, getAs, getMany, getString, getNumber, getEnum, getRaw, getRawString, getRawNumber, breakpoint, attributes]
     );
 }
