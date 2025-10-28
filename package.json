@@ -2,16 +2,17 @@
     "name": "costered-blocks",
     "version": "1.1.1",
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
-    "main": "costered-blocks.php",
+    "main": "js/app.js",
     "scripts": {
-        "dev": "cross-env NODE_ENV=development node ./node/dev.config.mjs",
-        "watch": "cross-env NODE_ENV=development node ./node/dev.config.mjs -- --watch",
+        "dev": "cross-env NODE_ENV=development node ./node/dev.config.mjs -- --watch",
         "build": "cross-env NODE_ENV=production node ./node/dev.config.mjs -- --build",
         "svgr:convert": "node ./node/svgr-convert.mjs"
     },
     "devDependencies": {
         "@svgr/core": "^8.1.0",
         "@svgr/plugin-svgo": "^8.1.0",
+        "@types/react": "^19.2.0",
+        "@types/react-dom": "^19.2.0",
         "cross-env": "^10.0.0",
         "esbuild": "^0.25.5",
         "esbuild-plugin-path-alias": "^1.0.7",
@@ -35,6 +36,7 @@
     "homepage": "https://github.com/plackyfantacky/costered-blocks#readme",
     "dependencies": {
         "@svgr/plugin-jsx": "^8.1.0",
-        "@svgr/plugin-prettier": "^8.1.0"
+        "@svgr/plugin-prettier": "^8.1.0",
+        "typescript": "^5.9.3"
     }
 }

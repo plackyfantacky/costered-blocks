@@ -1,3 +1,4 @@
+// @ts-nocheck
 import esbuild from 'esbuild';
 import { context, build } from 'esbuild';
 import { glob } from 'glob';
@@ -15,6 +16,54 @@ const cssOutDir = './css';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const pluginRoot = path.resolve(__dirname, '..');
+
+const pathAliases = {
+    'assets': 'src/assets',
+    'components': 'src/components',
+    'config': 'src/config.ts',
+    'filters': 'src/filters',
+    'hooks': 'src/hooks',
+    'icons': 'src/assets/icons/index.js',
+    'labels': 'src/labels.ts',
+    'panels': 'src/panels',
+    'providers': 'src/providers',
+    'stores': 'src/stores',
+    'tabs': 'src/tabs',
+    'utils': 'src/utils',
+    'debug': 'src/utils/debug.ts',
+    'types': 'types'
+};
+
+const globalsMap = {
+    "@wordpress/api-fetch": "wp.apiFetch",
+    "@wordpress/blob": "wp.blob",
+    "@wordpress/block-editor": "wp.blockEditor",
+    "@wordpress/blocks": "wp.blocks",
+    "@wordpress/components": "wp.components",
+    "@wordpress/compose": "wp.compose",
+    "@wordpress/customize-posts": "wp.customizePosts",
+    "@wordpress/data": "wp.data",
+    "@wordpress/date": "wp.date",
+    "@wordpress/dom-ready": "wp.domReady",
+    "@wordpress/edit-post": "wp.editPost",
+    "@wordpress/editor": "wp.editor",
+    "@wordpress/element": "wp.element",
+    "@wordpress/hooks": "wp.hooks",
+    "@wordpress/html-entities": "wp.htmlEntities",
+    "@wordpress/i18n": "wp.i18n",
+    "@wordpress/icons": "wp.icons",
+    "@wordpress/interface": "wp.interface",
+    "@wordpress/keycodes": "wp.keycodes",
+    "@wordpress/media-upload": "wp.mediaUpload",
+    "@wordpress/media-utils": "wp.mediaUtils",
+    "@wordpress/plugins": "wp.plugins",
+    "@wordpress/preferences": "wp.preferences",
+    "@wordpress/url": "wp.url",
+    "@wordpress/utils": "wp.utils",
+    "@wordpress/viewport": "wp.viewport",
+    "react": "React",
+    "react-dom": "ReactDOM",
+};
 
 function importAsGlobals(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); // https://stackoverflow.com/a/3561711/153718
@@ -54,41 +103,18 @@ function importAsGlobals(mapping) {
     };
 }
 
-const globalsMap = {
-    "@wordpress/components": "wp.components",
-    "@wordpress/compose": "wp.compose",
-    "@wordpress/api-fetch": "wp.apiFetch",
-    "@wordpress/edit-post": "wp.editPost",
-    "@wordpress/element": "wp.element",
-    "@wordpress/plugins": "wp.plugins",
-    "@wordpress/editor": "wp.editor",
-    "@wordpress/block-editor": "wp.blockEditor",
-    "@wordpress/blocks": "wp.blocks",
-    "@wordpress/hooks": "wp.hooks",
-    "@wordpress/utils": "wp.utils",
-    "@wordpress/date": "wp.date",
-    "@wordpress/data": "wp.data",
-    "@wordpress/dom-ready": "wp.domReady",
-    "@wordpress/icons": "wp.icons",
-    "@wordpress/i18n": "wp.i18n",
-    "@wordpress/preferences": "wp.preferences",
-    "@wordpress/keycodes": "wp.keycodes",
-    "@wordpress/html-entities": "wp.htmlEntities",
-    "@wordpress/url": "wp.url",
-    "@wordpress/media-utils": "wp.mediaUtils",
-    "@wordpress/media-upload": "wp.mediaUpload",
-    "@wordpress/blob": "wp.blob",
-    "@wordpress/customize-posts": "wp.customizePosts",
-    "@wordpress/viewport": "wp.viewport",
-    "react": "React",
-    "react-dom": "ReactDOM",
-};
-
 function cleanOutputDir(outdir) {
     if (fs.existsSync(outdir)) {
         fs.rmSync(outdir, { recursive: true, force: true });
     }
 }
+
+const resolvedAliases = Object.fromEntries(
+    Object.entries(pathAliases).map(([key, relPath]) => [
+        `@${key}`,
+        path.resolve(pluginRoot, relPath),
+    ])
+);
 
 const jsConfig = {
     entryPoints: await glob('src/**/*.{js,jsx,ts,tsx}').then((files) =>
@@ -104,27 +130,27 @@ const jsConfig = {
     outdir: jsOutDir,
     loader: {
         '.js': 'jsx',
-        '.ts': 'tsx',
+        '.ts': 'ts',
         '.jsx': 'jsx',
         '.tsx': 'tsx'
     },
     jsx: 'transform',
-    jsxFactory: 'React.createElement',
-    jsxFragment: 'React.Fragment',
+    jsxFactory: 'wp.element.createElement',
+    jsxFragment: 'wp.element.Fragment',
+    tsconfigRaw: {
+        compilerOptions: {
+            // Force classic JSX at bundle-time even if tsconfig says react-jsx
+            jsx: 'react',
+            jsxFactory: 'wp.element.createElement',
+            jsxFragmentFactory: 'wp.element.Fragment'
+        }
+    },
     target: ['es2020'],
     format: 'iife',
     platform: 'browser',
     plugins: [
         importAsGlobals(globalsMap),
-        pathAlias({
-            '@editor': path.resolve(pluginRoot, 'src/editor'),
-            '@tabs': path.resolve(pluginRoot, 'src/editor/tabs'),
-            '@components': path.resolve(pluginRoot, 'src/components'),
-            '@assets': path.resolve(pluginRoot, 'src/assets'),
-            '@hooks': path.resolve(pluginRoot, 'src/hooks'),
-            '@filters': path.resolve(pluginRoot, 'src/filters'),
-            '@config': path.resolve(pluginRoot, 'src/config.js'),
-        })
+        pathAlias(resolvedAliases),
     ],
     logLevel: 'info',
     resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],

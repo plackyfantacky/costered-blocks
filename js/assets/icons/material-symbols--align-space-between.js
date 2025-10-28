@@ -1,1 +1,0 @@
-(()=>{var v=({size:t=24,...h})=>React.createElement("svg",{xmlns:"http://www.w3.org/2000/svg",width:t,height:t,...h},React.createElement("path",{fill:"currentColor",d:"M7 7V4H2V2h20v2h-5v3zM2 22v-2h5v-3h10v3h5v2z"})),e=v;})();
