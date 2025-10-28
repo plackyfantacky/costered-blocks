@@ -3,11 +3,11 @@
 /**
  * Plugin Name:       Costered Blocks
  * Description:       A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.
- * Version:           1.1.1
+ * Version:           1.3.0
  * Author:            Adam Trickett
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * License:           GPL-2.0-or-later
+ * License:           GPL-2.0-or-later and MIT
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       costered-blocks
  */
