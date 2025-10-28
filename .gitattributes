@@ -1,0 +1,16 @@
+# Dotfiles / repo meta
+/.gitignore               export-ignore
+/.gitattributes           export-ignore
+/.editorconfig            export-ignore
+/.env*                    export-ignore
+
+# Node / build configs & local dev
+/.github/                 export-ignore
+/CHANGELOG-DEV.md         export-ignore
+/node/                    export-ignore
+/src/                     export-ignore
+/types/                   export-ignore
+/package.json             export-ignore
+/package-lock.json        export-ignore
+/tsconfig*.json           export-ignore
+
