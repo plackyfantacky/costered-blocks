@@ -3,82 +3,113 @@ name: Release on tag
 on:
     push:
         tags:
-            - 'v*'   # v1.4.0, v1.4.1-alpha1, v1.5.0-beta1
+            - 'v*'                 # e.g. v1.3.0, v1.4.0-beta1
+    workflow_dispatch:
+        inputs:
+            ref_name:
+                description: "Fake tag name (for manual/dry runs)"
+                type: string
+                default: "vTEST-0.0.0"
+            prerelease:
+                description: "Treat as prerelease?"
+                type: boolean
+                default: true
+            dry_run:
+                description: "Skip publishing the GitHub Release (build and artifact only)"
+                type: boolean
+                default: true
 
 permissions:
     contents: write
 
 concurrency:
-    group: release-${{ github.ref }}
+    group: release-${{ github.ref || inputs.ref_name }}
     cancel-in-progress: false
 
 jobs:
     gate:
-        name: Classify tag (main vs dev + version scheme)
+        name: Classify release (main vs dev, stable vs prerelease)
         runs-on: ubuntu-latest
         outputs:
             release_should_run: ${{ steps.decide.outputs.release_should_run }}
-            prerelease: ${{ steps.decide.outputs.prerelease }}
-            version: ${{ steps.version.outputs.version }}
+            prerelease:         ${{ steps.decide.outputs.prerelease }}
+            version:            ${{ steps.version.outputs.version }}
+            ref_name:           ${{ steps.version.outputs.ref_name }}
+            dry_run:            ${{ steps.decide.outputs.dry_run }}
         steps:
-            - name: Checkout tag commit
+            - name: Checkout
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
-            - name: Derive version from tag
+            - name: Derive ref/tag
               id: version
               run: |
-                  RAW="${GITHUB_REF_NAME}"
-                  echo "version=${RAW#v}" >> "$GITHUB_OUTPUT"
-
-            - name: Fetch main & dev
-              run: |
-                  git fetch origin main --depth=1 || true
-                  git fetch origin dev --depth=1 || true
+                  if [ "${{ github.event_name }}" = "push" ]; then
+                      REF_NAME="${GITHUB_REF_NAME}"
+                  else
+                      REF_NAME="${{ inputs.ref_name }}"
+                  fi
+                  # Strip leading v for the version output
+                  CLEAN="${REF_NAME#v}"
+                  echo "ref_name=${REF_NAME}" >> "$GITHUB_OUTPUT"
+                  echo "version=${CLEAN}"     >> "$GITHUB_OUTPUT"
 
             - name: Decide release kind
               id: decide
               shell: bash
               run: |
                   set -euo pipefail
-                  TAG="${GITHUB_REF_NAME}"
+                  EVENT="${{ github.event_name }}"
+                  TAG="${{ steps.version.outputs.ref_name }}"
 
                   RE_STABLE='^v[0-9]+\.[0-9]+\.[0-9]+$'
                   RE_PRE='^v[0-9]+\.[0-9]+\.[0-9]+-(alpha|beta)[0-9]+$'
 
-                  on_main="false"
-                  on_dev="false"
+                  release_should_run=false
+                  prerelease=false
+                  dry_run=false
 
-                  if git rev-parse --verify --quiet origin/main >/dev/null; then
-                    if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then on_main="true"; fi
-                  fi
-                  if git rev-parse --verify --quiet origin/dev >/dev/null; then
-                    if git merge-base --is-ancestor "$GITHUB_SHA" origin/dev; then on_dev="true"; fi
-                  fi
+                  if [ "$EVENT" = "push" ]; then
+                    # Real tag push: classify by ancestry + pattern
+                    git fetch origin main --depth=1 || true
+                    git fetch origin dev  --depth=1 || true
 
-                  release_should_run="false"
-                  prerelease="false"
+                    on_main=false
+                    on_dev=false
+                    if git rev-parse --verify --quiet origin/main >/dev/null; then
+                      if git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then on_main=true; fi
+                    fi
+                    if git rev-parse --verify --quiet origin/dev >/dev/null; then
+                      if git merge-base --is-ancestor "$GITHUB_SHA" origin/dev; then on_dev=true; fi
+                    fi
 
-                  if [[ "$on_main" == "true" && "$TAG" =~ $RE_STABLE ]]; then
-                      release_should_run="true"
-                      prerelease="false"
-                      echo "Stable release (on main): $TAG"
-                  elif [[ "$on_dev" == "true" && "$TAG" =~ $RE_PRE ]]; then
-                      release_should_run="true"
-                      prerelease="true"
-                      echo "Prerelease (on dev): $TAG"
+                    if [[ "$on_main" == "true" && "$TAG" =~ $RE_STABLE ]]; then
+                      release_should_run=true
+                      prerelease=false
+                    elif [[ "$on_dev" == "true" && "$TAG" =~ $RE_PRE ]]; then
+                      release_should_run=true
+                      prerelease=true
+                    else
+                      release_should_run=false
+                    fi
                   else
-                      echo "No release: tag does not match branch/pattern rules."
-                      echo "on_main=$on_main on_dev=$on_dev tag=$TAG"
-                      echo "Expected: main + $RE_STABLE OR dev + $RE_PRE"
+                    # Manual dispatch: trust inputs, still require v* shape
+                    if [[ "$TAG" =~ ^v.+$ ]]; then
+                      release_should_run=true
+                      prerelease=${{ inputs.prerelease && 'true' || 'false' }}
+                      dry_run=${{ inputs.dry_run && 'true' || 'false' }}
+                    else
+                      release_should_run=false
+                    fi
                   fi
 
                   echo "release_should_run=$release_should_run" >> "$GITHUB_OUTPUT"
-                  echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+                  echo "prerelease=$prerelease"                 >> "$GITHUB_OUTPUT"
+                  echo "dry_run=$dry_run"                       >> "$GITHUB_OUTPUT"
 
     build:
-        name: Build (Node only)
+        name: Build (Node-only) and package
         needs: gate
         if: needs.gate.outputs.release_should_run == 'true'
         runs-on: ubuntu-latest
@@ -89,22 +120,59 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Setup Node
+            # Detect lockfile to avoid setup-node cache error when none present
+            - name: Detect lockfile
+              id: lock
+              run: |
+                  if [ -f package-lock.json ]; then
+                    echo "manager=npm"   >> "$GITHUB_OUTPUT"
+                    echo "has_lock=true" >> "$GITHUB_OUTPUT"
+                  elif [ -f yarn.lock ]; then
+                    echo "manager=yarn"  >> "$GITHUB_OUTPUT"
+                    echo "has_lock=true" >> "$GITHUB_OUTPUT"
+                  elif [ -f pnpm-lock.yaml ]; then
+                    echo "manager=pnpm"  >> "$GITHUB_OUTPUT"
+                    echo "has_lock=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "manager=none"  >> "$GITHUB_OUTPUT"
+                    echo "has_lock=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Setup Node (no cache)
+              if: steps.lock.outputs.has_lock == 'false'
               uses: actions/setup-node@v4
               with:
                   node-version: '20'
-                  cache: 'npm'
+
+            - name: Setup Node (with cache)
+              if: steps.lock.outputs.has_lock == 'true'
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: ${{ steps.lock.outputs.manager }}
 
             - name: Install dependencies
-              env:
-                  NODE_ENV: development
               run: |
-                  if [ -f package-lock.json ]; then npm ci; else npm install; fi
+                  if [ -f package-lock.json ]; then
+                      npm ci
+                  else
+                      npm install
+                  fi
 
             - name: Build assets
               env:
                   NODE_ENV: production
               run: npm run build
+
+            - name: Debug build outputs
+              run: |
+                  set -euxo pipefail
+                  echo "PWD=$(pwd)"
+                  ls -la
+                  echo "---- find js/css up to 3 levels ----"
+                  find . -maxdepth 3 -type d \( -name js -o -name css -o -name dist -o -name build -o -name assets \) -print || true
+                  du -sh ./* 2>/dev/null || true
+                  du -sh ./dist/* ./build/* ./assets/* 2>/dev/null || true
 
             - name: Create release zip
               run: |
@@ -113,16 +181,52 @@ jobs:
                   VERSION="${{ needs.gate.outputs.version }}"
                   ZIP="${PLUGIN_SLUG}-v${VERSION}.zip"
 
-                  # Export clean tree (respects .gitattributes export-ignore)
+                  # 1) Export a clean tree that honours .gitattributes (excludes src/, dev files, etc.)
                   git archive --format=tar --prefix="${PLUGIN_SLUG}/" HEAD | tar -x -C /tmp
 
-                  # If build outputs to ignored dirs, copy them in:
-                  for DIR in dist build assets; do
-                      if [ -d "$DIR" ]; then
-                          rsync -a "$DIR/" "/tmp/${PLUGIN_SLUG}/${DIR}/"
-                      fi
-                  done
+                  # 2) Locate built outputs; normalise into /js and /css inside the ZIP
+                  find_first_dir () { for d in "$@"; do [ -d "$d" ] && { echo "$d"; return 0; }; done; return 1; }
 
+                  JS_SRC="$(find_first_dir js dist/js build/js assets/js || true)"
+                  CSS_SRC="$(find_first_dir css dist/css build/css assets/css || true)"
+
+                  if [ -n "${JS_SRC:-}" ]; then
+                      mkdir -p "/tmp/${PLUGIN_SLUG}/js"
+                      rsync -a "$JS_SRC/" "/tmp/${PLUGIN_SLUG}/js/"
+                  else
+                      # Fallback: harvest js files from common roots
+                      if [ -d dist ] || [ -d build ] || [ -d assets ]; then
+                          mkdir -p "/tmp/${PLUGIN_SLUG}/js"
+                          find dist build assets -type f -name '*.js' -print0 2>/dev/null | xargs -0 -I{} rsync -a "{}" "/tmp/${PLUGIN_SLUG}/js/" || true
+                      fi
+                  fi
+
+                  if [ -n "${CSS_SRC:-}" ]; then
+                      mkdir -p "/tmp/${PLUGIN_SLUG}/css"
+                      rsync -a "$CSS_SRC/" "/tmp/${PLUGIN_SLUG}/css/"
+                  else
+                      # Fallback: harvest css files from common roots
+                      if [ -d dist ] || [ -d build ] || [ -d assets ]; then
+                          mkdir -p "/tmp/${PLUGIN_SLUG}/css"
+                          find dist build assets -type f -name '*.css' -print0 2>/dev/null | xargs -0 -I{} rsync -a "{}" "/tmp/${PLUGIN_SLUG}/css/" || true
+                      fi
+                  fi
+
+                  # 3) Optional: include other runtime artefacts if you produce them
+                  # for p in assets languages *.asset.php; do
+                  #   if [ -e "$p" ]; then
+                  #     mkdir -p "/tmp/${PLUGIN_SLUG}/$p"
+                  #     rsync -a "$p"/ "/tmp/${PLUGIN_SLUG}/$p"/ 2>/dev/null || true
+                  #   fi
+                  # done
+
+                  # 4) Sanity check: fail if neither js nor css made it in
+                  if [ ! -d "/tmp/${PLUGIN_SLUG}/js" ] && [ ! -d "/tmp/${PLUGIN_SLUG}/css" ]; then
+                      echo "ERROR: No built JS or CSS were found to include in the ZIP."
+                      exit 1
+                  fi
+
+                  # 5) Zip the final tree
                   cd /tmp
                   zip -rq "$ZIP" "${PLUGIN_SLUG}"
                   mkdir -p "$GITHUB_WORKSPACE/artifacts"
@@ -137,9 +241,8 @@ jobs:
     release:
         name: Publish GitHub Release
         needs: [gate, build]
-        if: needs.gate.outputs.release_should_run == 'true'
+        if: needs.gate.outputs.release_should_run == 'true' && needs.gate.outputs.dry_run != 'true'
         runs-on: ubuntu-latest
-
         steps:
             - name: Download artifact
               uses: actions/download-artifact@v4
@@ -150,13 +253,10 @@ jobs:
             - name: Create Release
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: ${{ github.ref_name }}
+                  tag_name: ${{ needs.gate.outputs.ref_name }}
                   files: dist/*.zip
                   draft: false
                   prerelease: ${{ needs.gate.outputs.prerelease == 'true' }}
-                  # Option A: let GitHub autogenerate notes from merged PRs/commits
                   generate_release_notes: true
-                  # Option B (later): supply a custom body from CHANGELOG.md
-                  # body_path: CHANGELOG.md
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
