@@ -87,7 +87,7 @@
         "gridUnit": "1fr",
         "appendImportantToMirroredStyles": true,
         "styleTagId": "costered-blocks-style-mirror",
-        "reduxStoreKey": "costered/ui",
+        "reduxStoreKey": "costered/breakpoints",
         "breakpoints": {
             "mobile": 782,
             "tablet": 1024,

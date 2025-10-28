@@ -41,7 +41,6 @@ const FieldSlot = memo(function FieldSlot({
 
 function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } : Props) {
     //prefixed by default so marginTop, paddingTop, etc are used. if false, just top, left for positioning, etc.
-    const { getString } = useAttrGetter(clientId);
     const { set, withPrefix } = useAttrSetter(clientId);
 
     const isPrefixed = typeof prefixed === 'boolean' ? prefixed : Boolean(prefix);
@@ -56,55 +55,31 @@ function DirectionalInputGroup({ prefix, clientId, blockName = null, prefixed } 
         [isPrefixed, prefix]
     );
 
-    const values = useMemo(
-        () => ({
-            Top: getString(resolveKey('Top')) ?? '',
-            Left: getString(resolveKey('Left')) ?? '',
-            Right: getString(resolveKey('Right')) ?? '',
-            Bottom: getString(resolveKey('Bottom')) ?? '',
-        }),
-        [getString, resolveKey]
-    );
-
     const safeBlockName = useSafeBlockName(blockName, clientId);
-
     const idBase = useMemo(() => `costered-directional-input-${clientId}-${isPrefixed ? prefix : 'unprefixed'}`, [clientId, isPrefixed, prefix]);
 
     // Preference key: `${prefix}Mode` when prefixed, else shared `positionCoordinatesMode`
     const modeKey = isPrefixed && prefix ? `${prefix}Mode` : `positionCoordinatesMode`;
     const scopeKey = useScopedKey(modeKey, safeBlockName ? { blockName: safeBlockName } : undefined);
     const [mode, setMode] = useUIPreferences<MeasurementMode>(scopeKey, 'unit');
-    
-    const handleChange = useCallback(
-        (direction: Direction) => (next: string) => {
-            const nextValue = next ?? '';
-            const payload = nextValue === '' ? undefined : nextValue;
-            if (ns) ns.set(direction, payload);
-            else set(resolveKey(direction), payload);
-        },
-        [ns, set, resolveKey]
-    );
+
 
     const renderField = useCallback(
         (direction: Direction, label: string, idSuffix: string) => {
             const id: string = `${idBase}-${idSuffix}`;
-            const value = values[direction]; // likely CSSPrimitive (string|number|'')
-
             return (
                 <CSSMeasurementControl
                     mode={mode}
                     label={label}
-                    value={value}
-                    onChange={handleChange(direction)}
                     allowReset
-                    // pass through id to underlying inputs
-                    // (both UnitControlInput/TextControlInput accept an id prop)
                     textProps={{ id }}
                     unitProps={{ id }}
+                    clientId={clientId}
+                    prop={resolveKey(direction)}
                 />
             )
         },
-        [mode, values, handleChange, idBase]
+        [mode, idBase, clientId, resolveKey]
     );
 
     return (
