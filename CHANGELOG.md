@@ -1,5 +1,63 @@
 # Changelog
 
+## What's Changed in 1.3.0
+
+This release focuses on stability, responsive design, and a more usable Grid experience. It also completes a big internal refactor that makes the plugin safer and faster.
+
+### For editors & designers
+
+#### What's new
+- **Responsive controls**: Set different styles for Desktop, Tablet, and Mobile. Switch device in the editor and you'll see the correct styles reflected.
+- **Grid made simpler**: Two ways to place items:
+  - *Simple*: pick where an item starts, and how many columns/rows it spans.
+  - *Tracks*: fine control with start/end (supports named lines for advanced layouts).
+- **Per-block style preview**: The editor now mirrors the selected breakpoint's styles more accurately—what you see is much closer to what visitors see.
+- **Unsaved change indicator**: Grid panels show a small indicator when you've changed something and not saved yet (this will be rolled out everywhere in a future update).
+
+#### Why it's better
+- **Cleaner output**: Frontend CSS is printed once instead of inline styles scattered around, which helps performance and avoids “why does this look different here?” moments.
+
+#### How to use the new bits
+1) In the editor sidebar, choose Desktop / Tablet / Mobile.
+2) Adjust your block’s styles (spacing, grid placement, alignment).
+Those changes apply only to the active device unless you’ve set nothing yet (in which case it falls back from Desktop → Tablet → Mobile).
+3) For Grid:
+   - Use *Simple* for quick start/span.
+   - Use *Tracks* when you need precision (named lines, explicit start/end).
+
+#### Known limitation
+- **Shrinking Grid Template Areas**: When reducing columns/rows from a parsed template, the grid can mis-shrink (e.g. 9×3 -> 9×1). This is being fixed in a follow-up.
+
+### For developers
+
+See [CHANGELOG-DEV.md](CHANGELOG-DEV.md) for API changes and technical notes.
+
+## What's Changed in 1.1.1
+
+#### Changes in 1.1.1
+
+No new features, no bug fixes — just a licensing and contributor policy update to make this project more usable for more people. Costered Blocks is now dual-licensed under MIT and GPL-2.0-or-later. You can use either license as needed.
+
+Why? Because some developers want permissive reuse, some want GPL continuity, and most of us just want tools that work without license anxiety.
+
+- docs: re-licensed under dual MIT and GPL-2.0-or-later. add RELICENSE.md
+
+#### Changes in 1.1.0
+
+- feat: add Grid Controls panel to allow fine control over grid columns, rows, and gaps
+- feat: add gap control to FlexBox Controls panel
+- refactor!: migrate all 'mode' type attributes to use a new user preference store
+- refactor: import attribute list from config into editor-style-mirror, avoids redundant attribute definitions
+- refactor: rewrite entire icon handling system to reduce work needed when adding more icons
+- refactor: separate hooks into individual files
+- refactor: clean up file paths for hooks and filter for simpler file structure
+
+*BREAKING CHANGE*: a lot of UI controls have alternate modes allowing more control over what
+values are saved. previously these were stored as attributes such as "marginMode". These
+are removed in favour of per-user preference store which is saved in the database and local
+storage. This reduces attribute pollution.
+
+
 ## What's Changed in 1.1.0
 - feat: add Grid Controls panel to allow fine control over grid columns, rows, and gap
 - feat: add gap control to Flexbox Controls panel

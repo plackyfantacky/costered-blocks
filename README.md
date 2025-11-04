@@ -1,4 +1,4 @@
-# Costered Blocks
+<img src="logo.svg" alt="Description" width="800" alt="Costered Blocks" loading="lazy">
 
 > *"Because not every block needs to be blessed by the cult of Gutenberg."*
 
@@ -39,27 +39,32 @@ If that sounds like you, congrats. You've been *Costered*.
 ## Features
 
 ### All Blocks
-- **Padding and Margin controls:** now with units you actually use! Yes! that includes `px`, `em`, `%` and even `var()` and `calc()`.
+- **Responsive Styles per device:** set different styles for **Desktop / Tablet / Mobile** with a cascade that actually behaves—so you're not playing breakpoint whack-a-mole.
+- **Padding and Margin controls:** bring your own units - `em`/`%` for responsible adults, `var()` + `calc()` for those with taste, and even `px` for the uncultured.
 - **Display and visibility options:** use `block`, `inline`, `flex`, `grid`, and variants - because layout should be more than vibes.
 - **Width/Height fields (including min/max variants):** adjust the dimensions of ANY BLOCK (_well... ones that aren't inline_) Finally a `<div>` can be a normal element - not some mystical entity we're not allowed to touch.
+- **Item positioning**: `relative`, `absolute`, `fixed/sticky`, coordinates (`top/right/bottom/left`), and `z-index` - because sometimes "layout" means "hold my beer".
 
 ### Flexbox & Grid
-- **Flexbox:** direction, wrap, gap, and alignment — because `display: flex` shouldn’t mean “good luck, you’re on your own.”  
+- **Flexbox:** direction, wrap, gap, and alignment — because `display: flex` shouldn't mean "good luck, you're on your own."  
 - **Flexbox Items:** grow, shrink, basis, `align-self`, `justify-self`, and `order` — finally tell your block children to sit still and behave.  
-- **Grid:** columns, rows, gaps, and template areas (Simple/Advanced modes) — tracks and areas, not guesswork and grief.
+- **Grid:** real controls for columns, rows, gaps, and template areas with an editor that tries its best to follow CSS Grids - despite the spec being a perpetual moving target.
 
 ### Changes To Core Blocks
-- **core/group:** Removed the option to switch between 'Row' and 'Stack' variants - because it’s a `<div>` cosplaying as a flex container, and it needs to calm down.
+- **core/group:** Removed the option to switch between 'Row' and 'Stack' variants - because it's a `<div>` cosplaying as a flex container, and it needs to calm down.
 - **core/button:** Added support for InnerBlocks — now you can finally add an icon to a button without invoking four plugins and a Gutenberg ritual. How novel.
 - **core/cover:** Removed the Alignment toolbar button — because covers aren't images, and floating a layout container left in 2025 should be a crime.
 
 ### Misc
-- **Per-user Preferences:** editing modes are remembered per block type — so you don’t have to tick the same bloody toggle every time.  
+- **Per-user Preferences:** editing modes are remembered per block type — so you don't have to tick the same bloody toggle every time.  
 - **Headless-Friendly:** all styles are stored in block attributes, queryable via WPGraphQL or REST — your frontend gets data, and you get your time back.
+- **No ID/classname pollution:** one `data-costered="uuid"` to rule them all - keep your markup on a detox.
+- **Unsaved changes indicator:** a little shame icon (in Grid panels) so you remember to hit Save like a responsible adult.
 
 ## How This Thing Works
-Abuses WordPress’s beloved block API against itself by storing everything as block attributes and `style` properties. 
-Yes...inline styles, I know. Don't shoot me — it actually works. That's the point. I might come up with a cleaner solution later...or I might not.
+- Abuses WordPress's beloved block API against itself by storing everything as block attributes (where they belong) and scoping output with a single data attribute.  
+- Frontend CSS is generated per block and printed **once** (no inline `style=""` confetti), keyed to `[data-costered]`.  
+- Yes, it still actually works. That's the point. Faster, better, fewer "why does this look different here?" tantrums.
 
 ## Documentation & Guides
 - [Wiki](https://github.com/plackyfantacky/costered-blocks/wiki):
@@ -80,9 +85,10 @@ See [`LICENSE`](./LICENSE) (MIT) and [`LICENSE-GPL`](./LICENSE-GPL) (GPL-2.0)
 
 ## Acknowledgements
 Interface icons are SVG files found at [Iconify](https://iconify.design/). Sets used include:
+- Game Icons "Hammer Break" (CC BY 3.0) for logo/icon.
 - Radix Icons (license: MIT)
 - Lucide (license: ISC)
 - Material Design Icons (license: Apache 2.0)
 - Material Symbols (license: Apache 2.0)
 - Iconoir (license: MIT)
-- _If I’ve missed a license attribution, please open an issue or PR._
+- _If I've missed a license attribution, please open an issue or PR._
