@@ -15,13 +15,14 @@
         "baseUrl": ".",
         "paths": {
             "@assets/*": ["src/assets/*"],
+            "@blockUIs/*": ["src/blocks/ui-controls/*"],
+            "@components/Icon": ["src/components/Icon.tsx"],
             "@components/*": ["src/components/*"],
             "@config": ["src/config.ts"],
             "@debug": ["src/utils/debug.ts"],
             "@filters/*": ["src/filters/*"],
             "@hooks": ["src/hooks"],
             "@hooks/*": ["src/hooks/*"],
-            "@icons": ["src/assets/icons/index.js"],
             "@labels": ["src/labels"],
             "@panels/*": ["src/panels/*"],
             "@providers/*": ["src/providers/*"],
@@ -33,6 +34,10 @@
             "@wordpress/*": ["types/wp/*"],
             "@wordpress/element/jsx-runtime": ["types/wp/element-jsx-runtime.d.ts"]
         },
+        "typeRoots": [
+            "types",
+            "node_modules/@types"
+        ],
         "noEmit": true,
         "isolatedModules": true,
         "verbatimModuleSyntax": true,

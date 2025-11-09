@@ -1,5 +1,9 @@
 # Changelog
 
+## What's Changed in 1.3.1
+
+- feat: add InlineSVG block
+
 ## What's Changed in 1.3.0
 
 This release focuses on stability, responsive design, and a more usable Grid experience. It also completes a big internal refactor that makes the plugin safer and faster.

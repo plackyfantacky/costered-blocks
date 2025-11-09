@@ -1,5 +1,5 @@
 import { isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import type { ReactNode } from '@wordpress/element';
 
 import {
     AlignSelfBaseline,
@@ -10,7 +10,6 @@ import {
 } from "@assets/icons";
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import { LABELS } from "@labels";
-import type React from "react";
 
 type Props = {
     value: string;

@@ -54,7 +54,6 @@ export default function TokenGridBoard({
     rowData,
     setCell,
     resize,
-    clear,
     emptyToken = '.',
     labels = {},
     onEditingChange

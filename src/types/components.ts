@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+
+import type { CSSProperties, ReactNode } from '@wordpress/element';
 
 export type Children = { children?: ReactNode };
 export type ClassStyle = { className?: string; style?: CSSProperties };

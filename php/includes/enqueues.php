@@ -6,7 +6,7 @@
 add_action('enqueue_block_editor_assets', function () {
 
     $files = [
-        'costered-blocks--entrypoint' => ['file' => 'js/app.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'costered-blocks--hooks']],
+        'costered-blocks--entrypoint' => ['file' => 'js/app.js', 'dependencies' => ['wp-editor', 'wp-plugins', 'wp-i18n', 'wp-element', 'wp-components', 'wp-data', 'wp-blocks', 'wp-block-editor', 'costered-blocks--hooks']],
         'costered-blocks--hooks' => ['file' => 'js/hooks/index.js', 'dependencies' => ['wp-hooks', 'wp-element']],
         'costered-blocks--blocks-core-button--innerblocks-support' => ['file' => 'js/blocks/core-button--innerblocks-support.js', 'dependencies' => ['wp-hooks', 'wp-block-editor', 'wp-components', 'wp-compose', 'wp-element']],
         'costered-blocks--blocks-core-cover--restrict-align-toolbar' => ['file' => 'js/blocks/core-cover--restrict-align-toolbar.js', 'dependencies' => ['wp-hooks', 'wp-element']],

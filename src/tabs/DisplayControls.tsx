@@ -16,7 +16,6 @@ import {
     MdiEyeOffOutline as EyeOffOutline,
     IconoirCollapse as Collapse
 } from "@assets/icons";
-import { useEffect } from "react";
 
 const DisplayControls = () => {
     const { selectedBlock, clientId } = useSelectedBlockInfo();

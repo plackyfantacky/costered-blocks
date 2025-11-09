@@ -1,6 +1,6 @@
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { useCallback } from "@wordpress/element";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from '@wordpress/element';
 
 import { maybeFormat } from "@utils/common";
 

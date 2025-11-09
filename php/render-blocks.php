@@ -112,9 +112,10 @@ add_filter('render_block', function($block_content, $block) {
     // Build CSS and add to the shared buffer
     $css = costered_build_css_for_uid_pretty($uid, $stylesByBreakpoint, $blockName);
 
-    if ($css === '') {
-        error_log('costered: no CSS for uid ' . var_export($uid, true));
-    } else {
+    //if ($css === '') {
+        //error_log('costered: no CSS for uid ' . var_export($uid, true));
+    //} else {
+    if ($css !== '') {
         error_log('costered: added CSS for uid ' . var_export($uid, true));
     }
 

@@ -16,10 +16,6 @@ export const ensureShape = (costered?: Partial<CosteredAttributes> | undefined):
     };
     
     const input = (costered && typeof costered === 'object') ? costered : {};
-    
-
-    const hasNamedBuckets =
-        !!input.desktop || !!input.tablet || !!input.mobile;
 
     return {
         desktop: makeBucket(input.desktop),

@@ -1,5 +1,6 @@
-const MaterialSymbolsAlignJustifySpaceAround = ({ size = 24, ...props }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} {...props}>
+import * as React from 'react';
+const MaterialSymbolsAlignJustifySpaceAround = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
         <path fill="currentColor" d="M20 22V2h2v20zM2 22V2h2v20zm13-5V7h3v10zm-9 0V7h3v10z" />
     </svg>
 );

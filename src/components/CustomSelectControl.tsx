@@ -1,7 +1,6 @@
 import { isRTL } from '@wordpress/i18n';
 import { useState, useCallback, useEffect, useRef, createContext, useContext, useMemo, Children, memo } from '@wordpress/element';
 import { Flex, FlexItem } from '@wordpress/components';
-import type * as React from 'react'; 
 
 import { LABELS } from "@labels";
 

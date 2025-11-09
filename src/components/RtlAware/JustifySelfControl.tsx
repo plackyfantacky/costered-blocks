@@ -1,5 +1,5 @@
 import { isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import type { ReactNode } from '@wordpress/element';
 
 import CustomToggleGroup from "@components/CustomToggleGroup";
 import { LABELS } from "@labels";

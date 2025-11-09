@@ -1,5 +1,5 @@
 import { isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import type { ReactNode } from '@wordpress/element';
 
 import { useAttrGetter } from '@hooks';
 import CustomToggleGroup from "@components/CustomToggleGroup";

@@ -1,16 +1,31 @@
 // types/wp/icons.d.ts
 declare module '@wordpress/icons' {
-    export const Icon: any;
-    export const check: any;
-    export const close: any;
-    export const plus: any;
-    export const chevronDown: any;
-    export const chevronRight: any;
-    export const more: any;
-    export const moreVertical: any;
-    export const settings: any;
-    export const trash: any;
-    export const edit: any;
-    export const warning: any;
-    export const info: any;
+    import type { ComponentType, ReactElement, SVGProps } from 'react';
+
+    export type IconType = 
+        | ComponentType<SVGProps<SVGSVGElement>>
+        | ReactElement
+        | string
+        | null
+        | undefined;
+
+    export const Icon: ComponentType<{ 
+        icon?: IconType;
+        size?: number | string;
+        className?: string;
+    }>;
+
+    export const blockDefault: IconType;
+    export const check: IconType;
+    export const close: IconType;
+    export const plus: IconType;
+    export const chevronDown: IconType;
+    export const chevronRight: IconType;
+    export const more: IconType;
+    export const moreVertical: IconType;
+    export const settings: IconType;
+    export const trash: IconType;
+    export const edit: IconType;
+    export const warning: IconType;
+    export const info: IconType;
 }

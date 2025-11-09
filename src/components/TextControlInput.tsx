@@ -1,5 +1,5 @@
 import { TextControl } from '@wordpress/components';
-import type { CSSProperties } from 'react';
+import type { CSSProperties } from '@wordpress/element';
 
 import { maybeFormat } from "@utils/common";
 

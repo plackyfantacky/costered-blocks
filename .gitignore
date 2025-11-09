@@ -2,3 +2,4 @@ commit-text.txt
 
 js/*
 css/*
+/vendor/

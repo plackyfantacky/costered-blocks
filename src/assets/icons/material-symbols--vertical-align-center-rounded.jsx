@@ -1,6 +1,7 @@
-const MaterialSymbolsVerticalAlignCenterRounded = ({ size = 24, ...props }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} {...props}>
-        <path fill="currentColor" d="m11 17.8l-.9.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l2.6-2.6q.15-.15.325-.212t.375-.063t.375.063t.325.212l2.6 2.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-.9-.9V21q0 .425-.288.713T12 22t-.712-.288T11 21zM5 13q-.425 0-.712-.288T4 12t.288-.712T5 11h14q.425 0 .713.288T20 12t-.288.713T19 13zm6-6.8V3q0-.425.288-.712T12 2t.713.288T13 3v3.2l.9-.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-2.6 2.6q-.15.15-.325.213T12 9.575t-.375-.062T11.3 9.3L8.7 6.7q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275z" />
+import * as React from 'react';
+const MaterialSymbolsVerticalAlignCenterRounded = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} {...props}>
+        <path fill="currentColor" d="m11 17.8-.9.9q-.275.275-.7.275t-.7-.275-.275-.7.275-.7l2.6-2.6q.15-.15.325-.212t.375-.063.375.063.325.212l2.6 2.6q.275.275.275.7t-.275.7-.7.275-.7-.275l-.9-.9V21q0 .425-.288.713T12 22t-.712-.288T11 21zM5 13q-.425 0-.712-.288T4 12t.288-.712T5 11h14q.425 0 .713.288T20 12t-.288.713T19 13zm6-6.8V3q0-.425.288-.712T12 2t.713.288T13 3v3.2l.9-.9q.275-.275.7-.275t.7.275.275.7-.275.7l-2.6 2.6q-.15.15-.325.213T12 9.575t-.375-.062T11.3 9.3L8.7 6.7q-.275-.275-.275-.7t.275-.7.7-.275.7.275z" />
     </svg>
 );
 export default MaterialSymbolsVerticalAlignCenterRounded;

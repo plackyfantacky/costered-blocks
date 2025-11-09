@@ -1,7 +1,7 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
-import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, GetterLike, AugmentedAttributes } from '@types';
+import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, AugmentedAttributes } from '@types';
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { augmentAttributes } from '@utils/breakpointUtils';
 import { MIRRORED_STYLE_KEYS } from '@config';

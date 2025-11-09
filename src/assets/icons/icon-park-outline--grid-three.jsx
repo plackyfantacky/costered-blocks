@@ -1,5 +1,6 @@
-const IconParkOutlineGridThree = ({ size = 24, ...props }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width={size} height={size} {...props}>
+import * as React from 'react';
+const IconParkOutlineGridThree = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 48 48" {...props}>
         <g fill="none" stroke="currentColor" strokeWidth={4}>
             <path d="M39.3 6H8.7A2.7 2.7 0 0 0 6 8.7v30.6A2.7 2.7 0 0 0 8.7 42h30.6a2.7 2.7 0 0 0 2.7-2.7V8.7A2.7 2.7 0 0 0 39.3 6Z" />
             <path strokeLinecap="round" d="M15 6v36m27-25H6" />

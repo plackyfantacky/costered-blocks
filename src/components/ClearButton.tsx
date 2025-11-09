@@ -1,7 +1,7 @@
 import { Button, Tooltip } from '@wordpress/components';
-import { Icon, trash } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 
+import Icon from '@components/Icon';
 import { LABELS } from '@labels';
 import { useAttrSetter } from '@hooks';
 
@@ -40,7 +40,7 @@ export default function ClearButton({
                 className="costered-blocks--icon-button costered-blocks--clear-button"
                 variant="tertiary"
                 size="compact"
-                icon={<Icon icon={trash} />}    
+                icon={<Icon name="trash" />}
                 onClick={handleClick}
                 label={clearLabel}
                 aria-label={clearLabel}

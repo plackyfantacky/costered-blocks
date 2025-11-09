@@ -1,5 +1,5 @@
-import { __, isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import { isRTL } from '@wordpress/i18n';
+import type { ReactNode } from '@wordpress/element';
 
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
 import { LABELS, t } from "@labels";

@@ -4,7 +4,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo, useCallback } from '@wordpress/element';
 
 import type { Breakpoint, BlockAttributes, CSSPrimitive, CascadeOptions, AugmentedAttributes } from '@types';
-import { REDUX_STORE_KEY as BP_STORE } from '@config';
 import { augmentAttributes } from '@utils/breakpointUtils';
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 

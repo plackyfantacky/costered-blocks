@@ -6,6 +6,47 @@
         "blockWarningSummary": "Style changes may not appear in the editor",
         "blockWarningDetails": "There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here."
     },
+    "blocks": {
+        "blockCategory": "Costered Blocks",
+        "inlineSVG": {
+            "panelTitle": "Inline SVG",
+            "linkPanelTitle": "Link (optional)",
+            "actions": {
+                "selectSVG": "Select SVG",
+                "replaceSVG": "Replace SVG",
+                "clear": "Clear"
+            },
+            "mediaPlaceholder": {
+                "title": "Select or upload an SVG file",
+                "instructions": "SVG files can be selected from the media library or uploaded from your computer."
+            },
+            "notice": {
+                "svgNotSelected": "Please select an SVG file.",
+                "linkButNoSVG": "A link will do nothing until an SVG is selected.",
+                "SVGpreviewUnavailable": "SVG preview is unavailable (SSR not loaded).",
+                "svgFetchError": "There was an error fetching the SVG content.",
+                "svgPending": "Loading SVG preview..."
+            },
+            "fields": {
+                "svgClasses": {
+                    "label": "SVG classes",
+                    "help": "Optional class list for the <svg> element."
+                },
+                "linkURL": {
+                    "label": "Link URL",
+                    "placeholder": "https://example.com"
+                },
+                "linkClasses": {
+                    "label": "Link classes",
+                    "help": "Optional class list for the <a> wrapper."
+                }
+            }
+
+        }
+    },
+    "blockControls": {
+        "tabTitle": "Block Controls"
+    },
     "displayControls": {
         "panelTitle": "Display Controls",
         "displayLabel": "Display",
@@ -351,7 +392,11 @@
         "addColumn": "Add column",
         "removeColumn": "Remove column",
         "addRow": "Add row",
-        "removeRow": "Remove row"
+        "removeRow": "Remove row",
+        "matrix": {
+            "noAreas": "No areas defined",
+            "reset": "Reset Grid"
+        }
     },
     "tokenEditor": {
         "add": "Add",

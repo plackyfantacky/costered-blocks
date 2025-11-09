@@ -53,3 +53,6 @@ export type {
 // tokens
 
 export type { TokenAtomicItem, TokenModelAdapter, PersistedTracks, PersistedAreas } from './tokens.ts';
+
+// Block UI
+export type { BlockUIRenderContext, BlockUIComponent } from './block-ui.ts';

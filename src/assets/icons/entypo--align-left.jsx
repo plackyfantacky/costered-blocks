@@ -1,6 +1,7 @@
-const EntypoAlignLeft = ({ size = 24, ...props }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} {...props}>
-        <path fill="currentColor" d="m6 10l3 3v-2h8V9H9V7zM4 2c-.553 0-1 .047-1 .6v14.8c0 .551.447.6 1 .6s1-.049 1-.6V2.6c0-.553-.448-.6-1-.6" />
+import * as React from 'react';
+const EntypoAlignLeft = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} {...props}>
+        <path fill="currentColor" d="m6 10 3 3v-2h8V9H9V7zM4 2c-.553 0-1 .047-1 .6v14.8c0 .551.447.6 1 .6s1-.049 1-.6V2.6c0-.553-.448-.6-1-.6" />
     </svg>
 );
 export default EntypoAlignLeft;

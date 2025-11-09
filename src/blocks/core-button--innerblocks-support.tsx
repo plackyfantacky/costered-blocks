@@ -112,7 +112,8 @@ addFilter(
                                     'core/group',
                                     'core/html',
                                     'core/shortcode',
-                                    'outermost/icon-block'
+                                    'outermost/icon-block',
+                                    'costered-blocks/inline-svg'
                                 ]}
                                 template={BLOCK_TEMPLATE}
                                 templateLock={false}

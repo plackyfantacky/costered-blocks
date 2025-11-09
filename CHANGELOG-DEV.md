@@ -1,5 +1,10 @@
 # Developer/API Changelog
 
+## What's Changed in 1.3.1
+
+- **Composer**: installed and configured composer in `costered-blocks.php`
+- **Dependencies**: installed enshrined/svg-sanitize because wp_kses sucks when dealing with SVGs
+
 ## What's Changed in 1.3.0
 
 ### Highlights

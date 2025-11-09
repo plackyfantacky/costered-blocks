@@ -17,7 +17,6 @@ declare module '@wordpress/components' {
     export const Flex: any;
     export const FlexBlock: any;
     export const FlexItem: any;
-    export const Icon: any;
     export const Image: any;
     export const InnerBlocks: any;
     export const LinkControl: any;
@@ -31,9 +30,11 @@ declare module '@wordpress/components' {
     export const RadioControl: any;
     export const RangeControl: any;
     export const SelectControl: any;
+    export const Spinner: any;
     export const Suspense: any;
     export const TabPanel: any;
     export const TextControl: any;
+    export const TextareaControl: any;
     export const ToggleControl: any;
     export const Toolbar: any;
     export const ToolbarButton: any;

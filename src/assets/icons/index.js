@@ -57,3 +57,4 @@ export { default as PositionSticky } from './PositionSticky.jsx';
 export { default as RadixIconsDimensions } from './radix-icons--dimensions.jsx';
 export { default as SplitInput } from './SplitInput.jsx';
 export { default as TablerBoxMargin } from './tabler--box-margin.jsx';
+export { default as VscodeIconsFileTypeSvg } from './vscode-icons--file-type-svg.jsx';

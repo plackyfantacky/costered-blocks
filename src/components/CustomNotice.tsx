@@ -1,5 +1,5 @@
 import { Flex, Notice } from '@wordpress/components';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from '@wordpress/element';
 
 type WPNoticeProps = ComponentProps< typeof Notice >;
 type NoticeStatus = 

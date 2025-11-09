@@ -1,6 +1,9 @@
 // src/utils/blockUtils.ts
 import { select } from '@wordpress/data';
 import { isNonEmptyString } from '@utils/common';
+import { getBlockType } from '@wordpress/blocks';
+import type { ComponentType, ReactNode } from '@wordpress/element';
+import type { IconInput } from '@components/Icon';
 
 /** True when value is a non-empty string. */
 export function isValidCosteredId(value: unknown): value is string {
@@ -77,4 +80,22 @@ export function getCosteredIdFromBlock(block: unknown): string | null {
 /** Make a stable field id from a costeredId and an attribute name. */
 export function makeFieldId(costeredId: string, attr: string): string {
     return `${costeredId}:${attr}`;
+}
+
+/* ------------------------------ Misc Block Utils ------------------------------ */
+
+export function getBlockIconProps(blockName: string | null | undefined): {
+    name: string | null;
+    icon?: IconInput;
+} {
+    if (!blockName) return { name: null };
+    const raw = getBlockType(blockName)?.icon;
+
+    if (typeof raw === 'string' && raw.trim()) {
+        return { name: raw };
+    }
+    if (raw) {
+        return { name: null, icon: raw };
+    }
+    return { name: null };
 }
