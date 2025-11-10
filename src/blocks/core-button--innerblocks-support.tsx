@@ -168,7 +168,10 @@ addFilter(
                     <BlockEdit {...props} />
                     <InspectorControls>
                         <PanelBody title="Button Link" initialOpen={true}>
-                            <BaseControl label="Button URL">
+                            <BaseControl
+                                label="Button URL"
+                                __nextHasNoMarginBottom
+                            >
                                 <Flex expanded>
                                     <FlexItem isBlock>
                                         <URLInput

@@ -101,7 +101,7 @@ function BlockControlsTabBody() {
         parentAttrs
     };
 
-    console.log({ name, keys: Object.keys(REGISTRY), has: !!BlockUI });
+    //console.log({ name, keys: Object.keys(REGISTRY), has: !!BlockUI });
 
     return (
         <Panel className="costered-blocks--tab--block-controls">

@@ -36,6 +36,7 @@ type ConfigJson = {
         appendImportantToMirroredStyles?: boolean | null;
         styleTagId?: string | null;
         reduxStoreKey?: string | null;
+        sidebarID?: string | null;
         breakpoints?: {
             mobile?: number | null;
             tablet?: number | null;
@@ -102,6 +103,7 @@ export const DEFAULT_GRID_UNIT: string = (configData as ConfigJson)?.settings?.g
 export const MIRROR_APPEND_IMPORTANT_FOR_GRID: boolean = !!(configData as ConfigJson)?.settings?.appendImportantToMirroredStyles;
 export const STYLE_TAG_ID: string = (configData as ConfigJson)?.settings?.styleTagId || 'costered-blocks-style-mirror';
 export const REDUX_STORE_KEY: string = (configData as ConfigJson)?.settings?.reduxStoreKey || 'costered/ui';
+export const SIDEBAR_ID: string = (configData as ConfigJson)?.settings?.sidebarID || 'costered-blocks--sidebar';
 
 export const MOBILE_THRESHOLD: number = (configData as ConfigJson)?.settings?.breakpoints?.mobile ?? 782;
 export const TABLET_THRESHOLD: number = (configData as ConfigJson)?.settings?.breakpoints?.tablet ?? 1024;
@@ -112,6 +114,7 @@ export const GRID_COLUMN_KEYS: readonly string[] = arr<string>((configData as Co
 export const GRID_ROW_KEYS: readonly string[] = arr<string>((configData as ConfigJson)?.collections?.clearSets?.gridRows);
 
 export const IS_DEBUG: boolean = true;
+
 
 /**
  * Editor Style Mirror keys.

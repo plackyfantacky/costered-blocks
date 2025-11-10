@@ -1,13 +1,12 @@
 import { registerPlugin } from '@wordpress/plugins';
-import { useMemo } from '@wordpress/element';
-import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
+import { Panel, PanelBody, Flex, FlexItem } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { ComplementaryArea } from '@wordpress/interface';
 
 import '@stores/breakpoint'; // side-effect: registers stores
 import { startViewportSync } from '@utils/viewportSync';
 
-import { BLOCKS_WITH_EDITOR_STYLES, IS_DEBUG } from "@config";
+import { BLOCKS_WITH_EDITOR_STYLES, IS_DEBUG, SIDEBAR_ID } from "@config";
 import { LABELS } from '@labels';
 import { GameIconsHammerBreak as HammerBreakIcon } from "@assets/icons";
 
@@ -19,16 +18,42 @@ import SidebarTabs from "@components/SidebarTabs";
 import Icon from '@components/Icon';
 import CustomNotice from '@components/CustomNotice';
 
+import { SidebarWatcher, InterfaceBridge,  forceOpenSidebar, forceOpenSidebarSoon, isPostEditor, isSiteEditor } from '@utils/sidebarUtils';
+import { dbg } from '@utils/debug';
+
+function devGateEnabled(): boolean {
+    try {
+        return typeof window !== 'undefined' && window.localStorage.getItem('cb:dev') === '1';
+    } catch {
+        return false;
+    }
+}
+
+if (devGateEnabled()) {
+    (window as any).CB_open = forceOpenSidebar;
+    (window as any).CB_openSoon = forceOpenSidebarSoon;
+}
+
 declare global {
     interface Window {
         COSTERED_DEBUG?: boolean;
-        wp?: any
+        wp?: any,
+        CB_open?: () => void;
+        CB_openSoon?: () => void;
     }  
 }
 window.COSTERED_DEBUG = IS_DEBUG;
 startViewportSync();
 
-const SIDEBAR_NAME = 'costered-blocks/sidebar';
+setTimeout(() => {
+    const data = (window as any)?.wp?.data;
+    const sel = data?.select?.('core/interface');
+    try {
+        const a = sel?.getActiveComplementaryArea?.('core', 'sidebar');
+        const b = sel?.getActiveComplementaryArea?.('core');
+        dbg('probe: interface active', { a, b });
+    } catch (e) { dbg('probe: interface error', e); }
+}, 500);
 
 
 function SidebarBody() {
@@ -71,34 +96,42 @@ function SidebarBody() {
 };
 
 function UniversalSidebar() {
-    const PluginSidebar = window?.wp?.editor?.PluginSidebar || null;
-    
-    if (PluginSidebar) {
+    const isPost = isPostEditor();
+    if(isPost) {
+        const PluginSidebar = (window as any)?.wp?.editor?.PluginSidebar;
         return (
-            <PluginSidebar
-                name="costered-blocks--sidebar"
-                title={LABELS.pluginSidebar.title as string}
-                className="costered-blocks--sidebar"
-                icon={<HammerBreakIcon width={24} height={24} />}
-            >
-                <SidebarBody />
-            </PluginSidebar>
+            <>
+                <InterfaceBridge />
+                <SidebarWatcher /> {/* headless */}
+                <PluginSidebar
+                    name={SIDEBAR_ID}
+                    title={LABELS.pluginSidebar.title as string}
+                    className="costered-blocks--sidebar"
+                    icon={<HammerBreakIcon width={24} height={24} />}
+                >
+                    <SidebarBody />
+                </PluginSidebar>
+            </>
         );
     }
 
     // site editor / other
     return (
-        <ComplementaryArea
-            identifier="costered-blocks--sidebar"
-            title={LABELS.pluginSidebar.title as string}
-            icon={<HammerBreakIcon width={24} height={24} />}
-            // scopes: 'core/edit-site' | 'core/edit-post' - default is both
-            isActiveByDefault={false}
-            header={LABELS.pluginSidebar.title as string}
-            className="costered-blocks--sidebar"
-        >
-            <SidebarBody />
-        </ComplementaryArea>
+        <>
+            <InterfaceBridge />
+            <SidebarWatcher /> {/* headless */}
+            <ComplementaryArea
+                identifier={SIDEBAR_ID}
+                title={LABELS.pluginSidebar.title as string}
+                icon={<HammerBreakIcon width={24} height={24} />}
+                // scopes: 'core/edit-site' | 'core/edit-post' - default is both
+                isActiveByDefault={false}
+                header={LABELS.pluginSidebar.title as string}
+                className="costered-blocks--sidebar"
+            >
+                <SidebarBody />
+            </ComplementaryArea>
+        </>
     );  
 }
 

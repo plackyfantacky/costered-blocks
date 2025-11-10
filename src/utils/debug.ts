@@ -6,28 +6,41 @@ declare global {
     }
 }
 
-/**
- * Namespaced console logger gated by window.COSTERED_DEBUG.
- */
-export function log(...args: unknown[]): void {
-    if (typeof window !== 'undefined' && !window.COSTERED_DEBUG) return;
-    // namespaced so it’s searchable in console
-    // eslint-disable-next-line no-console
-    console.log('[CosteredBlocks]', ...args);
-}
+export type DebugLog = {
+    (...args: unknown[]): void;
+    group: (...args: unknown[]) => void;
+    end: () => void;
+};
 
-export function dbg(ns: string) {
-    const enabled = (() => {
-        try { return /(^|,)grid(?=,|$)/.test(localStorage.getItem('debug') || ''); }
-        catch { return true; } // SSR/sandbox: default on
+/** Console logger that only runs when localStorage.debug === '1'. */
+export const dbg: DebugLog = (() => {
+    const isEnabled = (() => {
+        try {
+            return typeof window !== 'undefined' && window.localStorage.getItem('debug') === '1';
+        } catch {
+            return false; // SSR/sandbox: stay silent
+        }
     })();
-    const p = (label: string, ...args: unknown[]) => {
-        if (!enabled) return;
+
+    const log = (...args: unknown[]) => {
+        if (!isEnabled) return;
         // eslint-disable-next-line no-console
-        console.log(`%c[${ns}]`, 'color:#6b5b95', label, ...args);
+        console.log(...args);
     };
-    p.group = (label: string, ...args: unknown[]) => enabled && console.groupCollapsed(`%c[${ns}]`, 'color:#6b5b95', label, ...args);
-    p.end   = () => enabled && console.groupEnd();
-    p.trace = (label: string, ...args: unknown[]) => enabled && (console.groupCollapsed(`%c[${ns}]`, 'color:#6b5b95', label, ...args), console.trace(), console.groupEnd());
-    return p;
-}
+
+    log.group = (...args: unknown[]) => {
+        if (!isEnabled) return;
+        // eslint-disable-next-line no-console
+        console.groupCollapsed(...args);
+    };
+
+    log.end = () => {
+        if (!isEnabled) return;
+        try {
+            // eslint-disable-next-line no-console
+            console.groupEnd();
+        } catch { /* ignore */ }
+    };
+
+    return log;
+})();

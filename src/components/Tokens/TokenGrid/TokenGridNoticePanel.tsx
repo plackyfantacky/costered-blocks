@@ -126,9 +126,9 @@ export default function TokenGridNoticePanel({
         }
     }, [model, performShrink]);
 
-    useEffect(() => {
-        console.log('[Mismatch check]', { areaCols, areaRows, trackCols, trackRows });
-    }, [areaCols, areaRows, trackCols, trackRows]);
+    // useEffect(() => {
+    //     console.log('[Mismatch check]', { areaCols, areaRows, trackCols, trackRows });
+    // }, [areaCols, areaRows, trackCols, trackRows]);
 
     if (!columnsMismatch && !rowsMismatch) return null;
 

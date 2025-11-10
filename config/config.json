@@ -88,6 +88,7 @@
         "appendImportantToMirroredStyles": true,
         "styleTagId": "costered-blocks-style-mirror",
         "reduxStoreKey": "costered/breakpoints",
+        "sidebarID": "costered-blocks--sidebar",
         "breakpoints": {
             "mobile": 782,
             "tablet": 1024,
