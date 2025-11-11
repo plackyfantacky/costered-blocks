@@ -30,6 +30,7 @@ type ConfigJson = {
             gridColumns?: string[] | null;
             gridRows?: string[] | null;
         } | null;
+        blockControls?: string[] | null;
     } | null;
     settings?: {
         gridUnit?: string | null;
@@ -97,6 +98,7 @@ export const VERBATIM_STRING_KEYS: ReadonlySet<string> = new Set([
 /** misc */
 export const BLOCKS_WITH_EDITOR_STYLES: readonly string[] = arr<string>((configData as ConfigJson)?.collections?.editorStyles);
 export const UNITLESS: ReadonlySet<string> = toSet<string>((configData as ConfigJson)?.collections?.unitless);
+export const BLOCK_CONTROLS_REGISTRY_KEYS: readonly string[] = arr<string>((configData as ConfigJson)?.collections?.blockControls); 
 
 export const DEFAULT_GRID_UNIT: string = (configData as ConfigJson)?.settings?.gridUnit || '1fr';
 export const MIRROR_APPEND_IMPORTANT_FOR_GRID: boolean = !!(configData as ConfigJson)?.settings?.appendImportantToMirroredStyles;

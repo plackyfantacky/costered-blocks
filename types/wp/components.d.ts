@@ -1,5 +1,7 @@
 // types/wp/components.d.ts
 declare module '@wordpress/components' {
+    import type { ComponentType, ReactNode } from '@wordpress/element';
+
     export const __experimentalConfirmDialog: any;
     export const __experimentalGrid: any;
     export const __experimentalHeading: any;
@@ -14,6 +16,7 @@ declare module '@wordpress/components' {
     export const BaseControl: any;
     export const Button: any;
     export const ComboboxControl: any;
+    export const DropZone: any;
     export const Flex: any;
     export const FlexBlock: any;
     export const FlexItem: any;
@@ -30,6 +33,7 @@ declare module '@wordpress/components' {
     export const RadioControl: any;
     export const RangeControl: any;
     export const SelectControl: any;
+    export const SlotFill: any;
     export const Spinner: any;
     export const Suspense: any;
     export const TabPanel: any;
@@ -40,4 +44,21 @@ declare module '@wordpress/components' {
     export const ToolbarButton: any;
     export const ToolbarGroup: any;
     export const Tooltip: any;
+
+    export type FillProps = {
+        children?: ReactNode;
+        [key: string]: any;
+    };
+
+    export type SlotProps = {
+        children?: ReactNode;
+        [key: string]: any;
+    };
+
+    export function createSlotFill(name: string): {
+        Fill: ComponentType<FillProps>;
+        Slot: ComponentType<SlotProps>;
+    };
+
+    export const SlotFillProvider: ComponentType<{ children?: ReactNode }>;
 }

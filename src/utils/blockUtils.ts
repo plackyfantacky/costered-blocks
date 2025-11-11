@@ -2,7 +2,6 @@
 import { select } from '@wordpress/data';
 import { isNonEmptyString } from '@utils/common';
 import { getBlockType } from '@wordpress/blocks';
-import type { ComponentType, ReactNode } from '@wordpress/element';
 import type { IconInput } from '@components/Icon';
 
 /** True when value is a non-empty string. */

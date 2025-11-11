@@ -64,3 +64,10 @@
         padding-left: 6px; /* offset the width of the dot */
     }
 }
+
+
+.costered-blocks--inline-svg {
+    svg {
+        display: block;
+    }
+}

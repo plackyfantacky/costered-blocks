@@ -9,7 +9,6 @@
     "supports": { "html": false },
     "textdomain": "costered-blocks",
     "editorScript": "file:./index.tsx",
-    "render": "file:./render.php",
     "attributes": {
         "mediaId": {
             "type": "number",
@@ -32,6 +31,14 @@
             "default": ""
         },
         "svgMarkup": {
+            "type": "string",
+            "default": ""
+        },
+        "svgWidth": {
+            "type": "string",
+            "default": ""
+        },
+        "svgHeight": {
             "type": "string",
             "default": ""
         }

@@ -1,5 +1,9 @@
 <?php
 
+use enshrined\svgSanitize\Sanitizer;
+use enshrined\svgSanitize\data\AllowedTags as BaseAllowedTags;
+use enshrined\svgSanitize\data\AllowedAttributes as BaseAllowedAttributes;
+
 // Allow safe SVG uploads
 add_filter('upload_mimes', function ($mimes) {
     if (current_user_can('upload_files') && current_user_can('unfiltered_html')) {
@@ -54,10 +58,13 @@ function costered_sanitize_svg_raw(string $raw): string {
 
     $pre = costered_svg_lift_presentation_styles_to_attributes($raw);
 
-    $sanitizer = new \enshrined\svgSanitize\Sanitizer();
+    $sanitizer = new Sanitizer();
     $sanitizer->minify(true);
     $sanitizer->removeXMLTag(true);
     $sanitizer->removeRemoteReferences(true);
+
+    //allow animations
+    costered_svg_allow_smil($sanitizer);
 
     $clean = $sanitizer->sanitize($pre);
     if ($clean === false || $clean === '') {
@@ -71,7 +78,6 @@ function costered_sanitize_svg_raw(string $raw): string {
     
     return trim($clean);
 }
-
 
 // Returns true if the post content contains our inline-svg block.
 function costered_contains_inline_svg_block(string $content): bool {
@@ -319,3 +325,41 @@ add_filter('content_save_pre', function (string $content) {
 
     return $content;
 }, 9);
+
+class CosteredAllowedTagsSMIL extends BaseAllowedTags {
+    public static function getTags(): array {
+        $base = parent::getTags();
+
+        $extra = [
+            'animate',
+            'animatetransform',
+            'animatemotion',
+            'set',
+        ];
+
+        return array_values(array_unique(array_merge($base, $extra)));
+    }
+}
+
+class CosteredAllowedAttributesSMIL extends BaseAllowedAttributes {
+    public static function getAttributes(): array {
+        $base = parent::getAttributes();
+
+        $extra = [
+            'attributename', 'from', 'to', 'dur', 'repeatcount', 'values',
+            'keytimes', 'keysplines', 'calcmode', 'begin', 'end', 'fill',
+            'additive', 'accumulate', 'min', 'max', 'restart',
+            'type', 'path', 'keypoints', 'rotate',
+            'href', 'xlink:href',
+        ];
+
+        return array_values(array_unique(array_merge($base, $extra)));
+    }
+}
+
+/** Extend allowed tags/attrs to keep SMIL animation. */
+function costered_svg_allow_smil(Sanitizer $sanitizer): void
+{
+    $sanitizer->setAllowedTags(new CosteredAllowedTagsSMIL());
+    $sanitizer->setAllowedAttrs(new CosteredAllowedAttributesSMIL());
+}

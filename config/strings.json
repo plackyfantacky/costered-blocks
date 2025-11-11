@@ -16,16 +16,15 @@
                 "replaceSVG": "Replace SVG",
                 "clear": "Clear"
             },
-            "mediaPlaceholder": {
-                "title": "Select or upload an SVG file",
-                "instructions": "SVG files can be selected from the media library or uploaded from your computer."
-            },
             "notice": {
-                "svgNotSelected": "Please select an SVG file.",
-                "linkButNoSVG": "A link will do nothing until an SVG is selected.",
-                "SVGpreviewUnavailable": "SVG preview is unavailable (SSR not loaded).",
-                "svgFetchError": "There was an error fetching the SVG content.",
-                "svgPending": "Loading SVG preview..."
+                "errorFetchResponseInvalid": "Invalid response from SVG fetch.",
+                "errorFetchResponseMalformedSVG": "Response does not contain <svg>.",
+                "errorFetchResponseUnknownFallback": "Error fetching SVG.",
+                "errorFetchResponseUnknown": "Inline SVG Load Error: %1$s",
+                "errorUIInvalidFileType": "Please select an SVG file.",
+                "warningLinkButNoSVG": "A link will do nothing until an SVG is selected.",
+                "warningSVGpreviewUnavailable": "SVG preview is unavailable (SSR not loaded).",
+                "noticeSVGPending": "Loading SVG preview..."
             },
             "fields": {
                 "svgClasses": {
@@ -39,6 +38,18 @@
                 "linkClasses": {
                     "label": "Link classes",
                     "help": "Optional class list for the <a> wrapper."
+                },
+                "customMedia": {
+                    "label": "SVG File",
+                    "help": "Select or upload an SVG file."
+                },
+                "svgWidth": {
+                    "label": "SVG Width",
+                    "help": "Set a custom width for the SVG (e.g. 100px, 10rem, 50%)."
+                },
+                "svgHeight": {
+                    "label": "SVG Height",
+                    "help": "Set a custom height for the SVG (e.g. 100px, 10rem, 50%)."
                 }
             }
 
