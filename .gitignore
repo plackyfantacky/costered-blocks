@@ -1,3 +1,6 @@
+node_modules
+vendor
+
 commit-text.txt
 
 js/*

@@ -1,7 +1,8 @@
-import { __, isRTL } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
+import { isRTL } from '@wordpress/i18n';
+import type { ReactNode } from '@wordpress/element';
 
 import { CustomSelectControl as SelectControl } from "@components/CustomSelectControl";
+import Icon from "@components/Icon";
 import { LABELS, t } from "@labels";
 import {
     FlexDirectionColumn, 
@@ -21,19 +22,16 @@ export default function FlexDirectionControl({
 }: Props) {
     const rtl = isRTL();
 
-    const RowIcon: ReactNode = rtl ? <FlexDirectionRowReverse /> : <FlexDirectionRow />;
-    const RowReverseIcon: ReactNode = rtl ? <FlexDirectionRow /> : <FlexDirectionRowReverse />;
-
     return (
         <SelectControl
             label={LABELS.flexDirection.label}
             value={value}
             onChange={setFlexDirection}
         >
-            <SelectControl.Option value="row">{RowIcon} {LABELS.flexDirection.row}</SelectControl.Option>
-            <SelectControl.Option value="row-reverse">{RowReverseIcon} {LABELS.flexDirection.rowReverse}</SelectControl.Option>
-            <SelectControl.Option value="column"><FlexDirectionColumn /> {LABELS.flexDirection.column}</SelectControl.Option>
-            <SelectControl.Option value="column-reverse"><FlexDirectionColumnReverse /> {LABELS.flexDirection.columnReverse}</SelectControl.Option>
+            <SelectControl.Option value="row"><Icon icon={ rtl ? FlexDirectionRowReverse : FlexDirectionRow } /> {LABELS.flexDirection.row}</SelectControl.Option>
+            <SelectControl.Option value="row-reverse"><Icon icon={ rtl ? FlexDirectionRow : FlexDirectionRowReverse } /> {LABELS.flexDirection.rowReverse}</SelectControl.Option>
+            <SelectControl.Option value="column"><Icon icon={ FlexDirectionColumn } /> {LABELS.flexDirection.column}</SelectControl.Option>
+            <SelectControl.Option value="column-reverse"><Icon icon={ FlexDirectionColumnReverse } /> {LABELS.flexDirection.columnReverse}</SelectControl.Option>
         </SelectControl>
     )
 }
