@@ -1,5 +1,10 @@
 # Developer/API Changelog
 
+## What's Changed in 1.3.1
+
+- fix: width/height values are colliding with min/max variant values (#1)
+- fix: flex-direction custom dropdown icons have inconsistent sizes or are missing (#2)
+
 ## What's Changed in 1.3.0
 
 ### Highlights
