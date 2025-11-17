@@ -1,7 +1,11 @@
 import type { CSSPrimitive } from "./index";
 import type { Breakpoint, BreakpointBucket } from "./breakpoints";
 
-export type CosteredAttributes = Partial<Record<Breakpoint, BreakpointBucket>>;
+export type CosteredAttributes = {
+    desktop: BreakpointBucket;
+    tablet: BreakpointBucket;
+    mobile: BreakpointBucket;
+};
 
 export interface BlockAttributes {
     costered?: CosteredAttributes;

@@ -8,7 +8,7 @@
         "jsx": "react-jsx",
         "jsxImportSource": "@wordpress/element",
         "resolveJsonModule": true,
-        "types": ["react"],
+        "types": ["react", "jest", "node"],
         "allowJs": true,
         "checkJs": true,
         "strict": true,
@@ -51,6 +51,7 @@
     "include": [
         "config",
         "src",
+        "tests",
         "types"
     ],
     "exclude": [

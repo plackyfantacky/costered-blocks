@@ -34,10 +34,10 @@ export function useBreakpointState<Value = string>(
         setDraft(parsed);
     }, [parsed, bp]);
 
-    useEffect(() => {
-        // eslint-disable-next-line no-console
-        console.debug('[bp-field]', { prop, bp, raw });
-    }, [bp, raw, prop]);
+    // useEffect(() => {
+    //     // eslint-disable-next-line no-console
+    //     //console.debug('[bp-field]', { prop, bp, raw });
+    // }, [bp, raw, prop]);
 
     const commit = useCallback((next: Value) => {
         const serialised = serialise(next);
