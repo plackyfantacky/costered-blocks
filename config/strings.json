@@ -6,6 +6,58 @@
         "blockWarningSummary": "Style changes may not appear in the editor",
         "blockWarningDetails": "There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here."
     },
+    "blocks": {
+        "blockCategory": "Costered Blocks",
+        "inlineSVG": {
+            "panelTitle": "Inline SVG",
+            "linkPanelTitle": "Link (optional)",
+            "actions": {
+                "selectSVG": "Select SVG",
+                "replaceSVG": "Replace SVG",
+                "clear": "Clear"
+            },
+            "notice": {
+                "errorFetchResponseInvalid": "Invalid response from SVG fetch.",
+                "errorFetchResponseMalformedSVG": "Response does not contain <svg>.",
+                "errorFetchResponseUnknownFallback": "Error fetching SVG.",
+                "errorFetchResponseUnknown": "Inline SVG Load Error: %1$s",
+                "errorUIInvalidFileType": "Please select an SVG file.",
+                "warningLinkButNoSVG": "A link will do nothing until an SVG is selected.",
+                "warningSVGpreviewUnavailable": "SVG preview is unavailable (SSR not loaded).",
+                "noticeSVGPending": "Loading SVG preview..."
+            },
+            "fields": {
+                "svgClasses": {
+                    "label": "SVG classes",
+                    "help": "Optional class list for the <svg> element."
+                },
+                "linkURL": {
+                    "label": "Link URL",
+                    "placeholder": "https://example.com"
+                },
+                "linkClasses": {
+                    "label": "Link classes",
+                    "help": "Optional class list for the <a> wrapper."
+                },
+                "customMedia": {
+                    "label": "SVG File",
+                    "help": "Select or upload an SVG file."
+                },
+                "svgWidth": {
+                    "label": "SVG Width",
+                    "help": "Set a custom width for the SVG (e.g. 100px, 10rem, 50%)."
+                },
+                "svgHeight": {
+                    "label": "SVG Height",
+                    "help": "Set a custom height for the SVG (e.g. 100px, 10rem, 50%)."
+                }
+            }
+
+        }
+    },
+    "blockControls": {
+        "tabTitle": "Block Controls"
+    },
     "displayControls": {
         "panelTitle": "Display Controls",
         "displayLabel": "Display",
@@ -351,7 +403,11 @@
         "addColumn": "Add column",
         "removeColumn": "Remove column",
         "addRow": "Add row",
-        "removeRow": "Remove row"
+        "removeRow": "Remove row",
+        "matrix": {
+            "noAreas": "No areas defined",
+            "reset": "Reset Grid"
+        }
     },
     "tokenEditor": {
         "add": "Add",

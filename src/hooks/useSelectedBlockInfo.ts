@@ -15,7 +15,6 @@ type Result = {
     attributes: AugmentedAttributes;
 }
 
-
 export function useSelectedBlockInfo(): Result {
 
     const activeBreakpoint = useSelect(selectActiveBreakpoint, []) as Breakpoint | undefined;

@@ -1,0 +1,16 @@
+{
+    "name": "adamtrickett/costered-blocks",
+    "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
+    "type": "project",
+    "license": "GPL-2.0-or-later & MIT",
+    "authors": [
+        {
+            "name": "Adam Trickett",
+            "email": "me@ariom.id.au"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "enshrined/svg-sanitize": "dev-master"
+    }
+}

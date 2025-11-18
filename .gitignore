@@ -2,6 +2,12 @@ node_modules
 vendor
 
 commit-text.txt
+.vscode
+.foam
 
 js/*
 css/*
+vendor/
+node_modules/
+.DS_Store
+Thumbs.db

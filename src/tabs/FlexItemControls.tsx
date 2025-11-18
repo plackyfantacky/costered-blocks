@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 

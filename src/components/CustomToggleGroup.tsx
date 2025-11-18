@@ -1,5 +1,5 @@
 import { useCallback, memo } from '@wordpress/element';
-import { Flex, FlexItem,
+import {
     __experimentalToggleGroupControl as ToggleGroupControl,
     __experimentalToggleGroupControlOption as ToggleGroupControlOption,
     __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon

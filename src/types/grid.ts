@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType } from '@wordpress/element';
 
 export type GridControlsPanelMap<Key extends string> = Record<Key, ComponentType<any>>;
 export type GridControlsPanelProps<Key extends string> =

@@ -12,7 +12,7 @@ import {
 } from '@utils/tokenAreaAdapter';
 import { countTracks, toCount } from "@utils/gridUtils";
 
-import type { Matrix, ColumnInfo, RowInfo, CSSPrimitive } from '@types';
+import type { Matrix, ColumnInfo, RowInfo } from '@types';
 
 const EMPTY = '.';
 

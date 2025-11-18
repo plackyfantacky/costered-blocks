@@ -588,36 +588,6 @@ export function parseAreas(template: string, emptyToken: string = '.'): string[]
 }
 
 
-//Deprecated: use ensureSize from tokenAreaAdapter.ts
-/**
- * Ensure a matrix has exactly cols × rows, filling with `fill`.
- */
-// export function ensureSize<Value>(
-//     matrix: readonly (readonly Value[])[] | Value[][], 
-//     cols: number,
-//     rows: number,
-//     fill: Value
-// ): Value[][] {
-
-//     const colCount = toCount(cols);
-//     const rowCount = toCount(rows);
-//     if (colCount === 0 || rowCount === 0) return [];
-    
-//     const source = Array.isArray(matrix) ? matrix : [];
-    
-//     const output: Value[][] = [];
-//     for(let y = 0; y < rowCount; y++) {
-//         const sourceRow = Array.isArray(source[y]) ? source[y]! : [];
-//         const row = Array.from({ length: colCount }, (_, x) => {
-//             const value = (sourceRow as (Value | undefined)[])[x];
-//             return value === undefined ? fill : value;
-//         });
-//         output.push(row);
-//     }
-//     return output;
-// }
-
-
 /**
  * Measure the number of tracks in a grid-template-columns or grid-template-rows string.
  * Handles repeat(N, ...), strips named lines, ignores subgrid.

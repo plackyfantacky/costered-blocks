@@ -9,7 +9,7 @@ import {
     useScopedKey,
     useUIPreferences
 } from '@hooks';
-import { handleSpanChangeSkippingZero, isIntToken, toInt } from "@utils/gridPlacement";
+import { isIntToken, toInt } from "@utils/gridPlacement";
 
 import {
     AxisStartNumber,

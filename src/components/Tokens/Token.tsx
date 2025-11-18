@@ -1,4 +1,4 @@
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from '@wordpress/element';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { TextControl, Button, Tooltip, Popover } from '@wordpress/components';
 

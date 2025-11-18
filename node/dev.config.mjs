@@ -17,13 +17,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const pluginRoot = path.resolve(__dirname, '..');
 
+const fsp = fs.promises;
+const block_src = path.resolve(pluginRoot, 'src/blocks');
+const block_build = path.resolve(pluginRoot, 'js/blocks');
+
 const pathAliases = {
     'assets': 'src/assets',
+    'blockUIs': 'src/blocks/ui-controls',
     'components': 'src/components',
     'config': 'src/config.ts',
     'filters': 'src/filters',
     'hooks': 'src/hooks',
-    'icons': 'src/assets/icons/index.js',
     'labels': 'src/labels.ts',
     'panels': 'src/panels',
     'providers': 'src/providers',
@@ -62,8 +66,92 @@ const globalsMap = {
     "@wordpress/utils": "wp.utils",
     "@wordpress/viewport": "wp.viewport",
     "react": "React",
-    "react-dom": "ReactDOM",
+    "react-dom": "ReactDOM"
 };
+
+async function findBlockDirs(root) {
+    const entries = await fsp.readdir(root, { withFileTypes: true }).catch(() => []);
+    return entries.filter((entry) => entry.isDirectory()).map((entry) => path.join(root, entry.name));
+}
+
+async function ensureDir(dir) {
+    await fsp.mkdir(dir, { recursive: true });
+}
+
+function rewriteBlockJsonPaths(json) {
+    const fields = ['script', 'style', 'editorScript', 'editorStyle', 'viewScript', 'viewStyle'];
+        for (const key of fields) {
+        const val = json?.[key];
+        if (typeof val === 'string' && val.startsWith('file:./')) {
+            json[key] = val.replace(/\.tsx?$/i, '.js');
+        }
+    }
+    return json;
+}
+
+async function copyBlockStatics() {
+    const blockDirs = await findBlockDirs(block_src);
+    for (const srcDir of blockDirs) {
+        const name = path.basename(srcDir);
+        const outDir = path.join(block_build, name);
+        await ensureDir(outDir);
+
+        // Copy + rewrite block.json
+        const jsonPath = path.join(srcDir, 'block.json');
+        try {
+            const raw = await fsp.readFile(jsonPath, 'utf8');
+            const parsed = JSON.parse(raw);
+            const rewritten = JSON.stringify(rewriteBlockJsonPaths(parsed), null, 4);
+            const outJson = path.join(outDir, 'block.json');
+
+            // avoid redundant writes
+            let shouldWrite = true;
+            try {
+                const existing = await fsp.readFile(outJson, 'utf8');
+                if (existing === rewritten) shouldWrite = false;
+            } catch {}
+            if (shouldWrite) await fsp.writeFile(outJson, rewritten, 'utf8');
+        } catch (err) {
+            if (err?.code !== 'ENOENT') throw err;
+        }
+
+        // Copy render.php (if present)
+        const phpPath = path.join(srcDir, 'index.asset.php');
+        try {
+            const outPhp = path.join(outDir, 'index.asset.php');
+            await fsp.copyFile(phpPath, outPhp);
+        } catch (err) {
+            if (err?.code !== 'ENOENT') throw err;
+        }
+    }
+}
+
+function copyBlockStaticsPlugin() {
+    return {
+        name: 'costered-copy-json-php',
+        setup(build) {
+            build.onEnd(async (result) => {
+                if (result?.errors?.length) return;
+                await copyBlockStatics();
+            });
+        }
+    };
+}
+
+async function watchBlockStatics() {
+    // Works fine on macOS/Linux; for Windows or deep trees, consider chokidar.
+    const watcher = fs.watch(block_src, { recursive: true }, async (_event, filename) => {
+        if (!filename) return;
+        if (!/\/(block\.json|render\.php)$/.test(filename)) return;
+        try {
+            await copyBlockStatics();
+            console.log(`Copied statics for ${filename}`);
+        } catch (e) {
+            console.warn('Static copy failed:', e?.message || e);
+        }
+    });
+    return watcher;
+}
 
 function importAsGlobals(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"); // https://stackoverflow.com/a/3561711/153718
@@ -93,8 +181,23 @@ function importAsGlobals(mapping) {
                 },
                 async (args) => {
                     const global = mapping[args.path];
+                    //return {
+                        //contents: `module.exports = ${global};`,
+                        //loader: "js",
+                    //};
+                    const mod = mapping[args.path];
                     return {
-                        contents: `module.exports = ${global};`,
+                        contents: `
+                            (function(){
+                                var g = ${mod};
+                                // CommonJS export and ESM-ish shapes
+                                module.exports = g;
+                                try { 
+                                    module.exports.default = g;
+                                    Object.defineProperty(module.exports, '__esModule', { value: true });
+                                } catch(e) {}
+                            })();
+                        `,
                         loader: "js",
                     };
                 },
@@ -151,6 +254,7 @@ const jsConfig = {
     plugins: [
         importAsGlobals(globalsMap),
         pathAlias(resolvedAliases),
+        copyBlockStaticsPlugin()
     ],
     logLevel: 'info',
     resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -181,6 +285,11 @@ if (isWatch) {
         jsContext.watch(),
         cssContext.watch(),
     ]);
+
+    // Initial copy + watch JSON/PHP
+    await copyBlockStatics();
+    await watchBlockStatics();
+
 } else {
     if (justBuild) {
         console.log('Cleaning output directories...');
@@ -197,6 +306,8 @@ if (isWatch) {
 
         await build({ ...jsConfig, sourcemap: true, minify: false, bundle: true });
         await build({ ...cssConfig, sourcemap: true, minify: false, bundle: true });
+
+         await copyBlockStatics();
     }
     console.log('Build completed successfully.');
 }

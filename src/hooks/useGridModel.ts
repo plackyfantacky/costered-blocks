@@ -4,7 +4,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
-import type { Breakpoint, BlockAttributes, CSSPrimitive } from "@types";
+import type { Breakpoint, BlockAttributes } from "@types";
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { decodeAxis, measureAreas, measureTrackCount } from "@utils/gridUtils";
 import { augmentAttributes } from '@utils/breakpointUtils';

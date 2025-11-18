@@ -1,4 +1,4 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback } from '@wordpress/element';
 import { Flex, FlexItem, Button } from '@wordpress/components';
 
@@ -99,9 +99,9 @@ export default function TokenGrid({
             />
             {!matrix?.length && (
                 <div className="costered-blocks--token-grid--notice">
-                    <p>{__('No grid-template-areas defined.', 'costered-blocks')}</p>
+                    <p>{tokenGridLabels.matrix.noAreas}</p>
                     <Button variant="secondary" onClick={() => resize(1, 1)}>
-                        {__('Reset Grid', 'costered-blocks')}
+                        {tokenGridLabels.matrix.reset}
                     </Button>
                 </div>
             )}

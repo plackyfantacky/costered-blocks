@@ -12,12 +12,24 @@
  * Text Domain:       costered-blocks
  */
 
-define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
-define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
 
+
+define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
+defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
+
+
+// critical includes
+require_once COSTERED_BLOCKS_PATH . 'php/includes/debug.php';
+if (file_exists(COSTERED_BLOCKS_PATH. '/vendor/autoload.php')) {
+    require COSTERED_BLOCKS_PATH. '/vendor/autoload.php';
+}
+require_once COSTERED_BLOCKS_PATH . 'php/includes/i18n.php';
+
+// main includes
 require_once COSTERED_BLOCKS_PATH . 'php/includes/blocks.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/enqueues.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/helpers.php';
+require_once COSTERED_BLOCKS_PATH . 'php/includes/svg.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 
 // Reset CSS buffer at start of the main query.

@@ -81,7 +81,10 @@
                 "gridRowStart",
                 "gridRowEnd"
             ]
-        }
+        },
+        "blockControls": [
+            "costered-blocks/inline-svg"
+        ]
     },
     "settings": {
         "gridUnit": "1fr",

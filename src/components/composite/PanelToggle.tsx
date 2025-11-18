@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode, ReactElement } from 'react';
+import type { ComponentType, ReactNode, ReactElement } from '@wordpress/element';
 import { memo, useCallback, Children, Suspense } from '@wordpress/element';
 import { Flex, FlexBlock } from '@wordpress/components';
 

@@ -1,6 +1,8 @@
 // src/utils/blockUtils.ts
 import { select } from '@wordpress/data';
 import { isNonEmptyString } from '@utils/common';
+import { getBlockType } from '@wordpress/blocks';
+import type { IconInput } from '@components/Icon';
 
 /** True when value is a non-empty string. */
 export function isValidCosteredId(value: unknown): value is string {

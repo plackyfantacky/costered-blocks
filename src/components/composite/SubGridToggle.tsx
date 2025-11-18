@@ -6,8 +6,7 @@ import { useCallback } from "@wordpress/element";
 import { LABELS } from '@labels';
 import { useAttrGetter, useAttrSetter, useParentAttrs, useUIPreferences, useScopedKey  } from '@hooks';
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
-import type { Breakpoint, GridAxisDisabled } from '@types'
-import { use } from "react";
+import type { Breakpoint, GridAxisDisabled } from '@types';
 
 type Props = {
     clientId: string;

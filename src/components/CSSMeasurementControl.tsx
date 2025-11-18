@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
+import type { ComponentProps } from '@wordpress/element';
 import UnitControlInput from '@components/UnitControlInput';
 import TextControlInput from '@components/TextControlInput';
 import { useBreakpointState } from "@hooks";

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from '@wordpress/element';
 import { useRef } from '@wordpress/element';
 
 import NumberControlInput from '@components/NumberControlInput';

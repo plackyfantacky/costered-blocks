@@ -1,9 +1,8 @@
 
 import { Panel, PanelBody, Flex, FlexBlock } from '@wordpress/components';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
 
-import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, 
-    useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
+import { useAttrGetter, useAttrSetter, useSelectedBlockInfo, useScopedKey, useUIPreferences, useSafeBlockName } from "@hooks";
 import { LABELS } from "@labels";
 import { FluentTableCellCenter24Regular as GridItem } from "@assets/icons";
 
@@ -17,7 +16,6 @@ import { GridItemTracks } from '@panels/GridItemTracks';
 import { GridItemAreas } from '@panels/GridItemAreas';
 
 import type { GridItemPanelKey, VisibilityCtx } from "@types";
-import { useEffect } from "react";
 
 const maxInteger = Number.MAX_SAFE_INTEGER;
 const minInteger = -maxInteger;

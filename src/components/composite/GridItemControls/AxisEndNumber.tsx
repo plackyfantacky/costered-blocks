@@ -1,5 +1,5 @@
 import { Notice } from '@wordpress/components';
-import type { ReactNode } from 'react';
+import type { ReactNode } from '@wordpress/element';
 
 import NumberControlInput from '@components/NumberControlInput';
 import { isIntToken, parseSigned } from '@utils/gridPlacement';

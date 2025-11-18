@@ -1,6 +1,6 @@
 import { Tooltip } from "@wordpress/components";
 
-import { MdiEditOutline as EditIcon } from "@icons";
+import { MdiEditOutline as EditIcon } from "@assets/icons";
 import { useUnsavedAttr } from "@hooks";
 import { LABELS } from "@labels";
 import { sprintf } from "@wordpress/i18n";

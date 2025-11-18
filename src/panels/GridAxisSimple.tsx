@@ -1,6 +1,5 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps } from '@wordpress/element';
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { Flex, FlexBlock, RangeControl, ToggleControl } from '@wordpress/components';
 import { sprintf } from '@wordpress/i18n';
 
@@ -12,7 +11,6 @@ import { makeRepeat } from '@utils/gridUtils';
 
 import UnitControlInput from '@components/UnitControlInput';
 import CustomNotice from "@components/CustomNotice";
-import { GridAxisAside } from "@components/composite/GridAxisAside";
 import type { GridAxisDisabled } from '@types';
 
 const EMPTY_AXIS = {

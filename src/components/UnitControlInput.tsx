@@ -1,5 +1,5 @@
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import type { ComponentProps, CSSProperties } from 'react';
+import type { ComponentProps } from '@wordpress/element';
 
 import { maybeFormat } from "@utils/common";
 

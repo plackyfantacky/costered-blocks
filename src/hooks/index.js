@@ -1,5 +1,6 @@
 export { useAttrGetter } from "@hooks/useAttrGetter";
 export { useAttrSetter } from "@hooks/useAttrSetter";
+export { useBlockAttrs } from "@hooks/useBlockAttrs";
 export { useBreakpointState } from "@hooks/useBreakpointState";
 export { useGridItemTracksController } from "@hooks/useGridItemTracksController"; //choo choo
 export { useGridItemWriter } from "@hooks/useGridItemWriter";

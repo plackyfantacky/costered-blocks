@@ -1,3 +1,7 @@
+svg {
+    display:block;
+}
+
 .costered-blocks--sidebar {
     /* Override default notice width */
     .components-notice__content {
@@ -33,6 +37,34 @@
 
 /* Common UI elements */
 
+.costered-blocks--text-control {
+    padding: 0 2px;
+}
+
+.costered-blocks--icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    width: var(--cb-icon-size, 24px);
+    height: var(--cb-icon-size, 24px);
+    color: var(--cb-icon-foreground, inherit);
+    background-color: var(--cb-icon-background, transparent);
+    
+    .dashicons {
+        font-size: var(--cb-icon-size, 24px);
+        width: 1em;
+        height: 1em;
+        line-height: 1;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+    }
+}
+
 .costered-blocks--unsaved-dot {
     background-color: var(--wp-admin-theme-color, #3858e9);
     border-radius: 50%; 
@@ -64,6 +96,45 @@ fieldset.costered-blocks--fieldset {
         top: 0rem;
         right: 0.5rem;
     }    
+}
+
+/* Custom Media Upload */
+.costered-blocks--custom-media-trigger {
+    position: relative;
+    display: inline-block;
+}
+
+.costered-blocks--custom-media-trigger__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px dashed var(--cb-border, #ccc);
+    border-radius: 6px;
+    background: transparent;
+    line-height: 1;
+}
+
+.costered-blocks--custom-media-trigger__button:hover {
+    border-color: var(--cb-border-hover, #888);
+}
+
+.costered-blocks--custom-media-trigger__icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    line-height: 14px;
+    text-align: centre;
+    user-select: none;
+}
+
+.costered-blocks--custom-media-trigger__label {
+    font-size: 12px;
+}
+
+.costered-blocks--inline-svg-actions .costered-blocks--custom-media-trigger__button {
+    padding: 4px 8px;
 }
 
 /* Custom Select Control */
@@ -519,5 +590,3 @@ fieldset.costered-blocks--fieldset {
         grid-template-columns: 1fr auto;
     }
 }
-
-/* GridItemControls sub-panels */

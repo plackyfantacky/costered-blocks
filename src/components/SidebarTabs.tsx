@@ -7,6 +7,7 @@ import { useParentAttrs } from "@hooks";
 import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { augmentAttributes } from '@utils/breakpointUtils';
 
+import BlockControls from "@tabs/BlockControls";
 import DimensionsControls from "@tabs/DimensionsControls";
 import DisplayControls from "@tabs/DisplayControls";
 import SpacingControls from "@tabs/SpacingControls";
@@ -16,12 +17,13 @@ import GridControls from "@tabs/GridControls";
 import GridItemControls from "@tabs/GridItemControls";
 import PositioningControls from "@tabs/PositioningControls";
 
-import type { ReactNode } from 'react';
+import type { ReactNode } from '@wordpress/element';
 import type { AugmentedAttributes } from "@types";
 
 type VisibleCtx = {
     attributes: AugmentedAttributes;
     parentAttrs: Record<string, unknown> | null;
+    blockName: string | null;
 }
 
 type TabDef = {
@@ -34,6 +36,7 @@ type TabDef = {
 };
 
 const tabs: readonly TabDef[] = [
+    BlockControls,
     DisplayControls,
     DimensionsControls,
     SpacingControls,
@@ -54,20 +57,39 @@ export default function SidebarTabs({ className }: SidebarTabsProps) {
     // active breakpoint (read-only)
     const activeBreakpoint = useSelect(selectActiveBreakpoint, []);
 
-    const { attributes, attrsVersion } = useSelect((select: any) => {
-        const blockEditor = select(blockEditorStore);
-        const id: string | null = blockEditor.getSelectedBlockClientId();
-        if (!id) return { attributes: EMPTY_ATTRS, attrsVersion: '0|0', clientId: null };
+    const {
+        attributes, 
+        attrsVersion, 
+        blockName
+    } = useSelect((select: any) => {
+        const editor = select(blockEditorStore);
+        const clientId = editor.getSelectedBlockClientId();
 
-        const attrs = (blockEditor.getBlockAttributes(id) || EMPTY_ATTRS) as Record<string, unknown>;
-        // cheap version so re-render when nested styles mutate in-place
-        const cheap = (attrs as any)?.costered || {};
+        
+        if (!clientId) {
+            return { 
+                attributes: EMPTY_ATTRS, 
+                attrsVersion: '0|0|0', 
+                blockName: null
+            };
+        }
+
+        const attrs = (editor.getBlockAttributes(clientId) || EMPTY_ATTRS) as Record<string, unknown>;
+        const costered = (attrs as any)?.costered || {};
+
         const version =
-            `${Object.keys(cheap.desktop?.styles || {}).length}` +
-            `|${Object.keys(cheap.tablet?.styles || {}).length}` +
-            `|${Object.keys(cheap.mobile?.styles || {}).length}`;
+            `${Object.keys(costered.desktop?.styles || {}).length}` +
+            `|${Object.keys(costered.tablet?.styles || {}).length}` +
+            `|${Object.keys(costered.mobile?.styles || {}).length}`;
 
-        return { attributes: attrs, attrsVersion: version, clientId: id };
+        const selectedBlock = editor.getSelectedBlock();
+        const name = selectedBlock?.name ?? null;
+
+        return { 
+            attributes: attrs, 
+            attrsVersion: version, 
+            blockName: name
+        };
     }, []);
 
     const augmentedAttributes = useMemo<AugmentedAttributes>(
@@ -78,20 +100,28 @@ export default function SidebarTabs({ className }: SidebarTabsProps) {
     const { parentAttrs } = useParentAttrs(undefined);
 
     const visibleTabs = useMemo(() => {
-        return tabs.filter(t => {
-            if (typeof t.isVisible === 'function') {
-                const ctx = { attributes: augmentedAttributes, parentAttrs };
-                let res = false;
+        return tabs.filter(tabDef => {
+            if (typeof tabDef.isVisible === 'function') {
+                const ctx: VisibleCtx = { 
+                    attributes: augmentedAttributes,
+                    parentAttrs,
+                    blockName
+                };
+
                 try {
-                    res = t.isVisible(ctx) === true;
-                } catch (e) {
-                    console.error(`Error evaluating visibility for tab "${t.name}":`, e);
+                    return tabDef.isVisible(ctx) === true;
+                } catch (error) {
+                    console.error(`Error evaluating visibility for tab "${tabDef.name}":`, error);
+                    return false;
                 }
-                return res;
             }
             return true;
         });
-    }, [augmentedAttributes, (augmentedAttributes as any)?.$bp, parentAttrs]);
+    }, [augmentedAttributes, parentAttrs, blockName]);
+
+    if (!visibleTabs.length) {
+        return null;
+    }
 
     const panelTabs = useMemo(() => {
         return visibleTabs.map(({ name, title, icon }) => ({ name, title, icon }));

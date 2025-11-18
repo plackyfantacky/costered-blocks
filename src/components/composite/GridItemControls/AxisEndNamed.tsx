@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from '@wordpress/element';
 import { ComboboxControl, Notice } from '@wordpress/components';
 import { isIntToken } from '@utils/gridPlacement';
 

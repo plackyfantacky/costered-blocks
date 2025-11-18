@@ -378,7 +378,6 @@ function costered_build_css_pretty_for_selectors(string|array $selectorOrArray, 
 
     // Desktop (no media)
     if (!empty($stylesByBreakpoint['desktop'])) {
-
         $blocks[] = costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['desktop'], $baseIndent);
     }   
 

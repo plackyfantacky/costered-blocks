@@ -1,5 +1,4 @@
 import { useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { Flex, FlexBlock, ComboboxControl } from '@wordpress/components';
 
 import { useAttrGetter, useAttrSetter, useParentGridMeta } from '@hooks';
