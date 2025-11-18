@@ -1,5 +1,8 @@
 # Changelog
 
+## What's Changed in 1.3.2
+- **Inline SVG Block**: upload a sanitised SVG and drop it straight into the page as actual `<svg>` markup, not some sad little file reference. At long last, every shape and path can finally enjoy the CSS attention they’ve been denied for years.
+
 ## What's Changed in 1.3.1
 - Minor UI fixes (See [CHANGELOG-DEV.md](CHANGELOG-DEV.md))
 
