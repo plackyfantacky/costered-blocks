@@ -4,6 +4,7 @@ vendor
 commit-text.txt
 .vscode
 .foam
+.env
 
 js/*
 css/*

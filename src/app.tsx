@@ -1,5 +1,7 @@
+import { nextVersionFeatures } from '@utils/nextVersionFeatures';
+nextVersionFeatures();
+
 import { registerPlugin } from '@wordpress/plugins';
-import { useMemo } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { ComplementaryArea } from '@wordpress/interface';

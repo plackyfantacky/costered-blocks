@@ -12,11 +12,11 @@
  * Text Domain:       costered-blocks
  */
 
-
+defined('ABSPATH') || exit;
+const COSTERED_DB_VERSION = '1';
 
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
-
 
 // critical includes
 require_once COSTERED_BLOCKS_PATH . 'php/includes/debug.php';
@@ -31,6 +31,32 @@ require_once COSTERED_BLOCKS_PATH . 'php/includes/enqueues.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/helpers.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/svg.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
+
+register_activation_hook(__FILE__, function() {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'costered_things';
+    $charset_collate = $wpdb->get_charset_collate();
+
+    $sql = <<<SQL
+    CREATE TABLE {$table_name} (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        thing_type VARCHAR(100) NOT NULL,
+        thing_key VARCHAR(191) NOT NULL,
+        thing_data LONGTEXT NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY unique_thing (thing_type, thing_key),
+        KEY idx_thing_type (thing_type)
+    ) {$charset_collate};
+    SQL;
+
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+
+    update_option('costered_db_version', COSTERED_DB_VERSION);
+});
 
 // Reset CSS buffer at start of the main query.
 add_action('wp', 'costered_styles_reset', 1); // function in helpers.php
