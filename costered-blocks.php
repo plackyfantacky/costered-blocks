@@ -13,7 +13,7 @@
  */
 
 defined('ABSPATH') || exit;
-const COSTERED_DB_VERSION = '1';
+const COSTERED_DB_VERSION = '2';
 
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
@@ -32,6 +32,16 @@ require_once COSTERED_BLOCKS_PATH . 'php/includes/helpers.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/svg.php';
 require_once COSTERED_BLOCKS_PATH . 'php/render-blocks.php';
 
+// 'things' includes
+require_once COSTERED_BLOCKS_PATH . 'php/includes/things-repository.php';
+require_once COSTERED_BLOCKS_PATH . 'php/includes/things.php';
+require_once COSTERED_BLOCKS_PATH . 'php/includes/rest-things.php';
+
+add_action('rest_api_init', function() {
+    $controller = new Costered_Things_Controller();
+    $controller->register_routes();
+});
+
 register_activation_hook(__FILE__, function() {
     global $wpdb;
 
@@ -42,13 +52,15 @@ register_activation_hook(__FILE__, function() {
     CREATE TABLE {$table_name} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         thing_type VARCHAR(100) NOT NULL,
+        thing_costered_id VARCHAR(64) DEFAULT NULL,
         thing_key VARCHAR(191) NOT NULL,
         thing_data LONGTEXT NOT NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY unique_thing (thing_type, thing_key),
-        KEY idx_thing_type (thing_type)
+        UNIQUE KEY unique_thing_costered_id (thing_costered_id),
+        KEY idx_thing_type (thing_type),
     ) {$charset_collate};
     SQL;
 
