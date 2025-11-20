@@ -369,35 +369,59 @@ function costered_render_rule_block(string|array $selectorOrArray, array $declar
  * @return string
  */
 function costered_build_css_pretty_for_selectors(string|array $selectorOrArray, array $stylesByBreakpoint, string $baseIndent = ''): string {
-    $blocks = [];
-
-    $breakpoints   = costered_get_breakpoints();
-    $mobileMaxPx   = (int)($breakpoints['mobile'] ?? 782);
-    $tabletMaxPx   = (int)($breakpoints['tablet'] ?? 1024);
-    $tabletMinPx   = $mobileMaxPx + 1;
-
-    // Desktop (no media)
-    if (!empty($stylesByBreakpoint['desktop'])) {
-        $blocks[] = costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['desktop'], $baseIndent);
-    }   
-
-    // Tablet
-    if (!empty($stylesByBreakpoint['tablet'])) {
-        $css = "@media (min-width: {$tabletMinPx}px) and (max-width: {$tabletMaxPx}px) {\n";
-        $css .= costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['tablet'], $baseIndent . '    ');
-        $css .= "}\n";
-        $blocks[] = $css;
+    $hasDesktop = !empty($stylesByBreakpoint['desktop']);
+    $hasTablet  = !empty($stylesByBreakpoint['tablet']);
+    $hasMobile  = !empty($stylesByBreakpoint['mobile']);
+    
+    if (!$hasDesktop && !$hasTablet && !$hasMobile) {
+        return '';
     }
 
-    // Mobile
-    if (!empty($stylesByBreakpoint['mobile'])) {
-        $css = "@media (max-width: {$mobileMaxPx}px) {\n";
-        $css .= costered_render_rule_block($selectorOrArray, $stylesByBreakpoint['mobile'], $baseIndent . '    ');
-        $css .= "}\n";
-        $blocks[] = $css;
+    $breakpoints = costered_get_breakpoints();
+    $mobileMaxPx = (int) ($breakpoints['mobile'] ?? 782);
+    $tabletMaxPx = (int) ($breakpoints['tablet'] ?? 1024);
+    $tabletMinPx = $mobileMaxPx + 1;
+
+    $baseDeclIndent   = $baseIndent . '    ';
+    $nestedBlockIndent = $baseIndent . '    ';
+    $innerDeclIndent  = $nestedBlockIndent . '    ';
+
+    $css = $selectorLine . " {\n";
+
+    // Base (desktop) declarations
+    if ($hasDesktop) {
+        $css .= costered_style_string($stylesByBreakpoint['desktop'], $baseDeclIndent);
     }
 
-    return costered_join_css_blocks($blocks);
+    $hasPrintedNested = false;
+
+    // Tablet nested @media
+    if ($hasTablet) {
+        if ($hasDesktop) {
+            $css .= "\n";
+        }
+
+        $css .= $nestedBlockIndent . "@media (min-width: {$tabletMinPx}px) and (max-width: {$tabletMaxPx}px) {\n";
+        $css .= costered_style_string($stylesByBreakpoint['tablet'], $innerDeclIndent);
+        $css .= $nestedBlockIndent . "}\n";
+
+        $hasPrintedNested = true;
+    }
+
+    // Mobile nested @media
+    if ($hasMobile) {
+        if ($hasDesktop || $hasPrintedNested) {
+            $css .= "\n";
+        }
+
+        $css .= $nestedBlockIndent . "@media (max-width: {$mobileMaxPx}px) {\n";
+        $css .= costered_style_string($stylesByBreakpoint['mobile'], $innerDeclIndent);
+        $css .= $nestedBlockIndent . "}\n";
+    }
+
+    $css .= $baseIndent . "}\n";
+
+    return $css;
 }
 
 /**

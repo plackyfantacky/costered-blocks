@@ -26,6 +26,7 @@ if (file_exists(COSTERED_BLOCKS_PATH. '/vendor/autoload.php')) {
 require_once COSTERED_BLOCKS_PATH . 'php/includes/i18n.php';
 
 // main includes
+require_once COSTERED_BLOCKS_PATH . 'php/includes/admin.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/blocks.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/enqueues.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/helpers.php';
