@@ -377,6 +377,11 @@ function costered_build_css_pretty_for_selectors(string|array $selectorOrArray, 
         return '';
     }
 
+    $selectorLine = costered_join_selectors($selectorOrArray, $baseIndent);
+    if ($selectorLine === '') {
+        return '';
+    }
+
     $breakpoints = costered_get_breakpoints();
     $mobileMaxPx = (int) ($breakpoints['mobile'] ?? 782);
     $tabletMaxPx = (int) ($breakpoints['tablet'] ?? 1024);
@@ -484,4 +489,99 @@ function costered_join_css_blocks(array $blocks): string {
         $output .= $block;
     }
     return $output === '' ? '' : ($output . "\n");
+}
+
+/**
+ * Rebuild the CSS file for a given post ID by rendering its blocks.
+ * Returns (url, path, version) or (null, null, null) on failure/no CSS.
+ */
+function costered_rebuild_post_css($postId) {
+    $postId = (int) $postId;
+    if ($postId <= 0) {
+        return array(null, null, null);
+    }
+
+    $post = get_post($postId);
+    if (!$post instanceof WP_Post) {
+        return array(null, null, null);
+    }
+
+    // Skip trash and auto-draft etc.
+    if (in_array($post->post_status, array('trash', 'auto-draft'), true)) {
+        return array(null, null, null);
+    }
+
+    // Ensure the buffer is clean.
+    if (function_exists('costered_styles_reset')) {
+        costered_styles_reset();
+    } else {
+        $GLOBALS['costered_css_buffer'] = array();
+    }
+
+    $previousGlobalPost = isset($GLOBALS['post']) ? $GLOBALS['post'] : null;
+
+    // Set the global $post and set up postdata so any block logic relying on it behaves.
+    $GLOBALS['post'] = $post;
+    setup_postdata($post);
+
+    /* Trigger normal block rendering so the render_block filter can
+    collect CSS into the buffer via costered_styles_add(...). */
+    $renderedContent = apply_filters('the_content', $post->post_content);
+    unset($renderedContent); // We only care about the side effects.
+
+    // Collect buffered CSS.
+    $buffer = isset($GLOBALS['costered_css_buffer']) && is_array($GLOBALS['costered_css_buffer'])
+        ? $GLOBALS['costered_css_buffer']
+        : array();
+
+    $css = trim(implode("\n\n", $buffer));
+
+    wp_reset_postdata();
+    $GLOBALS['post'] = $previousGlobalPost;
+
+    if ($css === '') {
+        return array(null, null, null);
+    }
+
+    if (!function_exists('costered_write_css_file')) {
+        return array(null, null, null);
+    }
+
+    return costered_write_css_file($css, $postId);
+}
+
+/**
+ * Rebuild Costered CSS for all pages, posts, and global blocks.
+ *
+ * Returns the number of items processed (not necessarily the number
+ * of files written successfully).
+ */
+function costered_rebuild_all_styles() {
+    $postTypes = array('page', 'post', 'wp_block');
+
+    $query = new WP_Query(array(
+        'post_type' => $postTypes,
+        'post_status' => array('publish', 'private'), // adjust if needed
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'orderby' => 'ID',
+        'order' => 'ASC',
+        'no_found_rows' => true,
+    ));
+
+    if (!$query->have_posts()) {
+        return 0;
+    }
+
+    $processedCount = 0;
+
+    foreach ($query->posts as $postId) {
+        $postId = (int) $postId;
+
+        // Allow future optimisation if needed (logging, error handling, etc).
+        costered_rebuild_post_css($postId);
+        $processedCount++;
+    }
+
+    return $processedCount;
 }

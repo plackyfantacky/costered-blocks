@@ -6,6 +6,21 @@
         "blockWarningSummary": "Style changes may not appear in the editor",
         "blockWarningDetails": "There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here."
     },
+    "admin": {
+        "menu": {
+            "pageTitle": "Costered Blocks Settings",
+            "menuTitle": "Costered Blocks",
+            "currentUserCant": "You do not have permission to access this page.",
+            "currentUserNotAllowed": "Sorry, you are not allowed to do this.",
+            "rebuild": {
+                "notice": "Rebuild completed. %s processed.",
+                "noticeSingular": "%d item was",
+                "noticePlural": "%d items were",
+                "intro": "Use this tool to rebuild all generated Costered CSS for pages, posts, and global blocks.",
+                "button": "Rebuild Costered CSS"
+            }
+        }
+    },
     "blocks": {
         "blockCategory": "Costered Blocks",
         "inlineSVG": {
