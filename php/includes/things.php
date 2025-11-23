@@ -15,8 +15,8 @@
         return costered_things_repo()->getByKey($thingType, $thingKey, $default);
     }
 
-    function costered_things_get_by_costered_id(string $thingCosteredId, mixed $default = null): mixed {
-        return costered_things_repo()->getByCosteredId($thingCosteredId, $default);
+    function costered_things_get_by_costered_id(string $thingType, string $thingCosteredId, mixed $default = null): mixed {
+        return costered_things_repo()->getByCosteredId($thingType, $thingCosteredId, $default);
     }
 
     function costered_things_set(string $thingType, string $thingKey, mixed $thingData, ?string $thingCosteredId = null): bool {
@@ -29,4 +29,8 @@
 
     function costered_things_list(string $thingType): array {
         return costered_things_repo()->listByType($thingType);
+    }
+
+    function costered_things_list_by_costered_id(string $thingType, string $thingCosteredId): array {
+        return costered_things_repo()->listByTypeAndCosteredId($thingType, $thingCosteredId);
     }

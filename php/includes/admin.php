@@ -63,7 +63,8 @@
 
         check_admin_referer('costered_rebuild_all_styles', 'costered_rebuild_all_styles_nonce');
 
-        $rebuiltCount = costered_rebuild_all_styles();
+        //$rebuiltCount = costered_rebuild_all_styles();
+        $rebuiltCount = costered_rebuild_all_styles_from_things();
 
         $redirectUrl = add_query_arg(
             array(

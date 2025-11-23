@@ -70,10 +70,14 @@
 
             $data = [];
 
-            foreach($items as $thingKey => $thingData) {
+            foreach($items as $thingKey => $item) {
+                $costeredId = $item['costered_id'] ?? null;
+                $thingData = $item['thing_data'] ?? null;
+
                 $data[] = [
                     'thing_type' => $thingType,
                     'thing_key' => $thingKey,
+                    'thing_costered_id' => $costeredId,
                     'thing_data' => $thingData,
                 ];
             }
@@ -86,15 +90,20 @@
             $thingType = (string) $request['thing_type'];
             $thingKey = (string) $request['thing_key'];
 
-            $value = costered_things_get($thingType, $thingKey, null);
+            $items = costered_things_list($thingType);
 
-            if($value === null) {
+            if (!isset($items[$thingKey])) {
                 return new WP_Error('costered_thing_not_found', 'Thing not found', ['status' => 404]);
             }
 
+            $item = $items[$thingKey];
+            $value = $item['thing_data'] ?? null;
+            $costeredId = $item['costered_id'] ?? null;
+            
             return rest_ensure_response([
                 'thing_type' => $thingType,
                 'thing_key' => $thingKey,
+                'thing_costered_id' => $costeredId,
                 'thing_data' => $value,
             ]);
         }

@@ -13,7 +13,7 @@
  */
 
 defined('ABSPATH') || exit;
-const COSTERED_DB_VERSION = '2';
+const COSTERED_DB_VERSION = '4';
 
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
@@ -59,9 +59,10 @@ register_activation_hook(__FILE__, function() {
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
-        UNIQUE KEY unique_thing (thing_type, thing_key),
-        UNIQUE KEY unique_thing_costered_id (thing_costered_id),
-        KEY idx_thing_type (thing_type),
+        UNIQUE KEY `idx_costered_key` (`thing_key`,`thing_costered_id`),
+        KEY `idx_thing_type` (`thing_type`),
+        KEY `idx_thing_key` (`thing_key`),
+        KEY `idx_thing_costered_id` (`thing_costered_id`)
     ) {$charset_collate};
     SQL;
 

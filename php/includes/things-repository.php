@@ -42,11 +42,12 @@
         /**
          * Get a thing by costered id
          */
-        public function getByCosteredId(string $costeredId, mixed $default = null): mixed {
+        public function getByCosteredId(string $thingType, string $costeredId, mixed $default = null): mixed {
             $row = $this->wpdb->get_row(
                 $this->wpdb->prepare(
-                    "SELECT thing_data FROM {$this->table} WHERE thing_costered_id = %s LIMIT 1",
-                    $costeredId
+                    "SELECT thing_data FROM {$this->table} WHERE thing_type = %s AND thing_costered_id = %s LIMIT 1",
+                    $thingType,
+                $costeredId
                 ),
                 ARRAY_A
             );
@@ -159,6 +160,34 @@
                     'costered_id' => $row['thing_costered_id'],
                     'thing_data' => $decoded,
                 ];
+            }
+
+            return $items;
+        }
+
+        /**
+         * List all things of a given type and costered id. Each result should have a unitque thing_key.
+         */
+        public function listByTypeAndCosteredId(string $thingType, string $costeredId): array {
+            $rows = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT thing_key, thing_data FROM {$this->table} WHERE thing_type = %s AND thing_costered_id = %s ORDER BY thing_key ASC",
+                    $thingType,
+                    $costeredId
+                ),
+                ARRAY_A
+            );
+
+            $items = [];
+
+            foreach ($rows as $row) {
+                $decoded = json_decode($row['thing_data'], true);
+
+                if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+                    continue;
+                }
+
+                $items[$row['thing_key']] = $decoded;
             }
 
             return $items;
