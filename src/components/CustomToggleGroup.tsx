@@ -44,7 +44,7 @@ function CustomToggleGroupBase({ value, onChange, label = "", isBlock = true, ch
     return (
             <ToggleGroupControl
                 className={`costered-blocks--custom-toggle-group ${value ? 'has-selection' : 'is-empty'}`}
-                label={label}
+                {...(label ? { label } : {})}
                 value={value}
                 onChange={handleChange}
                 isBlock={isBlock}

@@ -65,9 +65,12 @@
     }
 }
 
-
 .costered-blocks--inline-svg {
     svg {
         display: block;
     }
+}
+
+.components-base-control__label:empty {
+    display: none;
 }

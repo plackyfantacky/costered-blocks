@@ -98,7 +98,73 @@ fieldset.costered-blocks--fieldset {
     }    
 }
 
-/* Custom Media Upload */
+/* CSSMeasurementSlider */
+.costered-blocks--css-measurement-slider {
+    width: 100%;
+
+    .costered-blocks--css-measurement-slider--inner {
+        .costered-blocks--css-measurement-slider--range-control-wrapper {
+            flex-grow:1;
+        }
+    
+        .costered-blocks--css-measurement-slider--unit-control-wrapper {
+            width:80px
+        }
+    }
+}
+
+/* InlineSVG Media Upload */
+.costered-blocks--inline-svg--file-uploader {
+    display: flex;
+    gap:0.5rem;
+    align-items: center;
+    width:100%;
+}
+
+/* InlineSVG Preview */
+.costered-blocks--inline-svg--preview,
+.costered-blocks--inline-svg--preview-empty::after {
+    border: 1px solid var(--cb-border, #ccc);
+    padding: 0.25rem;
+    background-image:
+        linear-gradient(45deg, #EEE 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #EEE 75%),
+        linear-gradient(45deg, #EEE 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #EEE 75%);
+    background-size: 12px 12px;
+    background-position:
+        0 0,
+        0 0,
+        6px 6px,
+        6px 6px;
+    max-height:120px;
+    overflow:hidden;
+
+    img,
+    svg {
+        display:block;
+        width: 100%;
+        height: auto;
+    }
+}
+
+.costered-blocks--inline-svg--preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    padding: 1.5rem 0;
+    opacity: 0.75;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+
+.costered-blocks--inline-svg--size-controls {
+    width: 100%;
+}
+
+
 .costered-blocks--custom-media-trigger {
     position: relative;
     display: inline-block;
@@ -125,7 +191,7 @@ fieldset.costered-blocks--fieldset {
     height: 14px;
     font-size: 14px;
     line-height: 14px;
-    text-align: centre;
+    text-align: center;
     user-select: none;
 }
 

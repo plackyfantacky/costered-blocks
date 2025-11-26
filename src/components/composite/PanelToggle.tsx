@@ -22,7 +22,7 @@ function PanelToggleBase<Key extends string>({
     onChange,
     panels,
     panelProps = {},
-    label = LABELS.panelToggle.label,
+    label,
     className,
     children,
     ...rest
@@ -64,7 +64,7 @@ function PanelToggleBase<Key extends string>({
     return (
         <Flex direction="column" gap={2} className={className} {...rest}>
             <CustomToggleGroup
-                label={label}
+                {...(label ? { label } : null)}
                 value={effectiveValue as string}
                 onChange={handleChange}
                 >

@@ -98,7 +98,6 @@ const GridItemControls = () => {
                             className={'costered-blocks--griditem-controls--panel-template-mode'}
                             value={panelActiveKey}
                             onChange={handleChange}
-                            label={null}
                             forceActive
                             panels={panelsMap}
                             panelProps={{ clientId, blockName }}
