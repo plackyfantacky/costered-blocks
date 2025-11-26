@@ -1,33 +1,27 @@
-import { useCallback, useEffect } from '@wordpress/element';
-import { PanelBody, PanelRow, Button, Notice, Spinner, Flex, FlexBlock, FlexItem } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck, useBlockProps} from '@wordpress/block-editor';
+// import { useCallback, useEffect } from '@wordpress/element';
+// import { PanelBody, PanelRow, Button, Notice, Spinner, Flex, FlexBlock, FlexItem } from '@wordpress/components';
 
+import { Flex, PanelRow } from "@wordpress/components";
 
-import { LABELS } from '@labels';
-import {
-    useAttrSetter,
-    useParentGridMeta,
-    useGridItemTracksController,
-    useScopedKey,
-    useUIPreferences
-} from '@hooks';
+import SVGCodeEditor from "@components/SVGCodeEditor";
+import type { SVGEditorState } from "@hooks/useSVGEditor";
 
 type Props = {
-    clientId: string | null;
-    safeBlockName?: string;
+    atttributes: Record<string, any>;
 };
 
-
-export function SVGCodeEditor({
-    clientId,
-    safeBlockName }
-: Props) {
-    if (!clientId) return null;
+export function SVGCodeEditorPanel({ atttributes } : Props) {
+    const savedSVGMarkup: string = String(atttributes?.svgMarkup ?? '');
+    const hasUpload: boolean = Boolean(atttributes?.mediaId && atttributes?.mediaUrl);
 
     return (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <p>beans</p>
-        </div>
+        <PanelRow>
+            <Flex direction="column" gap={8}>
+                <SVGCodeEditor 
+                    savedSVGMarkup={savedSVGMarkup} 
+                    hasUpload={hasUpload} 
+                />
+            </Flex>
+        </PanelRow>
     )
-
 }

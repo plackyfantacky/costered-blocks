@@ -93,13 +93,15 @@ const ControlInner = ({
                             setNumeric(normalised);
                         }}
                         withInputField={false}
-                        __nextDefaultFontSize={true}
+                        showTooltip={false}
+                        __next40pxDefaultSize
                         {...rangeProps}
                     />
                 </div>
                 <div className="costered-blocks--css-measurement-slider--unit-control-wrapper">
                     <UnitControl
                         value={numeric ?? ''}
+                        unit={unit}
                         onChange={(next: any) => {
                             // next can be number | string | undefined
                             const normalised = normaliseToNumber(next);
@@ -107,7 +109,7 @@ const ControlInner = ({
                         }}
                     onUnitChange={(nextUnit: any) => setUnit(nextUnit)}
 
-                        __nextDefaultFontSize={true}
+                        __next40pxDefaultSize
                         {...unitProps}
                     />
                 </div>

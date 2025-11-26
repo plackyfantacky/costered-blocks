@@ -15,7 +15,7 @@ import CustomMediaTrigger from '@components/CustomMediaTrigger';
 import TextControlInput from "@components/TextControlInput";
 
 import { SVGFileUploader } from '@panels/SVGFileUploader';
-import { SVGCodeEditor } from '@panels/SVGCodeEditor';
+import { SVGCodeEditorPanel } from '@panels/SVGCodeEditor';
 
 import metadata from './block.json';
 
@@ -69,7 +69,7 @@ function InlineSVGControls({
     
     const panelsMap = useMemo(() => ({
         file: SVGFileUploader,
-        code: SVGCodeEditor,
+        code: SVGCodeEditorPanel,
     }), []);
     const panelKeys = useMemo(() => Object.keys(panelsMap) as Array<SVGPanelModeKey>, [panelsMap]);
     const firstKey = panelKeys[0]!;
