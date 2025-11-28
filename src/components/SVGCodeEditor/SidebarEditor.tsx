@@ -1,9 +1,24 @@
-import { Flex, Notice, Button } from '@wordpress/components';
+import { Flex, Notice, Button, Toolbar, ToolbarButton } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 import type { SVGEditorState } from '@hooks/useSVGEditor';
+
+import { 
+    MaterialSymbolsHistory,
+    MdiFileImport,
+    MdiTrashCanOutline,
+    StreamlineSharpBrowserCode2,
+} from '@assets/icons';
+import Icon from '@components/Icon';
 
 type Props = {
     state: SVGEditorState;
 }
+
+const RevertIcon = <Icon icon={MaterialSymbolsHistory} size={20} />;
+const LoadIcon = <Icon icon={MdiFileImport} size={20} />;
+const ClearIcon = <Icon icon={MdiTrashCanOutline} size={20} />;
+const CodeEditorIcon = <Icon icon={StreamlineSharpBrowserCode2} size={20} />;
+
 
 export default function SidebarEditor({ state }: Props) {
     const {
@@ -16,37 +31,19 @@ export default function SidebarEditor({ state }: Props) {
     } = state;
     
     return (
-        <div className="costered-blocks--svg-sidebar-editor">
+        <Flex direction="column" gap={1} className="costered-blocks--svg-sidebar-editor">
             <textarea
                 className="costered-blocks--svg-sidebar-editor--textarea"
                 placeholder="<!-- SVG markup here -->"
                 value={unsavedSVGMarkup}
                 onChange={(event) => setUnsavedSVGMarkup(event.target.value)}
             />
-            <Flex direction="row" gap={8} className="costered-blocks--svg-sidebar-editor--buttons">
-                <Button
-                    variant="secondary"
-                    onClick={loadFromFile}
-                    disabled={!hasUpload}
-                >
-                    Load from file
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={clearEditor}
-                >
-                    Clear
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={openModal}
-                >
-                    Open Full Editor
-                </Button>
+            <Flex direction="row" justify="flex-start" align="center" gap={2}>
+                <Button icon={RevertIcon} label="Revert" />
+                <Button icon={LoadIcon} label="Load from file" onClick={loadFromFile} disabled={!hasUpload} />
+                <Button icon={ClearIcon} label="Clear editor" onClick={clearEditor} />
+                <Button icon={CodeEditorIcon} label="Open full editor" onClick={openModal} />
             </Flex>
-            <Notice status="info" isDismissible={false} className="costered-blocks--svg-sidebar-editor--notice">
-                Sidebar editor scaffold - behaviour to be implemented.
-            </Notice>
-        </div>
+        </Flex>
     )
 }

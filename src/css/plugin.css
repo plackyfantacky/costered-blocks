@@ -113,6 +113,13 @@ fieldset.costered-blocks--fieldset {
     }
 }
 
+/* InlineSVG Code Editor Panel */
+
+.costered-blocks--inline-svg--code-editor,
+.costered-blocks--inline-svg--code-editor--wrapper {
+    width: 100%;
+}
+
 /* InlineSVG Media Upload */
 .costered-blocks--inline-svg--file-uploader {
     display: flex;
@@ -164,6 +171,7 @@ fieldset.costered-blocks--fieldset {
     width: 100%;
 }
 
+/* Custom Media Trigger/Placeholder */
 
 .costered-blocks--custom-media-trigger {
     position: relative;
@@ -201,6 +209,69 @@ fieldset.costered-blocks--fieldset {
 
 .costered-blocks--inline-svg-actions .costered-blocks--custom-media-trigger__button {
     padding: 4px 8px;
+}
+
+/* SVG Code Editor */
+
+.costered-blocks--svg-sidebar-editor {
+    width: 100%;
+
+    .costered-blocks--svg-sidebar-editor--toolbar {
+
+        svg,
+        svg path {
+            color: var(--wp-components-color-text, #000);
+        }
+    }
+
+    .costered-blocks--svg-sidebar-editor--textarea {
+        font-family: monospace;
+        font-size: 12px;
+        width: 100%;
+        height: 200px;
+        box-sizing: border-box;
+        border: 1px solid #dcdcde;
+        border-radius: 4px;
+        padding: 0.5rem;
+        resize: vertical;
+    }
+}
+
+.costered-blocks--svg-modal-editor {
+
+    &.components-modal__frame {
+        max-width: 960px;
+        max-height: 80vh;
+        width: 90vw;
+    }
+    
+    .components-modal__content {
+        display: flex;
+        flex-direction: column;
+        height:70vh;
+    }
+
+    .components-modal__header + div {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    
+    .costered-blocks--svg-modal-editor--wrapper {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    
+    .costered-blocks--svg-modal-editor--codemirror {
+        width: 100%;
+        flex: 1 1 auto;
+        border: 1px solid var(--wp--custom--token-border, #dcdcde);
+    }
+
+    .costered-blocks--svg-modal-editor--status {
+        font-size: 11px;
+        opacity: 0.7;
+    }
 }
 
 /* Custom Select Control */

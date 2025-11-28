@@ -15,8 +15,8 @@ export function SVGCodeEditorPanel({ atttributes } : Props) {
     const hasUpload: boolean = Boolean(atttributes?.mediaId && atttributes?.mediaUrl);
 
     return (
-        <PanelRow>
-            <Flex direction="column" gap={8}>
+        <PanelRow className="costered-blocks--inline-svg--code-editor">
+            <Flex direction="column" gap={2} className="costered-blocks--inline-svg--code-editor--wrapper">
                 <SVGCodeEditor 
                     savedSVGMarkup={savedSVGMarkup} 
                     hasUpload={hasUpload} 
