@@ -66,7 +66,7 @@ export function GridAxisTracks({
                         <TokenEditor
                             value={colValue}
                             onChange={writeCols}
-                            labelScope="gridControls.tracksPanel.columns"
+                            labels={LABELS.gridControls.tracksPanel.columns}
                             floatingEditor
                             popoverPlacement="bottom-start"
                         />
@@ -81,7 +81,7 @@ export function GridAxisTracks({
                         <TokenEditor
                             value={rowValue}
                             onChange={writeRows}
-                            labelScope="gridControls.tracksPanel.rows"
+                            labels={LABELS.gridControls.tracksPanel.rows}
                             floatingEditor
                             popoverPlacement="bottom-start"
                         />

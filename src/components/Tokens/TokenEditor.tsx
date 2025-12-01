@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
 import { Button, TextControl, Flex} from '@wordpress/components';
 
-import { scoped } from '@labels';
 import Token from './Token';
 import { TracksTokensAdapter } from '@utils/tokenTracksAdapter';
 import type { TokenAtomicItem } from '@types';
 
-type Labels = Partial<{
+type TokenEditorLabels = Partial<{
     addPlaceholder: string;
     addLabel: string;
     addToken: string;
@@ -14,10 +13,10 @@ type Labels = Partial<{
     duplicate: string;
 }>;
 
-type Props = {
+type TokenEditorProps = {
     value: string;
     onChange: (next: string) => void;
-    labelScope: string;
+    labels: TokenEditorLabels;
     floatingEditor?: boolean;
     popoverPlacement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end' | 'left-start' | 'left-end' | 'right-start' | 'right-end';
     popoverWidth?: string | number;
@@ -26,23 +25,13 @@ type Props = {
 export function TokenEditor({ 
     value,
     onChange,
-    labelScope,
+    labels,
     floatingEditor = false,
     popoverPlacement = 'bottom-start',
     popoverWidth = 200,
-}: Props) {
-
+}: TokenEditorProps) {
     const adapter = useMemo(() => TracksTokensAdapter, []);
-    const L = useMemo(() => scoped(labelScope), [labelScope]);
     const internalCommitRef = useRef(false);
-
-    const labels = useMemo<Required<Labels>>(() => ({
-        addPlaceholder: L('addPlaceholder', '#Enter value…#'),
-        addLabel: L('addLabel', '#Add [Name]#'),
-        addToken: L('addToken', '#Add measurement#'),
-        emptyState: L('emptyState', '#No tokens yet.#'),
-        duplicate: L('duplicate', '#Duplicate#'),
-    }), [L]);
 
     const withIds = (list: Omit<TokenAtomicItem, '_id'>[] | TokenAtomicItem[]): TokenAtomicItem[] => {
         return list.map((item) => {

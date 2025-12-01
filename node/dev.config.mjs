@@ -28,7 +28,7 @@ const pathAliases = {
     'config': 'src/config.ts',
     'filters': 'src/filters',
     'hooks': 'src/hooks',
-    'labels': 'src/labels.ts',
+    'labels': 'config/strings.ts',
     'panels': 'src/panels',
     'providers': 'src/providers',
     'stores': 'src/stores',
