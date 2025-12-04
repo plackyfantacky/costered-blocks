@@ -1,48 +1,82 @@
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 export type SVGEditorState = {
-    unsavedSVGMarkup: string;
-    setUnsavedSVGMarkup: (value: string) => void;
+    markup: string;
+    originalMarkup: string;
+    hasUpload: boolean;
+    isModified: boolean;
     isModalOpen: boolean;
     openModal: () => void;
     closeModal: () => void;
+    setMarkup: (nextMarkup: string) => void;
+    restoreOriginal: () => void;
+    clearMarkup: () => void;
     loadFromFile: () => void;
-    clearEditor: () => void;
-    savedSVGMarkup: string;
-    hasUpload: boolean;
 };
 
 type Options = {
-    savedSVGMarkup: string;
+    markup: string;
     hasUpload: boolean;
+    onChange: (nextMarkup: string) => void;
 }
 
-export function useSVGEditor({ savedSVGMarkup, hasUpload }: Options): SVGEditorState {
-    const [ unsavedSVGMarkup, setUnsavedSVGMarkup ] = useState<string>('');
-    const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false);
+export function useSVGEditor({ 
+    markup, 
+    hasUpload, 
+    onChange 
+}: Options): SVGEditorState {
+    const initialMarkup = markup || '';
 
-    const openModal = useCallback(() => setIsModalOpen(true), []);
-    const closeModal = useCallback(() => setIsModalOpen(false), []);
+    const [originalMarkup] = useState<string>(initialMarkup);
+    const [editorMarkup, setEditorMarkup] = useState<string>(initialMarkup);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const loadFromFile = useCallback(() => {
-        //placeholder
-        setUnsavedSVGMarkup(savedSVGMarkup);
-    }, [savedSVGMarkup]);
+    useEffect(() => {
+        const next = markup || '';
+        setEditorMarkup((current) => (current === next ? current : next));
+    }, [markup]);
 
-    const clearEditor = useCallback(() => {
-        setUnsavedSVGMarkup('');
-    }, []);
+    const isModified = useMemo(() => {
+        return editorMarkup !== originalMarkup;
+    }, [editorMarkup, originalMarkup]);
+
+    function setMarkup(nextMarkup: string): void {
+        setEditorMarkup(nextMarkup);
+        onChange(nextMarkup);
+    }
+
+    function restoreOriginal(): void {
+        setMarkup(originalMarkup);
+    }
+
+    function clearMarkup(): void {
+        setMarkup('');
+    }
+
+    function loadFromFile(): void {
+        // to be implemented later
+        console.log('loadFromFile called. (to be implemented)');
+    }
+
+    function openModal(): void {
+        setIsModalOpen(true);
+    }
+
+    function closeModal(): void {
+        setIsModalOpen(false);
+    }
 
     return {
-        unsavedSVGMarkup,
-        setUnsavedSVGMarkup,
+        markup: editorMarkup,
+        originalMarkup,
+        hasUpload,
+        isModified,
         isModalOpen,
         openModal,
         closeModal,
+        setMarkup,
+        restoreOriginal,
+        clearMarkup,
         loadFromFile,
-        clearEditor,
-        savedSVGMarkup,
-        hasUpload,
     };
-
 }

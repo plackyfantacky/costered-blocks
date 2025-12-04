@@ -6,12 +6,13 @@ import { useSVGEditor } from "@hooks";
 import type { SVGEditorState } from "@hooks/useSVGEditor";
 
 type Props = {
-    savedSVGMarkup: string;
+    markup: string;
     hasUpload: boolean;
+    onChange: (nextMarkup: string) => void;
 }
 
-export default function SVGCodeEditor({ savedSVGMarkup, hasUpload }: Props) {
-    const state: SVGEditorState = useSVGEditor({ savedSVGMarkup, hasUpload } );
+export default function SVGCodeEditor({ markup, hasUpload, onChange }: Props) {
+    const state: SVGEditorState = useSVGEditor({ markup, hasUpload, onChange } );
     return (
         <>
             <SidebarEditor state={state} />

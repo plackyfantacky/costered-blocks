@@ -22,12 +22,12 @@ const CodeEditorIcon = <Icon icon={StreamlineSharpBrowserCode2} size={20} />;
 
 export default function SidebarEditor({ state }: Props) {
     const {
-        unsavedSVGMarkup,
-        setUnsavedSVGMarkup,
-        loadFromFile,
-        clearEditor,
-        openModal,
+        markup,
+        setMarkup,
         hasUpload,
+        loadFromFile,
+        clearMarkup,
+        openModal,
     } = state;
     
     return (
@@ -35,13 +35,13 @@ export default function SidebarEditor({ state }: Props) {
             <textarea
                 className="costered-blocks--svg-sidebar-editor--textarea"
                 placeholder="<!-- SVG markup here -->"
-                value={unsavedSVGMarkup}
-                onChange={(event) => setUnsavedSVGMarkup(event.target.value)}
+                value={markup}
+                onChange={(event) => setMarkup(event.target.value)}
             />
             <Flex direction="row" justify="flex-start" align="center" gap={2}>
                 <Button icon={RevertIcon} label="Revert" />
                 <Button icon={LoadIcon} label="Load from file" onClick={loadFromFile} disabled={!hasUpload} />
-                <Button icon={ClearIcon} label="Clear editor" onClick={clearEditor} />
+                <Button icon={ClearIcon} label="Clear editor" onClick={clearMarkup} />
                 <Button icon={CodeEditorIcon} label="Open full editor" onClick={openModal} />
             </Flex>
         </Flex>

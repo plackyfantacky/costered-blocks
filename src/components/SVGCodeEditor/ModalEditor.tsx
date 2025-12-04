@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "@wordpress/element";
 import { Modal, Button, Flex } from '@wordpress/components';
 
-import type { KeyboardEvent } from '@wordpress/element';
 import type { SVGEditorState } from '@hooks/useSVGEditor';
 
 import { 
@@ -131,14 +130,14 @@ function CM6Editor({
 
 export default function ModalEditor({ state }: ModalEditorProps) {
     const {
-        unsavedSVGMarkup,
-        setUnsavedSVGMarkup,
+        markup,
+        setMarkup,
         loadFromFile,
-        clearEditor,
+        clearMarkup, 
         closeModal,
         hasUpload
     } = state;
-    
+
     return (
         <Modal
             title="Edit SVG code"
@@ -161,15 +160,22 @@ export default function ModalEditor({ state }: ModalEditorProps) {
                     <Button
                         icon={ClearIcon}
                         label="Clear editor"
-                        onClick={clearEditor}
+                        onClick={clearMarkup}
                     />
                 </Flex>
                 <CM6Editor
-                    value={unsavedSVGMarkup}
-                    onChange={setUnsavedSVGMarkup}
+                    value={markup}
+                    onChange={setMarkup}
                     className="costered-blocks--svg-modal-editor--codemirror"
                 />
-                <div className="costered-blocks--svg-modal-editor--status">status</div>
+                <Flex direction="row" justify="space-between" className="costered-blocks--svg-modal-editor--footer">
+                    <span className="costered-blocks--svg-modal-editor--status">
+                        { markup.length } characters
+                    </span>
+                    <span className="costered-blocks--svg-modal-editor--status">
+                        Press <kbd>Tab</kbd>/<kbd>Shift+Tab</kbd> to indent/unindent. Press <kbd>Esc</kbd> then <kbd>Tab</kbd> to focus outside the editor.
+                    </span>
+                </Flex>
             </Flex>
         </Modal>
     )

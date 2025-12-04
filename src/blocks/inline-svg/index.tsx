@@ -3,8 +3,7 @@ import { useBlockProps} from '@wordpress/block-editor';
 import { PanelBody, PanelRow, Notice } from '@wordpress/components';
 import { useState, useMemo, RawHTML } from '@wordpress/element';
 
-import { useSelectedBlockInfo, useScopedKey, useUIPreferences } from "@hooks";
-import { useInlineSVG } from '../../utils/inlineSVGutils';
+import { useInlineSVG, useSelectedBlockInfo, useScopedKey, useUIPreferences } from "@hooks";
 import { LABELS } from "@labels";
 import { VscodeIconsFileTypeSvg as SVGIcon } from '@assets/icons';
 

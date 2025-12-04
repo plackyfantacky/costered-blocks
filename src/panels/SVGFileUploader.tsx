@@ -1,20 +1,10 @@
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
-import { PanelBody, PanelRow, Button, Notice, Spinner, Flex, FlexBlock, FlexItem } from '@wordpress/components';
+import { useCallback, useMemo } from '@wordpress/element';
+import { PanelRow, Button, Spinner, Flex } from '@wordpress/components';
 import { MediaUpload, MediaUploadCheck, useBlockProps} from '@wordpress/block-editor';
 
-import { useInlineSVG } from '@utils/inlineSVGutils';
-
 import { CSSMeasurementSlider } from "@components/CSSMeasurementSlider";
-import UnitControlInput from "@components/UnitControlInput";
 
 import { LABELS } from '@labels';
-import {
-    useAttrSetter,
-    useParentGridMeta,
-    useGridItemTracksController,
-    useScopedKey,
-    useUIPreferences
-} from '@hooks';
 import InlineSVGPreview from "@components/InlineSVGPreview";
 
 type Props = {
