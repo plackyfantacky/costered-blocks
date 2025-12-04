@@ -46,7 +46,8 @@
         "moduleDetection": "force",
         "skipLibCheck": true,
         "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true
+        "exactOptionalPropertyTypes": true,
+        "esModuleInterop": true
     },
     "include": [
         "config",
