@@ -8,22 +8,6 @@ export const LABELS = {
         blockWarningSummary: __("Style changes may not appear in the editor", 'costered-blocks'),
         blockWarningDetails: __("There may be some differences between the editor and the frontend. This is due to limitations with the block editor, which does not always allow custom inline styles to be displayed here.", 'costered-blocks')
     },
-    
-    admin: {
-        menu: {
-            pageTitle: __("Costered Blocks Settings", 'costered-blocks'),
-            menuTitle: __("Costered Blocks", 'costered-blocks'),
-            currentUserCant: __("You do not have permission to access this page.", 'costered-blocks'),
-            currentUserNotAllowed: __("Sorry, you are not allowed to do this.", 'costered-blocks'),
-            rebuild: {
-                notice: __("Rebuild completed. %s processed.", 'costered-blocks'),
-                noticeSingular: __(" %d item was", 'costered-blocks'),
-                noticePlural: __(" %d items were", 'costered-blocks'),
-                intro: __("Use this tool to rebuild all generated Costered CSS for pages, posts, and global blocks.", 'costered-blocks'),
-                button: __("Rebuild Costered CSS", 'costered-blocks')
-            }
-        }
-    },
 
     blocks: {
         blockCategory: __("Costered Blocks", 'costered-blocks'),
@@ -40,6 +24,7 @@ export const LABELS = {
                 errorFetchResponseMalformedSVG: __("Response does not contain <svg>.", 'costered-blocks'),
                 errorFetchResponseUnknownFallback: __("Error fetching SVG.", 'costered-blocks'),
                 errorFetchResponseUnknown: __("Inline SVG Load Error: %1$s", 'costered-blocks'),
+                errorFetchResponseEmpty: __("Fetched SVG is empty.", 'costered-blocks'),
                 errorUIInvalidFileType: __("Please select an SVG file.", 'costered-blocks'),
                 warningLinkButNoSVG: __("A link will do nothing until an SVG is selected.", 'costered-blocks'),
                 warningSVGpreviewUnavailable: __("SVG preview is unavailable (SSR not loaded).", 'costered-blocks'),
@@ -493,10 +478,4 @@ export const LABELS = {
         saveChanges: __("Save Changes", 'costered-blocks'),
         discardChanges: __("Discard Changes", 'costered-blocks')
     }
-}
-
-// label scope helper
-export const scoped = (labelScope: string) => (key: string, fallback?: string) => {
-    const path = `${labelScope}.${key}`;
-    return t(path, fallback);
 }
