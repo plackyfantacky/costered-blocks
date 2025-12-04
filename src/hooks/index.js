@@ -5,6 +5,7 @@ export { useBreakpointState } from "@hooks/useBreakpointState";
 export { useGridItemTracksController } from "@hooks/useGridItemTracksController"; //choo choo
 export { useGridItemWriter } from "@hooks/useGridItemWriter";
 export { useGridModel } from "@hooks/useGridModel";
+export { useInlineSVG } from "@hooks/useInlineSVG";
 export { useParentAttrs } from "@hooks/useParentAttrs";
 export { useParentGridMeta } from "@hooks/useParentGridMeta";
 export { useSafeBlockName } from "@hooks/useSafeBlockName";

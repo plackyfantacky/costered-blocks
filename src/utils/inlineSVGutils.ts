@@ -1,38 +1,69 @@
-import { useCallback, useMemo, useState } from '@wordpress/element';
-import { sprintf } from '@wordpress/i18n';
-import { normaliseSVGForHTML } from '@utils/markupUtils';
 import { LABELS } from "@labels";
-
-type MediaMinimal = {
-    id?: number | string;
-    url?: string;
-    source_url?: string;
-    mime?: string;
-    mime_type?: string;
-};
-
-type Attrs = {
-    mediaId: number;
-    mediaUrl: string;
-    svgClasses: string;
-    linkURL: string;
-    linkClasses: string;
-    svgMarkup: string;
-    svgWidth: string;
-    svgHeight: string;
-}
-
-type Setter = (patch: Partial<Attrs>) => void;
 
 const labels = LABELS.blocks.inlineSVG;
 
+/**
+ * Fetches the sanitised SVG markup for a given attachment ID via a custom REST API endpoint.
+ * Throws an error if the response is invalid or does not contain valid SVG.
+ */
+export async function fetchSanitisedSVG(attachmentId: number): Promise<string> {
+    //fetch via WP REST API custom endpoint
+    const apiFetch = (window as any)?.wp?.apiFetch;
+    const res = await apiFetch?.({
+        path: `/costered-blocks/v1/svg/${attachmentId}`,
+        method: 'GET',
+        parse: true
+    });
+
+    // validate response matches expected shape (has 'svg' property with string value)
+    const svg = typeof res?.svg === 'string' ? res.svg : null;
+    if (!svg) throw new Error(labels.notice.errorFetchResponseInvalid);
+
+    // check if the returned SVG is not empty or malformed
+    if (svg.trim() === '') {
+        throw new Error(labels.notice.errorFetchResponseEmpty);
+    }
+
+    // check the returned SVG contains <svg> tag
+    if (!/<svg[\s\S]*?>[\s\S]*?<\/svg>/i.test(svg)) {
+        throw new Error(labels.notice.errorFetchResponseInvalid);
+    }
+    return svg;
+}
+
+/**
+ * cleans up non-self-closing and stray doctypes in SVG markup to be safely embedded within HTML inside the block editor. 
+ */
+export function normaliseSVGForHTML(input: string): string {
+    let svg = input
+        .replace(/^\uFEFF/, '')
+        .replace(/<\?xml[^>]*?>/gi, '')
+        .replace(/<!DOCTYPE[^>]*?>/gi, '')
+        .trim();
+
+    const SELF_CLOSING = [
+        'path','rect','circle','ellipse','line','polyline','polygon','stop','use',
+        'g','mask','clipPath','linearGradient','radialGradient','pattern','marker','defs'
+    ];
+
+    const result = new RegExp(`<(${SELF_CLOSING.join('|')})(\\b[^>]*)\\/\\s*>`, 'gi');
+    svg = svg.replace(result, '<$1$2></$1>');
+
+    // Normalise whitespace around tags a little (optional, helps with diffs)
+    svg = svg.replace(/\s+>/g, '>').replace(/>\s+</g, '><');
+
+    return svg;
+}
+
+// Applies width and height attributes to the root <svg> element in the provided SVG markup.
+// (refactor: remove the checks for valid SVG, as we should be past that point if this function 
+// is being called. validation is done in fetchSanitisedSVG, and formatting in normaliseSVGForHTML)
+
 export function applySVGDimensions(svgMarkup: string, width?: string, height?: string): string {
-    try {
-        if (!svgMarkup || !svgMarkup.trim()) return svgMarkup;
         const parser = new DOMParser();
         const doc = parser.parseFromString(svgMarkup, 'image/svg+xml');
         const svg = doc.documentElement;
-        if (!svg || svg.nodeName.toLowerCase() !== 'svg') return svgMarkup;
+        // intentional: no validation check here. garbage in, garbage out. 
 
         const w = (width ?? '').trim();
         const h = (height ?? '').trim();
@@ -40,106 +71,4 @@ export function applySVGDimensions(svgMarkup: string, width?: string, height?: s
         if (h) svg.setAttribute('height', h); else svg.removeAttribute('height');
 
         return new XMLSerializer().serializeToString(svg);
-    } catch {
-        return svgMarkup;
-    }
-}
-
-export async function fetchSanitisedSVG(attachmentId: number): Promise<string> {
-    const apiFetch = (window as any)?.wp?.apiFetch;
-    const res = await apiFetch?.({
-        path: `/costered-blocks/v1/svg/${attachmentId}`,
-        method: 'GET',
-        parse: true
-    });
-    const svg = typeof res?.svg === 'string' ? res.svg : null;
-    if (!svg) throw new Error(labels.notice.errorFetchResponseInvalid);
-    return svg;
-}
-
-export function useInlineSVG(
-    attributes: Attrs,
-    setAttributes: Setter
-) {
-    const {
-        mediaId = 0,
-        mediaUrl = '',
-        svgMarkup = '',
-        svgWidth = '',
-        svgHeight = '',
-        linkURL = '',
-        linkClasses = '',
-        svgClasses = '',
-    } = attributes;
-
-    const [isLoading, setLoading] = useState(false);
-    const hasSVG = useMemo(() => Number(mediaId) > 0 && !!mediaUrl, [mediaId, mediaUrl]);
-    const write = useCallback((patch: Partial<Attrs>) => setAttributes(patch), [setAttributes]);
-
-    const loadMarkup = useCallback(async (id: number) => {
-        setLoading(true);
-        try {
-            const raw = await fetchSanitisedSVG(id);
-            const htmlLike = normaliseSVGForHTML(raw);
-            const withDims = applySVGDimensions(htmlLike, svgWidth, svgHeight);
-            write({ svgMarkup: withDims });
-        } catch (error: any) {
-            const msg = error?.message || error?.data?.message || labels.notice.errorFetchResponseUnknownFallback;
-            const notice = sprintf(labels.notice.errorFetchResponseUnknown, msg);
-            (window as any)?.wp?.data?.dispatch('core/notices')?.createNotice?.('error', notice, { type: 'snackbar' });
-            write({ svgMarkup: '' });
-        } finally {
-            setLoading(false);
-        }
-    }, [write, svgWidth, svgHeight]);
-
-    const onSelectMedia = useCallback((media: MediaMinimal) => {
-        const mime = media?.mime ?? media?.mime_type ?? '';
-        if (mime !== 'image/svg+xml') {
-            const notice = labels.notice.errorUIInvalidFileType;
-            (window as any)?.wp?.data?.dispatch('core/notices')?.createNotice?.('warning', notice, { type: 'snackbar' });
-            return;
-        }
-        const id = Number(media?.id) || 0;
-        const url = String(media?.url || media?.source_url || '');
-        write({ mediaId: id, mediaUrl: url });
-        if (id > 0) { void loadMarkup(id); }
-    }, [write, loadMarkup]);
-
-    const onClearMedia = useCallback(() => {
-        write({ mediaId: 0, mediaUrl: '', svgMarkup: '' });
-    }, [write]);
-
-    const onChangeWidth = useCallback((value?: string) => {
-        const next = value ?? '';
-        const nextMarkup = applySVGDimensions(typeof svgMarkup === 'string' ? svgMarkup : '', next, svgHeight);
-        write({ svgWidth: next, svgMarkup: nextMarkup });
-    }, [write, svgMarkup, svgHeight]);
-
-    const onChangeHeight = useCallback((value?: string) => {
-        const next = value ?? '';
-        const nextMarkup = applySVGDimensions(typeof svgMarkup === 'string' ? svgMarkup : '', svgWidth, next);
-        write({ svgHeight: next, svgMarkup: nextMarkup });
-    }, [write, svgMarkup, svgWidth]);
-
-    return {
-        isLoading,
-        hasSVG,
-        //values
-        mediaId: Number(mediaId) || 0,
-        mediaUrl: String(mediaUrl) || '',
-        svgMarkup: String(svgMarkup) || '',
-        svgWidth: String(svgWidth) || '',
-        svgHeight: String(svgHeight) || '',
-        linkURL: String(linkURL) || '',
-        linkClasses: String(linkClasses) || '',
-        svgClasses: String(svgClasses) || '',
-        //actions
-        onSelectMedia,
-        onClearMedia,
-        onChangeWidth,
-        onChangeHeight,
-        loadMarkup,
-        write
-    }
 }
