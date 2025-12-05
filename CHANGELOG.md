@@ -1,5 +1,8 @@
 # Changelog
 
+## What's Changed in 1.3.3
+- **Inline SVG block**: You can now poke at the raw SVG code right inside the block. We still scrub it for unsafe nonsense, so it will not set anything on fire. Probably.
+
 ## What's Changed in 1.3.2
 - **Inline SVG Block**: upload a sanitised SVG and drop it straight into the page as actual `<svg>` markup, not some sad little file reference. At long last, every shape and path can finally enjoy the CSS attention they’ve been denied for years.
 

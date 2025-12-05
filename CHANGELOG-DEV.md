@@ -1,5 +1,35 @@
 # Developer/API Changelog
 
+## What's Changed in v1.3.3 (since 1.3.1)
+
+### Highlights
+#### Blocks
+- **new InlineSVG**: Adds a dedicated block for rendering inline SVGs, with support for both file uploads and direct SVG code editing. All markup is sanitised on save and before output.
+#### Database
+- **new costered_things table**: Introduces a custom database table and repository layer for storing reusable “things” (such as styles or animation sequences), with a REST controller for managing them from the editor.
+#### UI
+- **new Admin menu screen**: Adds an admin screen for Costered Blocks to inspect status, view generated CSS information, and trigger maintenance actions (such as rebuilding styles) from within the dashboard.
+#### Components
+- **SVGCodeEditor**: A CodeMirror powered text/code editor for editing SVG code LIVE! Markup is saved/loaded in `attrs.svgMarkup`.
+- **InlineSVGPreview**: Renders a SVG image on a semi-transparent checkerboard canvas. Useful for SVG that use colours that make them blending the UI making them impossible to see (e.g white text on white background).
+- **CSSMeasurementSlider**: UnitControl and RangeControl had a baby.
+
+#### Hooks
+- **useInlineSVG**: A dedicated reader/writer for the InlineSVG block.
+- **useSVGEditor**: A (draft) handler for the SVGEditor component (in the InlineSVG block UI)
+
+#### Utils
+- **nextVersionFeatures**: Some initial (and very basic) feature-flag code.
+  
+#### I18N
+- **labels/strings refactored to NOT be dynamic**: All user-facing text is now defined in the central `config/strings.ts` file and accessed via `costered_i18n` helpers, removing dynamic label generation and making translation files stable and predictable. POT/PO files can be generated now!
+
+
+#### Misc
+- **Updated CSS build pipeline**: Refactors the CSS generation process to use the new data model, improve breakpoint handling, and avoid touching posts that do not use Costered attributes. Includes additional PHPUnit coverage for the core builders.
+- **"DebugControls" Tab**: Adds an editor tab that is only visible when `window.CB_WP_DEBUG` is enabled. It exposes tools such as viewing and copying raw block data and opening a larger preview, to help with diagnosing block and styling issues during development.
+
+
 ## What's Changed in 1.3.1
 
 - fix: width/height values are colliding with min/max variant values (#1)

@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       Costered Blocks
  * Description:       A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.
- * Version:           1.3.1
+ * Version:           1.3.3
  * Author:            Adam Trickett
  * Requires at least: 6.5
  * Requires PHP:      8.0
