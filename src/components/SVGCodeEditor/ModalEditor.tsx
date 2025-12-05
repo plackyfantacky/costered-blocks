@@ -7,7 +7,7 @@ import {
     MaterialSymbolsHistory,
     MdiFileImport,
     MdiTrashCanOutline,
-    StreamlineSharpBrowserCode2,
+    // StreamlineSharpBrowserCode2,
 } from '@assets/icons';
 import Icon from '@components/Icon';
 
@@ -30,7 +30,6 @@ type ModalEditorProps = {
 const RevertIcon = <Icon icon={MaterialSymbolsHistory} size={20} />;
 const LoadIcon = <Icon icon={MdiFileImport} size={20} />;
 const ClearIcon = <Icon icon={MdiTrashCanOutline} size={20} />;
-const CodeEditorIcon = <Icon icon={StreamlineSharpBrowserCode2} size={20} />;
 
 function CM6Editor({
     value,
@@ -149,25 +148,36 @@ export default function ModalEditor({ state }: ModalEditorProps) {
             <Flex
                 direction="column" 
                 className="costered-blocks--svg-modal-editor--wrapper"
+                gap={4}
             >
-                <Flex direction="row" gap={0} justify="flex-start" className="costered-blocks--svg-modal-editor--buttons">
-                    <Button 
-                        icon={RevertIcon} 
-                        label="Revert" 
-                        onClick={loadFromFile}
-                        disabled={!hasUpload}
-                    />
-                    <Button
-                        icon={ClearIcon}
-                        label="Clear editor"
-                        onClick={clearMarkup}
-                    />
-                </Flex>
                 <CM6Editor
                     value={markup}
                     onChange={setMarkup}
                     className="costered-blocks--svg-modal-editor--codemirror"
                 />
+                <Flex direction="row" gap={4} justify="flex-end" className="costered-blocks--svg-modal-editor--buttons">
+                    {/* <Button 
+                        icon={RevertIcon} 
+                        label="Revert" 
+                        onClick={loadFromFile}
+                        disabled={!hasUpload}
+                    /> */}
+                    <Button
+                        className="costered-blocks--button--clear"
+                        variant="secondary"
+                        onClick={clearMarkup}
+                    >
+                        { ClearIcon }
+                        <span>Clear editor</span>
+                    </Button>
+                    <Button
+                        className="costered-blocks--button--close"
+                        variant="primary"
+                        onClick={closeModal}
+                    >
+                        <span>Close editor</span>
+                    </Button>
+                </Flex>
                 <Flex direction="row" justify="space-between" className="costered-blocks--svg-modal-editor--footer">
                     <span className="costered-blocks--svg-modal-editor--status">
                         { markup.length } characters

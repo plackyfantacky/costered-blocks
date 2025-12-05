@@ -40,6 +40,28 @@ add_filter('block_categories_all', function($block_categories, $block_editor_con
     
 }, 10, 2);
 
+// Restrict the InlineSVG block to users who can use unfiltered HTML.
+add_filter('allowed_block_types_all', function ($allowed, $editor_context) {
+    if (!current_user_can('unfiltered_html')) {
+        // Remove the InlineSVG block for users who are not allowed raw HTML.
+        if (is_array($allowed)) {
+            $allowed = array_diff($allowed, ['costered-blocks/inline-svg']);
+        } else {
+            // If $allowed is true (all blocks), turn it into a list and remove ours.
+            $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+            $allowed     = [];
+
+            foreach ($block_types as $name => $type) {
+                if ($name !== 'costered-blocks/inline-svg') {
+                    $allowed[] = $name;
+                }
+            }
+        }
+    }
+
+    return $allowed;
+}, 10, 2);
+
 add_action('init', function() {
     // block registrations
     register_block_type(COSTERED_BLOCKS_PATH. '/js/blocks/inline-svg');

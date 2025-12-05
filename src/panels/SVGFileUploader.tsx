@@ -32,7 +32,6 @@ export function SVGFileUploader({
     if (!clientId) return null;
 
     const mediaId = Number(attributes?.mediaId ?? 0);
-    const svgClasses = String(attributes?.svgClasses ??'');
     const svgWidth = String(attributes?.svgWidth ?? '');
     const svgHeight = String(attributes?.svgHeight ?? '');
 

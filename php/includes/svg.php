@@ -90,7 +90,7 @@ function costered_contains_inline_svg_block(string $content): bool {
         if (!is_array($b)) {
             continue;
         }
-        if (!empty($b['blockName']) && $b['blockName'] === 'costered/inline-svg') {
+        if (!empty($b['blockName']) && $b['blockName'] === 'costered-blocks/inline-svg') {
             return true;
         }
         if (!empty($b['innerBlocks']) && is_array($b['innerBlocks'])) {
@@ -363,3 +363,4 @@ function costered_svg_allow_smil(Sanitizer $sanitizer): void
     $sanitizer->setAllowedTags(new CosteredAllowedTagsSMIL());
     $sanitizer->setAllowedAttrs(new CosteredAllowedAttributesSMIL());
 }
+

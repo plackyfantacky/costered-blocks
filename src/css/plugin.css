@@ -255,15 +255,28 @@ fieldset.costered-blocks--fieldset {
     }
     
     .costered-blocks--svg-modal-editor--codemirror {
-        width: 100%;
         flex: 1 1 auto;
+        width: 100%;
         border: 1px solid var(--wp--custom--token-border, #dcdcde);
     }
 
+    .costered-blocks--svg-modal-editor--buttons {
+
+        flex:0 0 auto;
+        min-height: fit-content;
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap:0.25rem;   
+        }
+    }
+
     .costered-blocks--svg-modal-editor--footer {
-        margin-top: 0.5rem;
+        flex:0 0 auto;
         font-size: 11px;
         opacity: 0.7;
+        min-height: fit-content;
     }
 
     .costered-blocks--svg-modal-editor--status {

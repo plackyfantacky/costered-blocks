@@ -1,10 +1,9 @@
-import { Flex, Notice, Button, Toolbar, ToolbarButton } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { Flex, Button, Toolbar, ToolbarButton } from '@wordpress/components';
 import type { SVGEditorState } from '@hooks/useSVGEditor';
 
 import { 
-    MaterialSymbolsHistory,
-    MdiFileImport,
+    // MaterialSymbolsHistory,
+    // MdiFileImport,
     MdiTrashCanOutline,
     StreamlineSharpBrowserCode2,
 } from '@assets/icons';
@@ -14,8 +13,8 @@ type Props = {
     state: SVGEditorState;
 }
 
-const RevertIcon = <Icon icon={MaterialSymbolsHistory} size={20} />;
-const LoadIcon = <Icon icon={MdiFileImport} size={20} />;
+// const RevertIcon = <Icon icon={MaterialSymbolsHistory} size={20} />;
+// const LoadIcon = <Icon icon={MdiFileImport} size={20} />;
 const ClearIcon = <Icon icon={MdiTrashCanOutline} size={20} />;
 const CodeEditorIcon = <Icon icon={StreamlineSharpBrowserCode2} size={20} />;
 
@@ -25,7 +24,7 @@ export default function SidebarEditor({ state }: Props) {
         markup,
         setMarkup,
         hasUpload,
-        loadFromFile,
+        // loadFromFile,
         clearMarkup,
         openModal,
     } = state;
@@ -39,8 +38,8 @@ export default function SidebarEditor({ state }: Props) {
                 onChange={(event) => setMarkup(event.target.value)}
             />
             <Flex direction="row" justify="flex-start" align="center" gap={2}>
-                <Button icon={RevertIcon} label="Revert" />
-                <Button icon={LoadIcon} label="Load from file" onClick={loadFromFile} disabled={!hasUpload} />
+                {/* <Button icon={RevertIcon} label="Revert" /> */} {/* Revert functionality can be added later */}
+                {/* <Button icon={LoadIcon} label="Load from file" onClick={loadFromFile} disabled={!hasUpload} />  */} {/* Load from file can be enabled later */}
                 <Button icon={ClearIcon} label="Clear editor" onClick={clearMarkup} />
                 <Button icon={CodeEditorIcon} label="Open full editor" onClick={openModal} />
             </Flex>
