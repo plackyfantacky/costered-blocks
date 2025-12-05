@@ -25,11 +25,16 @@ add_action('enqueue_block_editor_assets', function () {
         );
     }
 
+    $is_debug = costered_is_debug_enabled();
     $enabled = costered_blocks_next_version_features_enabled();
     $json = $enabled ? 'true' : 'false';
 
     $inline = <<<JS
 window.CB_NEXT_VERSION_FEATURES = {$json};
+window.CB_WP_DEBUG = {$is_debug};
+if(window.CB_WP_DEBUG ) {
+    console.log('[costered] WP_DEBUG is enabled');
+}
 JS;
 
     wp_add_inline_script('costered-blocks--entrypoint', $inline, 'before');

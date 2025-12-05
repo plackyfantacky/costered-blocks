@@ -246,15 +246,7 @@ fieldset.costered-blocks--fieldset {
     }
     
     .components-modal__content {
-        display: flex;
-        flex-direction: column;
         height:70vh;
-    }
-
-    .components-modal__header + div {
-        display: flex;
-        flex: 1 1 auto;
-        min-height: 0;
     }
     
     .costered-blocks--svg-modal-editor--wrapper {
@@ -735,5 +727,32 @@ fieldset.costered-blocks--fieldset {
     .costered-blocks--token--popover .costered-blocks--token--panel {
         /* ensure input expands nicely in the popover */
         grid-template-columns: 1fr auto;
+    }
+}
+
+
+.costered-blocks--debug--modal--layout {
+    height: 100%;
+    width: 100%;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.costered-blocks--debug--pre {
+    max-height: 320px;
+    overflow: auto;
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 11px;
+    padding: 8px 10px;
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+    white-space: pre;
+    width: 100%;
+
+    &.costered-blocks--debug--modal--pre {
+        max-height: 60vh;
     }
 }

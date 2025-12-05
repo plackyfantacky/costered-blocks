@@ -477,5 +477,16 @@ export const LABELS = {
         unsavedChangesForAttrs: __("Unsaved changes for: %s", 'costered-blocks'),
         saveChanges: __("Save Changes", 'costered-blocks'),
         discardChanges: __("Discard Changes", 'costered-blocks')
+    },
+    debugTab: {
+        title: __("Debug Info", 'costered-blocks'),
+        description: __("Current block data as JSON. Only visible while debugging is enabled.", 'costered-blocks'),
+        noBlockSelected: __("No block selected.", 'costered-blocks'),
+        viewInModal: __("View in modal", 'costered-blocks'),
+        copyToClipboard: __("Copy to clipboard", 'costered-blocks'),
+        copiedToClipboard: __("Copied to clipboard", 'costered-blocks'),
+        modalTitle: __("Debug Information", 'costered-blocks'),
+        closeModal: __("Close", 'costered-blocks')
     }
+
 }

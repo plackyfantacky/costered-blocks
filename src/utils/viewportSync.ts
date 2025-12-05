@@ -7,7 +7,7 @@ import type { Breakpoint } from '@types';
 
 declare global {
     interface Window {
-        COSTERED_DEBUG?: boolean;
+        CB_WP_DEBUG?: boolean;
     }
 }
 
@@ -56,7 +56,7 @@ export function startViewportSync(): () => void {
             try {
                 dispatch(REDUX_STORE_KEY as any)?.setBreakpoint?.(bp);
             } catch {}
-            if (window.COSTERED_DEBUG) console.log('[costered:bp-sync]', { dev, bp });
+            if (window.CB_WP_DEBUG) console.log('[costered:bp-sync]', { dev, bp });
         }
     };
 
