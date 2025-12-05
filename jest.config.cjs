@@ -18,7 +18,7 @@ module.exports = {
         '^@filters/(.*)$': '<rootDir>/src/filters/$1',
         '^@hooks$': '<rootDir>/src/hooks',
         '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
-        '^@labels$': '<rootDir>/src/labels.ts',
+        '^@labels$': '<rootDir>/config/strings.ts',
         '^@panels/(.*)$': '<rootDir>/src/panels/$1',
         '^@stores/(.*)$': '<rootDir>/src/stores/$1',
         '^@tabs/(.*)$': '<rootDir>/src/tabs/$1',
@@ -26,7 +26,8 @@ module.exports = {
         '^@utils$': '<rootDir>/src/utils',
         '^@utils/(.*)$': '<rootDir>/src/utils/$1',
         // Mock WordPress dependencies
-        '^@wordpress/element$': '<rootDir>/tests/mocks/wp-element.ts'
+        '^@wordpress/element$': '<rootDir>/tests/mocks/wp-element.ts',
+        '^@wordpress/i18n$': '<rootDir>/tests/mocks/wp-i18n.ts'
     },
     testMatch: [
         '<rootDir>/tests/**/*.(test|spec).(ts|tsx)'

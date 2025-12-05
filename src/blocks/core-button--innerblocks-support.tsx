@@ -90,7 +90,7 @@ addFilter(
                     }
                 }, [buttonGap]);
                 
-                const raw = useBlockProps({ className: 'cb-button--with-innerblocks',});
+                const raw = useBlockProps({ className: 'costered-blocks--button--innerblocks',});
 
                 const { outerClassName, innerClassName } = splitClassNames(raw.className);
                 const { outerStyle, innerStyle } = splitStyles(raw.style);

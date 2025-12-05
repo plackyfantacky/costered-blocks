@@ -1,5 +1,7 @@
+import { nextVersionFeatures } from '@utils/nextVersionFeatures';
+nextVersionFeatures();
+
 import { registerPlugin } from '@wordpress/plugins';
-import { useMemo } from '@wordpress/element';
 import { Panel, PanelBody, Flex, FlexItem, Notice } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { ComplementaryArea } from '@wordpress/interface';
@@ -21,17 +23,18 @@ import CustomNotice from '@components/CustomNotice';
 
 declare global {
     interface Window {
-        COSTERED_DEBUG?: boolean;
+        CB_WP_DEBUG?: boolean;
         wp?: any
     }  
 }
-window.COSTERED_DEBUG = IS_DEBUG;
+
 startViewportSync();
 
 const SIDEBAR_NAME = 'costered-blocks/sidebar';
 
 
 function SidebarBody() {
+
     const { selectedBlock } = useSelectedBlockInfo();
     
     const blockIcon = selectedBlock?.name ? getBlockType(selectedBlock.name)?.icon : undefined;

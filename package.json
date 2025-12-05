@@ -44,6 +44,11 @@
     },
     "homepage": "https://github.com/plackyfantacky/costered-blocks#readme",
     "dependencies": {
+        "@codemirror/commands": "^6.10.0",
+        "@codemirror/lang-xml": "^6.1.0",
+        "@codemirror/language": "^6.11.3",
+        "@codemirror/state": "^6.5.2",
+        "@codemirror/view": "^6.38.8",
         "@svgr/plugin-jsx": "^8.1.0",
         "@svgr/plugin-prettier": "^8.1.0",
         "typescript": "^5.9.3"

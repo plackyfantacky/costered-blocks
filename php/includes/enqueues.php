@@ -25,6 +25,20 @@ add_action('enqueue_block_editor_assets', function () {
         );
     }
 
+    $is_debug = costered_is_debug_enabled();
+    $enabled = costered_blocks_next_version_features_enabled();
+    $json = $enabled ? 'true' : 'false';
+
+    $inline = <<<JS
+window.CB_NEXT_VERSION_FEATURES = {$json};
+window.CB_WP_DEBUG = {$is_debug};
+if(window.CB_WP_DEBUG ) {
+    console.log('[costered] WP_DEBUG is enabled');
+}
+JS;
+
+    wp_add_inline_script('costered-blocks--entrypoint', $inline, 'before');
+
     wp_enqueue_style('costered--blocks-styles-plugin', COSTERED_BLOCKS_URL . 'css/plugin.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/plugin.css'));
     wp_enqueue_style('costered--blocks-styles-overrides', COSTERED_BLOCKS_URL . 'css/overrides.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/overrides.css'));
 });
@@ -34,3 +48,49 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('costered--blocks-styles-plugins', COSTERED_BLOCKS_URL . 'css/plugin.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/plugin.css'));
     wp_enqueue_style('costered--blocks-styles-overrides', COSTERED_BLOCKS_URL . 'css/overrides.css', ['wp-editor'], filemtime(COSTERED_BLOCKS_PATH . 'css/overrides.css'));
 });
+
+function costered_blocks_next_version_features_enabled(): bool {
+    static $cached = null;
+
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    // 1) Try real environment variable first.
+    $raw = getenv('CB_NEXT_VERSION_FEATURES');
+    if ($raw !== false && $raw !== null) {
+        $value = strtolower(trim((string) $raw));
+        $cached = in_array($value, ['1', 'true', 'yes', 'on'], true);
+        return $cached;
+    }
+
+    // 2) Fallback to WP constant if defined.
+    $env_path = COSTERED_BLOCKS_PATH . '.env';
+    if (!file_exists($env_path) || !is_readable($env_path)) {
+        $cached = false;
+        return $cached;
+    }
+
+    $lines = file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+
+        if ($line === '' || strpos($line, '#') === 0) {
+            continue;
+        }
+
+        [$key, $value] = array_pad(explode('=', $line, 2), 2, '');
+        $key = trim($key);
+        $value = strtolower(trim($value));
+
+        if ($key !== 'CB_NEXT_VERSION_FEATURES') {
+            continue;
+        }
+
+        $cached = in_array($value, ['1', 'true', 'yes', 'on'], true);
+        return $cached;
+    }
+
+    $cached = false;
+    return $cached;
+}

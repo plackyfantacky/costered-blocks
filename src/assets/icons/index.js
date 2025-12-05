@@ -33,6 +33,7 @@ export { default as MaterialSymbolsBrickOutlineRounded } from './material-symbol
 export { default as MaterialSymbolsFlexNoWrapRounded } from './material-symbols--flex-no-wrap-rounded.jsx';
 export { default as MaterialSymbolsGridViewRounded } from './material-symbols--grid-view-rounded.jsx';
 export { default as MaterialSymbolsHelpOutlineRounded } from './material-symbols--help-outline-rounded.jsx';
+export { default as MaterialSymbolsHistory } from './material-symbols--history.jsx';
 export { default as MaterialSymbolsLightBackgroundGridSmallOutline } from './material-symbols-light--background-grid-small-outline.jsx';
 export { default as MaterialSymbolsMatchWordRounded } from './material-symbols--match-word-rounded.jsx';
 export { default as MaterialSymbolsRemoveSelectionRounded } from './material-symbols--remove-selection-rounded.jsx';
@@ -45,6 +46,7 @@ export { default as MdiBorderNoneVariant } from './mdi--border-none-variant.jsx'
 export { default as MdiEditOutline } from './mdi--edit-outline.jsx';
 export { default as MdiEyeOffOutline } from './mdi--eye-off-outline.jsx';
 export { default as MdiEyeOutline } from './mdi--eye-outline.jsx';
+export { default as MdiFileImport } from './mdi--file-import.jsx';
 export { default as MdiPlus } from './mdi--plus.jsx';
 export { default as MdiQuestionBoxMultiple } from './mdi--question-box-multiple.jsx';
 export { default as MdiTrashCanOutline } from './mdi--trash-can-outline.jsx';
@@ -56,5 +58,6 @@ export { default as PositionStatic } from './PositionStatic.jsx';
 export { default as PositionSticky } from './PositionSticky.jsx';
 export { default as RadixIconsDimensions } from './radix-icons--dimensions.jsx';
 export { default as SplitInput } from './SplitInput.jsx';
+export { default as StreamlineSharpBrowserCode2 } from './streamline-sharp--browser-code-2.jsx';
 export { default as TablerBoxMargin } from './tabler--box-margin.jsx';
 export { default as VscodeIconsFileTypeSvg } from './vscode-icons--file-type-svg.jsx';

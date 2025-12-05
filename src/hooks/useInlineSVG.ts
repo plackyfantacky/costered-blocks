@@ -1,65 +1,15 @@
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { sprintf } from '@wordpress/i18n';
-import { normaliseSVGForHTML } from '@utils/markupUtils';
+import { applySVGDimensions, fetchSanitisedSVG, normaliseSVGForHTML } from '@utils/inlineSVGutils';
+
 import { LABELS } from "@labels";
-
-type MediaMinimal = {
-    id?: number | string;
-    url?: string;
-    source_url?: string;
-    mime?: string;
-    mime_type?: string;
-};
-
-type Attrs = {
-    mediaId: number;
-    mediaUrl: string;
-    svgClasses: string;
-    linkURL: string;
-    linkClasses: string;
-    svgMarkup: string;
-    svgWidth: string;
-    svgHeight: string;
-}
-
-type Setter = (patch: Partial<Attrs>) => void;
+import type { InlineSVGAttrs, InlineSVGSetter, SVGMediaMinimal } from '@types';
 
 const labels = LABELS.blocks.inlineSVG;
 
-export function applySVGDimensions(svgMarkup: string, width?: string, height?: string): string {
-    try {
-        if (!svgMarkup || !svgMarkup.trim()) return svgMarkup;
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(svgMarkup, 'image/svg+xml');
-        const svg = doc.documentElement;
-        if (!svg || svg.nodeName.toLowerCase() !== 'svg') return svgMarkup;
-
-        const w = (width ?? '').trim();
-        const h = (height ?? '').trim();
-        if (w) svg.setAttribute('width', w); else svg.removeAttribute('width');
-        if (h) svg.setAttribute('height', h); else svg.removeAttribute('height');
-
-        return new XMLSerializer().serializeToString(svg);
-    } catch {
-        return svgMarkup;
-    }
-}
-
-export async function fetchSanitisedSVG(attachmentId: number): Promise<string> {
-    const apiFetch = (window as any)?.wp?.apiFetch;
-    const res = await apiFetch?.({
-        path: `/costered-blocks/v1/svg/${attachmentId}`,
-        method: 'GET',
-        parse: true
-    });
-    const svg = typeof res?.svg === 'string' ? res.svg : null;
-    if (!svg) throw new Error(labels.notice.errorFetchResponseInvalid);
-    return svg;
-}
-
 export function useInlineSVG(
-    attributes: Attrs,
-    setAttributes: Setter
+    attributes: InlineSVGAttrs,
+    setAttributes: InlineSVGSetter
 ) {
     const {
         mediaId = 0,
@@ -74,12 +24,13 @@ export function useInlineSVG(
 
     const [isLoading, setLoading] = useState(false);
     const hasSVG = useMemo(() => Number(mediaId) > 0 && !!mediaUrl, [mediaId, mediaUrl]);
-    const write = useCallback((patch: Partial<Attrs>) => setAttributes(patch), [setAttributes]);
+    const write = useCallback((patch: Partial<InlineSVGAttrs>) => setAttributes(patch), [setAttributes]);
 
     const loadMarkup = useCallback(async (id: number) => {
         setLoading(true);
         try {
             const raw = await fetchSanitisedSVG(id);
+            // if raw is valid SVG, normalise and apply dimensions
             const htmlLike = normaliseSVGForHTML(raw);
             const withDims = applySVGDimensions(htmlLike, svgWidth, svgHeight);
             write({ svgMarkup: withDims });
@@ -93,7 +44,7 @@ export function useInlineSVG(
         }
     }, [write, svgWidth, svgHeight]);
 
-    const onSelectMedia = useCallback((media: MediaMinimal) => {
+    const onSelectMedia = useCallback((media: SVGMediaMinimal) => {
         const mime = media?.mime ?? media?.mime_type ?? '';
         if (mime !== 'image/svg+xml') {
             const notice = labels.notice.errorUIInvalidFileType;

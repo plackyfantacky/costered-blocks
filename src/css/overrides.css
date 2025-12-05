@@ -65,9 +65,25 @@
     }
 }
 
-
 .costered-blocks--inline-svg {
     svg {
         display: block;
     }
+}
+
+.components-base-control__label:empty {
+    display: none;
+}
+
+/* Modal fixes */
+.components-modal__content {
+    display: flex;
+    flex-direction: column;
+    /* height: 70vh; */
+}
+
+.components-modal__header + div {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
 }

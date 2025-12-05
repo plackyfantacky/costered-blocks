@@ -1,4 +1,4 @@
-name: Build plugin zip on main
+name: Test build plugin (no publishing)
 
 on:
     push:

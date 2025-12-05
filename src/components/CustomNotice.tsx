@@ -10,7 +10,7 @@ type NoticeStatus =
 type Props = {
     type: NoticeStatus;
     title: ReactNode;
-    content: ReactNode;
+    content?: ReactNode;
     icon?: ReactNode | null;
     className?: string;
     dismissible?: boolean;

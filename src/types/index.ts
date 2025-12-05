@@ -56,3 +56,7 @@ export type { TokenAtomicItem, TokenModelAdapter, PersistedTracks, PersistedArea
 
 // Block UI
 export type { BlockUIRenderContext, BlockUIComponent } from './block-ui.ts';
+
+// Inline SVG
+
+export type { InlineSVGAttrs, InlineSVGSetter, SVGMediaMinimal } from './inlineSVG.ts';

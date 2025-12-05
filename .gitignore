@@ -4,6 +4,7 @@ vendor
 commit-text.txt
 .vscode
 .foam
+.env
 
 js/*
 css/*
@@ -11,3 +12,6 @@ vendor/
 node_modules/
 .DS_Store
 Thumbs.db
+.phpunit.result.cache
+tests/php/wp-tests-config.php
+phpunit.xml.dist

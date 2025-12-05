@@ -1,15 +1,20 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { MediaUpload, MediaUploadCheck, useBlockProps} from '@wordpress/block-editor';
-import { PanelBody, PanelRow, Button, Notice, Spinner, Flex, FlexItem } from '@wordpress/components';
-import { useCallback, useMemo, RawHTML } from '@wordpress/element';
+import { useBlockProps} from '@wordpress/block-editor';
+import { PanelBody, PanelRow, Notice } from '@wordpress/components';
+import { useState, useMemo, RawHTML } from '@wordpress/element';
+
+import { useInlineSVG, useSelectedBlockInfo, useScopedKey, useUIPreferences } from "@hooks";
+import { LABELS } from "@labels";
+import { VscodeIconsFileTypeSvg as SVGIcon } from '@assets/icons';
+
+import CosteredBlockControls from '@utils/slotFillUtils';
+import PanelToggle from "@components/composite/PanelToggle";
 
 import CustomMediaTrigger from '@components/CustomMediaTrigger';
 import TextControlInput from "@components/TextControlInput";
-import UnitControlInput from "@components/UnitControlInput";
-import { VscodeIconsFileTypeSvg as SVGIcon } from '@assets/icons';
-import { useInlineSVG } from './utils';
-import { LABELS } from "@labels";
-import CosteredBlockControls from '@utils/slotFillUtils';
+
+import { SVGFileUploader } from '@panels/SVGFileUploader';
+import { SVGCodeEditorPanel } from '@panels/SVGCodeEditor';
 
 import metadata from './block.json';
 
@@ -30,6 +35,8 @@ type SaveAttrs = {
     linkClasses?: string;
 };
 
+type SVGPanelModeKey = 'file' | 'code';
+
 const labels = LABELS.blocks.inlineSVG;
 
 function InlineSVGControls({
@@ -41,79 +48,73 @@ function InlineSVGControls({
     onChangeHeight,
     isLoading = false
 }: ControlsProps) {
-    const mediaId = Number(attributes.mediaId || 0);
-    const svgClasses = String(attributes.svgClasses || '');
+    const { selectedBlock, clientId } = useSelectedBlockInfo();
+    if (!clientId) return null;
+
     const linkURL = String(attributes.linkURL || '');
     const linkClasses = String(attributes.linkClasses || '');
-    const svgWidth = String(attributes.svgWidth || '');
-    const svgHeight = String(attributes.svgHeight || '');
+
     const hasSVG = useMemo(
         () => Number(attributes.mediaId || 0) > 0 && !!attributes.mediaUrl,
         [attributes.mediaId, attributes.mediaUrl]
     );
 
-    const handleWidthChange = useCallback((value: string | number) => {
-        onChangeWidth?.(typeof value === 'string' ? value : String(value));
-    }, [onChangeWidth]);
+    /* --- panel prefs + mode --- */
 
-    const handleHeightChange = useCallback((value: string | number) => {
-        onChangeHeight?.(typeof value === 'string' ? value : String(value));
-    }, [onChangeHeight]);
+    const panelPrefKey = useScopedKey('inlineSVGEditMode', { blockName: metadata.name });
+    const [panelStoredKey, setPanelStoredKey] = useUIPreferences<string>(panelPrefKey, 'file');
+
+    /* --- panel mode toggle --- */
+    
+    const panelsMap = useMemo(() => ({
+        file: SVGFileUploader,
+        code: SVGCodeEditorPanel,
+    }), []);
+    const panelKeys = useMemo(() => Object.keys(panelsMap) as Array<SVGPanelModeKey>, [panelsMap]);
+    const firstKey = panelKeys[0]!;
+
+    const modeKeySet = useMemo(() => new Set(panelKeys), [panelKeys]);
+    const isValid = (k: unknown): k is SVGPanelModeKey =>
+        typeof k === "string" && modeKeySet.has(k as SVGPanelModeKey);
+
+    const [panelActiveKey, setPanelActiveKey] = useState<SVGPanelModeKey>(
+        isValid(panelStoredKey) ? panelStoredKey : firstKey
+    );
+
+    const handleChange = (next: SVGPanelModeKey) => {
+        if (!isValid(next) || next === panelActiveKey) return;
+        setPanelActiveKey(next);
+        setPanelStoredKey(next);
+    }
 
     return (
         <>
             <PanelBody title={labels.panelTitle} initialOpen={true}>
-                <PanelRow>
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <MediaUploadCheck>
-                            <MediaUpload
-                                onSelect={onSelectMedia}
-                                allowedTypes={['image/svg+xml']}
-                                value={mediaId || undefined}
-                                render={({ open }: { open: () => void }) => (
-                                    <Button variant="primary" onClick={open}>
-                                        { hasSVG ? labels.actions.replaceSVG : labels.actions.selectSVG }
-                                    </Button>
-                                )}
-                            />
-                        </MediaUploadCheck>
-                        { hasSVG && (
-                            <Button variant="secondary" onClick={onClearMedia}>
-                                { labels.actions.clear }
-                            </Button>
-                        )}
-                        {isLoading && <Spinner />}
-                    </div>
-                </PanelRow>
-                
-                <PanelRow>
-                    <TextControlInput
-                        label={labels.fields.svgClasses.label}
-                        value={svgClasses}
-                        onChange={(val?: string) => setAttributes({ svgClasses: val ?? '' })}
-                        help={labels.fields.svgClasses.help}
-                    />
-                </PanelRow>
-
-                <PanelRow>
-                    <Flex direction="row" gap={4}>
-                        <UnitControlInput
-                            label={labels.fields.svgWidth.label}
-                            value={svgWidth}
-                            onChange={handleWidthChange}
-                            placeholder="e.g. 100px, 10rem, 50%"
-                            allowReset={true}
-                        />
-                        <UnitControlInput
-                            label={labels.fields.svgHeight.label}
-                            value={svgHeight}
-                            onChange={handleHeightChange}
-                            placeholder="e.g. 100px, 10rem, 50%"
-                            allowReset={true}
-                        />
-                    </Flex>
-                </PanelRow>
-
+                <PanelToggle
+                    className={'costered-blocks--inline-svg--panel-editing-mode'}
+                    value={panelActiveKey}
+                    onChange={handleChange}
+                    label={null}
+                    forceActive
+                    panels={panelsMap}
+                    panelProps={{ 
+                        clientId,
+                        attributes,
+                        setAttributes,
+                        onSelectMedia,
+                        onClearMedia,
+                        onChangeWidth,
+                        onChangeHeight,
+                        isLoading
+                    }}
+                >
+                    <PanelToggle.Composite value="file">
+                        {'File Upload'}
+                    </PanelToggle.Composite>
+                    <PanelToggle.Composite value="code">
+                        {'Code Editor'}
+                    </PanelToggle.Composite>
+                </PanelToggle>
             </PanelBody>
 
             <PanelBody title={labels.linkPanelTitle} initialOpen={false}>

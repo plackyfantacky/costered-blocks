@@ -23,7 +23,7 @@
             "@filters/*": ["src/filters/*"],
             "@hooks": ["src/hooks"],
             "@hooks/*": ["src/hooks/*"],
-            "@labels": ["src/labels"],
+            "@labels": ["config/strings.ts"],
             "@panels/*": ["src/panels/*"],
             "@providers/*": ["src/providers/*"],
             "@stores/*": ["src/stores/*"],
@@ -46,7 +46,8 @@
         "moduleDetection": "force",
         "skipLibCheck": true,
         "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true
+        "exactOptionalPropertyTypes": true,
+        "esModuleInterop": true
     },
     "include": [
         "config",

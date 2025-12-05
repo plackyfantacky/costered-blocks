@@ -8,6 +8,7 @@ import { selectActiveBreakpoint } from '@stores/activeBreakpoint';
 import { augmentAttributes } from '@utils/breakpointUtils';
 
 import BlockControls from "@tabs/BlockControls";
+import DebugControls from "@tabs/DebugControls";
 import DimensionsControls from "@tabs/DimensionsControls";
 import DisplayControls from "@tabs/DisplayControls";
 import SpacingControls from "@tabs/SpacingControls";
@@ -44,7 +45,8 @@ const tabs: readonly TabDef[] = [
     FlexItemControls,
     GridControls,
     GridItemControls,
-    PositioningControls
+    PositioningControls,
+    DebugControls
 ];
 
 type SidebarTabsProps = {
