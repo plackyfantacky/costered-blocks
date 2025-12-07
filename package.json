@@ -1,6 +1,6 @@
 {
     "name": "costered-blocks",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "description": "A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.",
     "main": "js/app.js",
     "scripts": {
@@ -9,10 +9,9 @@
         "build": "cross-env NODE_ENV=production node ./node/dev.config.mjs -- --build",
         "svg": "node ./node/svgr-convert.mjs",
         "version": "node ./node/sync-plugin-version.js",
-        "release:patch": "npm version patch",
-        "release:minor": "npm version minor",
-        "release:major": "npm version major"
-        
+        "release:patch": "npm version patch -m \"chore(release): v%s\"",
+        "release:minor": "npm version minor -m \"chore(release): v%s\"",
+        "release:major": "npm version major -m \"chore(release): v%s\""
     },
     "devDependencies": {
         "@svgr/core": "^8.1.0",

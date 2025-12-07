@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       Costered Blocks
  * Description:       A small collection of deliberate, developer-focused middle fingers to some of Gutenberg's most irritating decisions.
- * Version:           1.3.3
+ * Version:           1.3.4
  * Author:            Adam Trickett
  * Requires at least: 6.5
  * Requires PHP:      8.0
@@ -12,7 +12,7 @@
  * Text Domain:       costered-blocks
  */
 
-define('COSTERED_BLOCKS_VERSION', '1.3.3');
+define('COSTERED_BLOCKS_VERSION', '1.3.4');
 
 defined('ABSPATH') || exit;
 const COSTERED_DB_VERSION = '4';
