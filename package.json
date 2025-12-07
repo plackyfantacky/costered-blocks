@@ -7,7 +7,12 @@
         "test": "jest",
         "dev": "cross-env NODE_ENV=development node ./node/dev.config.mjs -- --watch",
         "build": "cross-env NODE_ENV=production node ./node/dev.config.mjs -- --build",
-        "svgr:convert": "node ./node/svgr-convert.mjs"
+        "svg": "node ./node/svgr-convert.mjs",
+        "version": "node ./node/sync-plugin-version.js",
+        "release:patch": "npm version patch",
+        "release:minor": "npm version minor",
+        "release:major": "npm version major"
+        
     },
     "devDependencies": {
         "@svgr/core": "^8.1.0",

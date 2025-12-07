@@ -11,6 +11,9 @@ permissions:
 jobs:
     build-release:
         runs-on: ubuntu-latest
+        env:
+            PLUGIN_SLUG: costered-blocks
+            ZIP_NAME: costered-blocks.zip
 
         steps:
         -   name: Checkout
@@ -21,6 +24,15 @@ jobs:
             with:
                 node-version: '20'
                 cache: 'npm'
+        -   name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: '8.2'
+                tools: composer
+                coverage: none
+
+        -   name: Install PHP dependencies (Composer)
+            run: composer install --no-dev --prefer-dist --optimize-autoloader
 
         -   name: Install dependencies
             run: npm ci
@@ -41,6 +53,10 @@ jobs:
                     echo "Version mismatch: tag is v${TAG_VERSION}, package.json is ${PKG_VERSION}"
                     exit 1
                 fi
+
+                # Export values for later steps
+                echo "TAG_VERSION=${TAG_VERSION}" >> "${GITHUB_ENV}"
+                echo "ZIP_NAME=${PLUGIN_SLUG}-v${TAG_VERSION}.zip" >> "${GITHUB_ENV}"
 
         -   name: Build assets
             env:
@@ -69,23 +85,29 @@ jobs:
                     fi
                 done
 
-                # 3) Create the final plugin zip next to the staging dir
+                # 3) Overlay vendor directory
+                if [ -d "${WORKDIR}/vendor" ]; then
+                    rm -rf "${STAGING_DIR}/vendor"
+                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
+                fi
+
+                # 4) Create the final plugin zip next to the staging dir
                 cd "$(dirname "${STAGING_DIR}")"
-                zip -rq "${PLUGIN_SLUG}.zip" "${PLUGIN_SLUG}"
+                zip -rq "${ZIP_NAME}" "${PLUGIN_SLUG}"
 
                 
         -   name: Upload plugin zip artefact
             uses: actions/upload-artifact@v4
             with:
                 name: costered-blocks-plugin
-                path: /tmp/costered-blocks.zip
+                path: "/tmp/${{ env.ZIP_NAME }}"
 
 
         -   name: Create GitHub Release
             uses: softprops/action-gh-release@v2
             with:
                 tag_name: ${{ github.ref_name }}
-                files: /tmp/costered-blocks.zip
+                files: "/tmp/${{ env.ZIP_NAME }}"
                 generate_release_notes: true
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

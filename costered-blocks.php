@@ -12,6 +12,8 @@
  * Text Domain:       costered-blocks
  */
 
+define('COSTERED_BLOCKS_VERSION', '1.3.3');
+
 defined('ABSPATH') || exit;
 const COSTERED_DB_VERSION = '4';
 
