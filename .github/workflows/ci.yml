@@ -12,24 +12,84 @@ permissions:
 jobs:
     build-develop:
         runs-on: ubuntu-latest
+        env:
+            PLUGIN_SLUG: costered-blocks
+            ZIP_BASENAME: costered-blocks-dev
+            ZIP_NAME: costered-blocks-dev.zip
 
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+            -   name: Checkout
+                uses: actions/checkout@v4
 
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '20'
-                  cache: 'npm'
+            -   name: Setup Node
+                uses: actions/setup-node@v4
+                with:
+                    node-version: '20'
+                    cache: 'npm'
+            
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.2'
+                    tools: composer
+                    coverage: none
 
-            - name: Install dependencies
-              run: npm ci
+            -   name: Install PHP dependencies (Composer)
+                run: composer install --no-dev --prefer-dist --optimize-autoloader
 
-            - name: Run Jest tests
-              run: npm test
+            -   name: Install dependencies
+                run: npm ci
 
-            - name: Build assets
-              env:
-                  NODE_ENV: production
-              run: npm run build
+            -   name: Run Jest tests
+                run: npm test
+
+            -   name: Build assets
+                env:
+                    NODE_ENV: production
+                run: npm run build
+
+            -   name: Compute zip name (commit hash)
+                run: |
+                    set -euxo pipefail
+
+                    SHORT_SHA="$(git rev-parse --short HEAD)"
+                    ZIP_BASENAME="${PLUGIN_SLUG}-${SHORT_SHA}"
+                    ZIP_NAME="${ZIP_BASENAME}.zip"
+
+                    echo "ZIP_BASENAME=${ZIP_BASENAME}" >> "${GITHUB_ENV}"
+                    echo "ZIP_NAME=${ZIP_NAME}" >> "${GITHUB_ENV}"
+
+            -   name: Create plugin zip (git archive + compiled assets)
+                run: |
+                    set -euxo pipefail
+
+                    WORKDIR="${GITHUB_WORKSPACE}"
+                    STAGING_DIR="/tmp/${PLUGIN_SLUG}"
+
+                    rm -rf "${STAGING_DIR}"
+                    mkdir -p "${STAGING_DIR}"
+
+                    git archive --format=tar HEAD | tar -x -C "${STAGING_DIR}"
+
+                    for dir in js css; do
+                        if [ -d "${WORKDIR}/${dir}" ]; then
+                            rm -rf "${STAGING_DIR}/${dir}"
+                            cp -a "${WORKDIR}/${dir}" "${STAGING_DIR}/${dir}"
+                        fi
+                    done
+
+                    if [ -d "${WORKDIR}/vendor" ]; then
+                        rm -rf "${STAGING_DIR}/vendor"
+                        cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
+                    fi
+
+                    cd "$(dirname "${STAGING_DIR}")"
+                    zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
+
+                    echo "Built /tmp/${ZIP_NAME}"
+
+            -   name: Upload plugin zip artefact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ${{ env.ZIP_BASENAME }}
+                    path: "/tmp/${{ env.ZIP_NAME }}"

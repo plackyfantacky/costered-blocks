@@ -1,16 +1,28 @@
 # Dotfiles / repo meta
 /.gitignore               export-ignore
 /.gitattributes           export-ignore
+/.github/                 export-ignore
 /.editorconfig            export-ignore
 /.env*                    export-ignore
+
+# Development directories
 /node_modules/            export-ignore
 /node/                    export-ignore
-
-# Node / build configs & local dev
-/.github/                 export-ignore
+/tests/                   export-ignore
+/.vscode/                 export-ignore
 /CHANGELOG-DEV.md         export-ignore
 /src/                     export-ignore
 /types/                   export-ignore
 /package.json             export-ignore
 /package-lock.json        export-ignore
 /tsconfig*.json           export-ignore
+/jest.config.cjs          export-ignore
+/jest.setup.ts            export-ignore
+/phpunit.xml.dist         export-ignore
+/.phpunit.result.cache    export-ignore
+/STRUCTURE.md             export-ignore
+
+# WP.org specific
+/.svn/                    export-ignore
+/README.md                export-ignore
+/php/includes/debug.php   export-ignore
