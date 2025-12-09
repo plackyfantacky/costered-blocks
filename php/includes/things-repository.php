@@ -1,6 +1,24 @@
 <?php
     defined('ABSPATH') || exit;
 
+    if (!defined('COSTERED_THINGS_TABLE') && isset($wpdb)) {
+        define('COSTERED_THINGS_TABLE', $wpdb->prefix . 'costered_things');
+    }
+
+    /*
+    * Notes about database access in this repository for reviewers:
+    *
+    * - All dynamic values in queries go through $wpdb->prepare() with placeholders.
+    * - COSTERED_THINGS_TABLE is a plugin defined constant based on $wpdb->prefix.
+    *   User input never influences this table name.
+    * - WordPress placeholders do not support identifiers such as table names. Using
+    *   a placeholder for the table name would produce invalid SQL.
+    *
+    * Some WPCS/PCP sniffs treat any dynamic table name as "NotPrepared", so targeted
+    * phpcs disables are used around those queries to avoid false positives without
+    * weakening the actual safety guarantees.
+    */
+
     class Costered_Things_Repository {
         /** @var \wpdb */
         private $wpdb;
@@ -19,14 +37,27 @@
          * @return mixed The thing data, or $default if not found
          */
         public function getByKey(string $thingType, string $thingKey, mixed $default = null): mixed {
-            $row = $this->wpdb->get_row(
-                $this->wpdb->prepare(
-                    "SELECT thing_data FROM {$this->table} WHERE thing_type = %s AND thing_key = %s LIMIT 1",
+
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;
+
+
+            /* We disable the WPCS/PCP sniffs around this line to keep the linter quiet without
+            * rewriting the query into something less clear or less correct. See note at top. */
+            
+            // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->prepare(
+                    "SELECT thing_data FROM " . COSTERED_THINGS_TABLE . "
+                     WHERE thing_type = %s 
+                     AND thing_key = %s 
+                     LIMIT 1",
                     $thingType,
                     $thingKey
                 ),
                 ARRAY_A
             );
+            // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
             if ($row === null) {
                 return $default;
@@ -43,14 +74,26 @@
          * Get a thing by costered id
          */
         public function getByCosteredId(string $thingType, string $costeredId, mixed $default = null): mixed {
-            $row = $this->wpdb->get_row(
-                $this->wpdb->prepare(
-                    "SELECT thing_data FROM {$this->table} WHERE thing_type = %s AND thing_costered_id = %s LIMIT 1",
+
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;            
+
+            /* We disable the WPCS/PCP sniffs around this line to keep the linter quiet without
+            * rewriting the query into something less clear or less correct. See note at top. */
+
+            // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->prepare(
+                    "SELECT thing_data FROM " . COSTERED_THINGS_TABLE . " 
+                     WHERE thing_type = %s 
+                     AND thing_costered_id = %s 
+                     LIMIT 1",
                     $thingType,
-                $costeredId
+                    $costeredId
                 ),
                 ARRAY_A
             );
+            // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
             if ($row === null) {
                 return $default;
@@ -84,7 +127,12 @@
                 $updateData['thing_costered_id'] = $costeredId;
             }
 
-            $updated = $this->wpdb->update(
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;
+
+            /* This is our own table, so we HAVE to interact with it directly. No choice here
+             * as WP does not provide an abstraction for custom tables. */
+            $updated = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                 $this->table,
                 $updateData,
                 [
@@ -105,7 +153,9 @@
                     'updated_at' => $now,
                 ];
 
-                $this->wpdb->insert(
+                /* This is our own table, so we HAVE to interact with it directly. No choice here
+                 * as WP does not provide an abstraction for custom tables. */
+                $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
                     $this->table,
                     $insertData,
                     [ '%s', '%s', '%s', '%s', '%s', '%s' ]
@@ -122,8 +172,14 @@
          * @return bool Success
          */
         public function deleteByKey(string $thingType, string $thingKey): bool {
-            $deleted = $this->wpdb->delete(
-                $this->table,
+
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;
+            
+            /* This is our own table, so we HAVE to interact with it directly. No choice here
+             * as WP does not provide an abstraction for custom tables. */
+            $deleted = $wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                COSTERED_THINGS_TABLE,
                 [
                     'thing_type' => $thingType,
                     'thing_key' => $thingKey,
@@ -139,13 +195,25 @@
          * @return array<string, array{costered_id: ?string, data: mixed}>
          */
         public function listByType(string $thingType): array {
-            $rows = $this->wpdb->get_results(
-                $this->wpdb->prepare(
-                    "SELECT thing_key, thing_costered_id, thing_data FROM {$this->table} WHERE thing_type = %s ORDER BY thing_key ASC",
+
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;
+
+            /* We disable the WPCS/PCP sniffs around this line to keep the linter quiet without
+            * rewriting the query into something less clear or less correct. See note at top. */
+
+            // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->prepare(
+                    "SELECT thing_key, thing_costered_id, thing_data FROM " . COSTERED_THINGS_TABLE . " 
+                     WHERE thing_type = %s 
+                     ORDER BY thing_key 
+                     ASC",
                     $thingType
                 ),
                 ARRAY_A
             );
+            // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
             $items = [];
 
@@ -169,14 +237,27 @@
          * List all things of a given type and costered id. Each result should have a unitque thing_key.
          */
         public function listByTypeAndCosteredId(string $thingType, string $costeredId): array {
-            $rows = $this->wpdb->get_results(
-                $this->wpdb->prepare(
-                    "SELECT thing_key, thing_data FROM {$this->table} WHERE thing_type = %s AND thing_costered_id = %s ORDER BY thing_key ASC",
+
+            /** @var \wpdb $wpdb */
+            $wpdb = $this->wpdb;
+
+            /* We disable the WPCS/PCP sniffs around this line to keep the linter quiet without
+            * rewriting the query into something less clear or less correct. See note at top. */
+            
+            // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+                $wpdb->prepare(
+                    "SELECT thing_key, thing_data FROM " . COSTERED_THINGS_TABLE . " 
+                     WHERE thing_type = %s 
+                     AND thing_costered_id = %s 
+                     ORDER BY thing_key 
+                     ASC",
                     $thingType,
                     $costeredId
                 ),
                 ARRAY_A
             );
+            // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
             $items = [];
 

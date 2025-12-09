@@ -29,13 +29,13 @@ add_action('enqueue_block_editor_assets', function () {
     $enabled = costered_blocks_next_version_features_enabled();
     $json = $enabled ? 'true' : 'false';
 
-    $inline = <<<JS
-window.CB_NEXT_VERSION_FEATURES = {$json};
-window.CB_WP_DEBUG = {$is_debug};
-if(window.CB_WP_DEBUG ) {
-    console.log('[costered] WP_DEBUG is enabled');
-}
-JS;
+    $inline = "
+        window.CB_NEXT_VERSION_FEATURES = {$json};
+        window.CB_WP_DEBUG = {$is_debug};
+        if(window.CB_WP_DEBUG ) {
+            console.log('[costered] WP_DEBUG is enabled');
+        }
+    ";
 
     wp_add_inline_script('costered-blocks--entrypoint', $inline, 'before');
 

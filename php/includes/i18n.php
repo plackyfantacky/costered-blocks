@@ -14,7 +14,7 @@ function costered_i18n_strings(string $textdomain = 'costered-blocks'): array {
     return $labels;
 }
 /**
- * Retrieve a single i18n string.
+ * Return a single i18n string.
  */
 function costered_i18n(string $path, $default = '', string $textdomain = 'costered-blocks'):string {
     $node = costered_i18n_strings($textdomain);
@@ -27,14 +27,14 @@ function costered_i18n(string $path, $default = '', string $textdomain = 'coster
     }
     
     if (is_string($node)) {
-        return $node;
+        return wp_kses($node, array());
     }
 
     return $default;
 }
 
 /**
- * Retrieve an HTML-escaped i18n string.
+ * Return an HTML-escaped i18n string.
  */
 function costered_i18n_html(string $path, $default = null, string $textdomain = 'costered-blocks'): string {
     $value = costered_i18n($path, $default, $textdomain);
@@ -42,9 +42,31 @@ function costered_i18n_html(string $path, $default = null, string $textdomain = 
 }
 
 /**
- * Retrieve an attribute-escaped i18n string.
+ * Return an attribute-escaped i18n string.
  */
 function costered_i18n_attr(string $path, $default = null, string $textdomain = 'costered-blocks'): string {
     $value = costered_i18n($path, $default, $textdomain);
     return is_string($value) ? esc_attr($value) : '';
+}
+
+/**
+ * Print an i18n string.
+ */
+function costered_i18n_e(string $path, $default = '', string $textdomain = 'costered-blocks'): void {
+    // use wp_kses wherever needed on the output side
+    echo wp_kses(costered_i18n($path, $default, $textdomain));
+}
+
+/**
+ * Print an HTML-escaped i18n string.
+ */
+function costered_i18n_html_e(string $path, $default = null, string $textdomain = 'costered-blocks'): void {
+    echo esc_html(costered_i18n_html($path, $default, $textdomain));
+}
+
+/**
+ * Print an attribute-escaped i18n string.
+ */
+function costered_i18n_attr_e(string $path, $default = null, string $textdomain = 'costered-blocks'): void {
+    echo esc_attr(costered_i18n_attr($path, $default, $textdomain));
 }

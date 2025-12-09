@@ -7,21 +7,30 @@
  * Author:            Adam Trickett
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * License:           GPL-2.0-or-later and MIT
+ * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       costered-blocks
  */
 
-define('COSTERED_BLOCKS_VERSION', '1.3.4');
-
 defined('ABSPATH') || exit;
-const COSTERED_DB_VERSION = '4';
 
+define('COSTERED_DB_VERSION', '4');
+define('COSTERED_BLOCKS_VERSION', '1.3.4');
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
+defined('COSTERED_DEBUG') || define('COSTERED_DEBUG', false);
+
+if (defined('COSTERED_DEBUG') && COSTERED_DEBUG) {
+    $costered_debug_file = plugin_dir_path(__FILE__) . 'php/debug.php';
+
+    if (file_exists($costered_debug_file)) {
+        // We only load this in dev installs where the file is present.
+        require_once $costered_debug_file;
+    }
+}
+
 
 // critical includes
-require_once COSTERED_BLOCKS_PATH . 'php/includes/debug.php';
 if (file_exists(COSTERED_BLOCKS_PATH. '/vendor/autoload.php')) {
     require COSTERED_BLOCKS_PATH. '/vendor/autoload.php';
 }
@@ -51,8 +60,7 @@ register_activation_hook(__FILE__, function() {
     $table_name = $wpdb->prefix . 'costered_things';
     $charset_collate = $wpdb->get_charset_collate();
 
-    $sql = <<<SQL
-    CREATE TABLE {$table_name} (
+    $sql = "CREATE TABLE {$table_name} (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         thing_type VARCHAR(100) NOT NULL,
         thing_costered_id VARCHAR(64) DEFAULT NULL,
@@ -65,8 +73,7 @@ register_activation_hook(__FILE__, function() {
         KEY `idx_thing_type` (`thing_type`),
         KEY `idx_thing_key` (`thing_key`),
         KEY `idx_thing_costered_id` (`thing_costered_id`)
-    ) {$charset_collate};
-    SQL;
+    ) COLLATE {$charset_collate}";
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
