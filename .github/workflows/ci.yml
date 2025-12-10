@@ -14,7 +14,6 @@ jobs:
         runs-on: ubuntu-latest
         env:
             PLUGIN_SLUG: costered-blocks
-            ZIP_BASENAME: costered-blocks-dev
             ZIP_NAME: costered-blocks-dev.zip
 
         steps:
@@ -48,17 +47,6 @@ jobs:
                     NODE_ENV: production
                 run: npm run build
 
-            -   name: Compute zip name (commit hash)
-                run: |
-                    set -euxo pipefail
-
-                    SHORT_SHA="$(git rev-parse --short HEAD)"
-                    ZIP_BASENAME="${PLUGIN_SLUG}-${SHORT_SHA}"
-                    ZIP_NAME="${ZIP_BASENAME}.zip"
-
-                    echo "ZIP_BASENAME=${ZIP_BASENAME}" >> "${GITHUB_ENV}"
-                    echo "ZIP_NAME=${ZIP_NAME}" >> "${GITHUB_ENV}"
-
             -   name: Create plugin zip (git archive + compiled assets)
                 run: |
                     set -euxo pipefail
@@ -86,10 +74,10 @@ jobs:
                     cd "$(dirname "${STAGING_DIR}")"
                     zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
 
-                    echo "Built /tmp/${ZIP_NAME}"
+                    echo "Prepared plugin folder at ${STAGING_DIR}"
 
             -   name: Upload plugin zip artefact
                 uses: actions/upload-artifact@v4
                 with:
-                    name: ${{ env.ZIP_BASENAME }}
-                    path: "/tmp/${{ env.ZIP_NAME }}"
+                    name: costered-blocks-${{ github.sha }}
+                    path: "/tmp/${{ env.PLUGIN_SLUG }}"
