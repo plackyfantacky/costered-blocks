@@ -73,8 +73,18 @@ jobs:
 
                 echo "Built /tmp/${ZIP_NAME}"
                 
-        -   name: Upload plugin zip artefact
+        -   name: Wrap plugin folder for artefact root
+            run: |
+                set -euxo pipefail
+
+                rm -rf /tmp/upload-root
+                mkdir -p /tmp/upload-root
+
+                rm -rf "/tmp/${PLUGIN_SLUG}"
+                mv "/tmp/${PLUGIN_SLUG}" "/tmp/upload-root/${PLUGIN_SLUG}"
+
+        -   name: Upload upload-ready artefact
             uses: actions/upload-artifact@v4
             with:
                 name: costered-blocks
-                path: "/tmp/${{ env.PLUGIN_SLUG }}"
+                path: /tmp/upload-root/*
