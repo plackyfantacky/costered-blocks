@@ -57,22 +57,12 @@ jobs:
                     rm -rf "${STAGING_DIR}"
                     mkdir -p "${STAGING_DIR}"
 
-                    git archive --format=tar HEAD | tar -x -C "${STAGING_DIR}"
-
-                    for dir in js css; do
-                        if [ -d "${WORKDIR}/${dir}" ]; then
-                            rm -rf "${STAGING_DIR}/${dir}"
-                            cp -a "${WORKDIR}/${dir}" "${STAGING_DIR}/${dir}"
-                        fi
-                    done
-
-                    if [ -d "${WORKDIR}/vendor" ]; then
-                        rm -rf "${STAGING_DIR}/vendor"
-                        cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
-                    fi
-
-                    cd "$(dirname "${STAGING_DIR}")"
-                    zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
+                    # Copy everything from the repo, ignoring only obvious junk
+                    rsync -a \
+                        --exclude '.git' \
+                        --exclude '.github' \
+                        --exclude 'node_modules' \
+                        "${WORKDIR}/" "${STAGING_DIR}/"
 
                     echo "Prepared plugin folder at ${STAGING_DIR}"
 
