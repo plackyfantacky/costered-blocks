@@ -15,6 +15,7 @@ jobs:
         env:
             PLUGIN_SLUG: costered-blocks
             ZIP_NAME: costered-blocks-dev.zip
+            SHORT_SHA: dev
 
         steps:
             -   name: Checkout
@@ -47,6 +48,12 @@ jobs:
                     NODE_ENV: production
                 run: npm run build
 
+            -   name: Compute short commit hash
+                run: |
+                    set -euxo pipefail
+                    SHORT_SHA="$(git rev-parse --short=7 HEAD)"
+                    echo "SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
+
             -   name: Create plugin zip (git archive + compiled assets)
                 run: |
                     set -euxo pipefail
@@ -66,8 +73,18 @@ jobs:
 
                     echo "Prepared plugin folder at ${STAGING_DIR}"
 
+            -   name: Wrap plugin folder for artefact root
+                run: |
+                    set -euxo pipefail
+
+                    rm -rf /tmp/artifact-root
+                    mkdir -p /tmp/artifact-root
+
+                    # We want the artefact zip to contain a top-level "costered-blocks/" folder.
+                    mv "/tmp/${PLUGIN_SLUG}" "/tmp/artifact-root/${PLUGIN_SLUG}"
+
             -   name: Upload plugin zip artefact
                 uses: actions/upload-artifact@v4
                 with:
-                    name: costered-blocks-${{ github.sha }}
-                    path: "/tmp/${{ env.PLUGIN_SLUG }}"
+                    name: costered-blocks-${{ env.SHORT_SHA }}
+                    path: "/tmp/artifact-root"
