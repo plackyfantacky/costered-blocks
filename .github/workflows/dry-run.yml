@@ -67,7 +67,7 @@ jobs:
                 # 3) Overlay vendor directory
                 if [ -d "${WORKDIR}/vendor" ]; then
                     rm -rf "${STAGING_DIR}/vendor"
-                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/${dir}"
+                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
                 fi
 
                 echo "Staged ${STAGING_DIR}"
