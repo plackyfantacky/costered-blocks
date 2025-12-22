@@ -11,7 +11,6 @@ jobs:
         runs-on: ubuntu-latest
         env:
             PLUGIN_SLUG: costered-blocks
-            ZIP_NAME: costered-blocks.zip
 
         steps:
         -   name: Checkout
@@ -44,7 +43,7 @@ jobs:
                 NODE_ENV: production
             run: npm run build
 
-        -   name: Create plugin zip (release-equivalent)
+        -   name: Stage plugin folder (release-equivalent)
             run: |
                 set -euxo pipefail
 
@@ -68,11 +67,11 @@ jobs:
                 # 3) Overlay vendor directory
                 if [ -d "${WORKDIR}/vendor" ]; then
                     rm -rf "${STAGING_DIR}/vendor"
-                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
+                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/${dir}"
                 fi
 
-                echo "Built /tmp/${ZIP_NAME}"
-                
+                echo "Staged ${STAGING_DIR}"
+
         -   name: Wrap plugin folder for artefact root
             run: |
                 set -euxo pipefail
@@ -80,11 +79,16 @@ jobs:
                 rm -rf /tmp/upload-root
                 mkdir -p /tmp/upload-root
 
-                rm -rf "/tmp/${PLUGIN_SLUG}"
+                if [ ! -d "/tmp/${PLUGIN_SLUG}" ]; then
+                    echo "Expected staging folder missing: /tmp/${PLUGIN_SLUG}"
+                    exit 1
+                fi
+
                 mv "/tmp/${PLUGIN_SLUG}" "/tmp/upload-root/${PLUGIN_SLUG}"
 
         -   name: Upload upload-ready artefact
             uses: actions/upload-artifact@v4
             with:
                 name: costered-blocks
-                path: /tmp/upload-root/*
+                path: /tmp/upload-root/costered-blocks
+                if-no-files-found: error
