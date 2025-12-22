@@ -2,11 +2,6 @@ name: Dry-run release build (manual)
 
 on:
     workflow_dispatch:
-        inputs:
-            suffix:
-                description: 'Suffix to append to the zip name (e.g. "rc1", "beta")'
-                required: false
-                default: ''
 
 permissions:
     contents: write
@@ -44,36 +39,15 @@ jobs:
         -   name: Run Jest tests
             run: npm test
 
-        -   name: Compute version + zip name
-            run: |
-                set -euxo pipefail
-
-                VERSION="$(node -p "require('./package.json').version")"
-                SHORT_SHA="$(git rev-parse --short=7 HEAD)"
-
-                SUFFIX="${{ inputs.suffix }}"
-                if [ -n "${SUFFIX}" ]; then
-                    ZIP_NAME="${PLUGIN_SLUG}-v${VERSION}-${SUFFIX}-${SHORT_SHA}.zip"
-                else
-                    ZIP_NAME="${PLUGIN_SLUG}-v${VERSION}-${SHORT_SHA}.zip"
-                fi
-
-                echo "VERSION=${VERSION}" >> "${GITHUB_ENV}"
-                echo "SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
-                echo "ZIP_NAME=${ZIP_NAME}" >> "${GITHUB_ENV}"
-
-                echo "Building ${ZIP_NAME}"
-
         -   name: Build assets
             env:
                 NODE_ENV: production
             run: npm run build
 
-        -   name: Create plugin zip (git archive + compiled assets)
+        -   name: Create plugin zip (release-equivalent)
             run: |
                 set -euxo pipefail
 
-                PLUGIN_SLUG="costered-blocks"
                 WORKDIR="${GITHUB_WORKSPACE}"
                 STAGING_DIR="/tmp/${PLUGIN_SLUG}"
 
@@ -83,7 +57,7 @@ jobs:
                 # 1) Export tracked files, honouring .gitattributes export-ignore
                 git archive --format=tar HEAD | tar -x -C "${STAGING_DIR}"
 
-                # 2) Overlay built assets from the working tree (js and css are generated)
+                # 2) Overlay built assets
                 for dir in js css; do
                     if [ -d "${WORKDIR}/${dir}" ]; then
                         rm -rf "${STAGING_DIR}/${dir}"
@@ -97,7 +71,7 @@ jobs:
                     cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
                 fi
 
-                # 4) Create the final plugin zip next to the staging dir
+                # 4) Zip the plugin folder (root = costered-blocks/)
                 cd "$(dirname "${STAGING_DIR}")"
                 zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
 
@@ -106,5 +80,5 @@ jobs:
         -   name: Upload plugin zip artefact
             uses: actions/upload-artifact@v4
             with:
-                name: ${{ env.ZIP_NAME }}
+                name: costered-blocks
                 path: "/tmp/${{ env.ZIP_NAME }}"
