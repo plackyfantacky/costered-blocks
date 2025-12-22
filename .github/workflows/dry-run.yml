@@ -1,0 +1,110 @@
+name: Dry-run release build (manual)
+
+on:
+    workflow_dispatch:
+        inputs:
+            suffix:
+                description: 'Suffix to append to the zip name (e.g. "rc1", "beta")'
+                required: false
+                default: ''
+
+permissions:
+    contents: write
+
+jobs:
+    build-release-dry-run:
+        runs-on: ubuntu-latest
+        env:
+            PLUGIN_SLUG: costered-blocks
+            ZIP_NAME: costered-blocks.zip
+
+        steps:
+        -   name: Checkout
+            uses: actions/checkout@v4
+
+        -   name: Setup Node
+            uses: actions/setup-node@v4
+            with:
+                node-version: '20'
+                cache: 'npm'
+
+        -   name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: '8.2'
+                tools: composer
+                coverage: none
+
+        -   name: Install PHP dependencies (Composer)
+            run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+        -   name: Install dependencies
+            run: npm ci
+
+        -   name: Run Jest tests
+            run: npm test
+
+        -   name: Compute version + zip name
+            run: |
+                set -euxo pipefail
+
+                VERSION="$(node -p "require('./package.json').version")"
+                SHORT_SHA="$(git rev-parse --short=7 HEAD)"
+
+                SUFFIX="${{ inputs.suffix }}"
+                if [ -n "${SUFFIX}" ]; then
+                    ZIP_NAME="${PLUGIN_SLUG}-v${VERSION}-${SUFFIX}-${SHORT_SHA}.zip"
+                else
+                    ZIP_NAME="${PLUGIN_SLUG}-v${VERSION}-${SHORT_SHA}.zip"
+                fi
+
+                echo "VERSION=${VERSION}" >> "${GITHUB_ENV}"
+                echo "SHORT_SHA=${SHORT_SHA}" >> "${GITHUB_ENV}"
+                echo "ZIP_NAME=${ZIP_NAME}" >> "${GITHUB_ENV}"
+
+                echo "Building ${ZIP_NAME}"
+
+        -   name: Build assets
+            env:
+                NODE_ENV: production
+            run: npm run build
+
+        -   name: Create plugin zip (git archive + compiled assets)
+            run: |
+                set -euxo pipefail
+
+                PLUGIN_SLUG="costered-blocks"
+                WORKDIR="${GITHUB_WORKSPACE}"
+                STAGING_DIR="/tmp/${PLUGIN_SLUG}"
+
+                rm -rf "${STAGING_DIR}"
+                mkdir -p "${STAGING_DIR}"
+
+                # 1) Export tracked files, honouring .gitattributes export-ignore
+                git archive --format=tar HEAD | tar -x -C "${STAGING_DIR}"
+
+                # 2) Overlay built assets from the working tree (js and css are generated)
+                for dir in js css; do
+                    if [ -d "${WORKDIR}/${dir}" ]; then
+                        rm -rf "${STAGING_DIR}/${dir}"
+                        cp -a "${WORKDIR}/${dir}" "${STAGING_DIR}/${dir}"
+                    fi
+                done
+
+                # 3) Overlay vendor directory
+                if [ -d "${WORKDIR}/vendor" ]; then
+                    rm -rf "${STAGING_DIR}/vendor"
+                    cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
+                fi
+
+                # 4) Create the final plugin zip next to the staging dir
+                cd "$(dirname "${STAGING_DIR}")"
+                zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
+
+                echo "Built /tmp/${ZIP_NAME}"
+                
+        -   name: Upload plugin zip artefact
+            uses: actions/upload-artifact@v4
+            with:
+                name: ${{ env.ZIP_NAME }}
+                path: "/tmp/${{ env.ZIP_NAME }}"
