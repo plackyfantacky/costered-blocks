@@ -71,14 +71,10 @@ jobs:
                     cp -a "${WORKDIR}/vendor" "${STAGING_DIR}/vendor"
                 fi
 
-                # 4) Zip the plugin folder (root = costered-blocks/)
-                cd "$(dirname "${STAGING_DIR}")"
-                zip -rq "/tmp/${ZIP_NAME}" "${PLUGIN_SLUG}"
-
                 echo "Built /tmp/${ZIP_NAME}"
                 
         -   name: Upload plugin zip artefact
             uses: actions/upload-artifact@v4
             with:
                 name: costered-blocks
-                path: "/tmp/${{ env.ZIP_NAME }}"
+                path: "/tmp/${{ env.PLUGIN_SLUG }}"
