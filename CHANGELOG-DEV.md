@@ -1,6 +1,12 @@
 # Developer/API Changelog
 
-## What's Changed in v1.3.3 (since 1.3.1)
+## What's Changed in v1.3.5
+
+- **updated Debug tools**: fixed a couple of fatal errors that were being thrown when `./php/includes/debug.php` is excluded from the release and `WP_DEBUG` is enabled.
+  - the Debug Controls panel now only loads when `WP_DEBUG` is set to true AND if the plugin is the development version. The release version NOW safely ignores this check.
+  - use `window.CB_DEBUG_TOOLS_ACTIVE` instead of `window.CB_WP_DEBUG` for development.
+
+## What's Changed in v1.3.4 (since 1.3.1)
 
 ### Highlights
 #### Blocks
@@ -27,7 +33,7 @@
 
 #### Misc
 - **Updated CSS build pipeline**: Refactors the CSS generation process to use the new data model, improve breakpoint handling, and avoid touching posts that do not use Costered attributes. Includes additional PHPUnit coverage for the core builders.
-- **"DebugControls" Tab**: Adds an editor tab that is only visible when `window.CB_WP_DEBUG` is enabled. It exposes tools such as viewing and copying raw block data and opening a larger preview, to help with diagnosing block and styling issues during development.
+- **"DebugControls" Tab**: Adds an editor tab that is only visible when ~~~`window.CB_WP_DEBUG`~~~ is enabled. It exposes tools such as viewing and copying raw block data and opening a larger preview, to help with diagnosing block and styling issues during development.
 
 
 ## What's Changed in 1.3.1

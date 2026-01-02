@@ -23,7 +23,7 @@ import CustomNotice from '@components/CustomNotice';
 
 declare global {
     interface Window {
-        CB_WP_DEBUG?: boolean;
+        CB_DEBUG_TOOLS_ACTIVE?: boolean;
         wp?: any
     }  
 }

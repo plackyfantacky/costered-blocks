@@ -26,14 +26,21 @@ add_action('enqueue_block_editor_assets', function () {
     }
 
     $is_debug = costered_is_debug_enabled();
+    $has_tools = costered_debug_tools_available();
+    $tools_active = costered_debug_tools_active();
+
     $enabled = costered_blocks_next_version_features_enabled();
-    $json = $enabled ? 'true' : 'false';
+    $features_json = $enabled ? 'true' : 'false';
 
     $inline = "
-        window.CB_NEXT_VERSION_FEATURES = {$json};
-        window.CB_WP_DEBUG = {$is_debug};
-        if(window.CB_WP_DEBUG ) {
-            console.log('[costered] WP_DEBUG is enabled');
+        window.CB_NEXT_VERSION_FEATURES = {$features_json};
+        window.CB_WP_DEBUG = " . ( $is_debug ? 'true' : 'false') . ";
+        window.CB_DEBUG_TOOLS_AVAILABLE = " . ( $has_tools ? 'true' : 'false' ) . ";
+        window.CB_DEBUG_TOOLS_ACTIVE = " . ( $tools_active ? 'true' : 'false' ) . ";
+        if(window.CB_WP_DEBUG ) { console.log('[costered] WP_DEBUG is enabled.'); }
+        if (window.CB_WP_DEBUG === true) {
+            if(window.CB_DEBUG_TOOLS_AVAILABLE ) { console.log('[costered] Plugin debug tools are available.'); }
+            if(window.CB_DEBUG_TOOLS_ACTIVE ) { console.log('[costered] Plugin debug tools are Active. Click a block and view the Debug Controls tab in the sidebar.'); }
         }
     ";
 

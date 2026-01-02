@@ -10,7 +10,7 @@ import Icon from '@components/Icon';
 
 declare global {
     interface Window {
-        CB_WP_DEBUG?: boolean;
+        CB_DEBUG_TOOLS_ACTIVE?: boolean;
     }
 }
 
@@ -121,6 +121,6 @@ export default {
     icon: icon,
     render: DebugControlsBody,
     isVisible: () => {
-        return Boolean(window.CB_WP_DEBUG);
+        return Boolean(window.CB_DEBUG_TOOLS_ACTIVE);
     },
 }

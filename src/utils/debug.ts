@@ -2,15 +2,15 @@
 
 declare global {
     interface Window {
-        CB_WP_DEBUG?: boolean;
+        CB_DEBUG_TOOLS_ACTIVE?: boolean;
     }
 }
 
 /**
- * Namespaced console logger gated by window.CB_WP_DEBUG.
+ * Namespaced console logger gated by window.CB_DEBUG_TOOLS_ACTIVE.
  */
 export function log(...args: unknown[]): void {
-    if (typeof window !== 'undefined' && !window.CB_WP_DEBUG) return;
+    if (typeof window !== 'undefined' && !window.CB_DEBUG_TOOLS_ACTIVE) return;
     // namespaced so it’s searchable in console
     // eslint-disable-next-line no-console
     console.log('[CosteredBlocks]', ...args);

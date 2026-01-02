@@ -18,23 +18,21 @@ define('COSTERED_DB_VERSION', '4');
 define('COSTERED_BLOCKS_VERSION', '1.3.4');
 define('COSTERED_BLOCKS_URL', plugin_dir_url(__FILE__));
 defined('COSTERED_BLOCKS_PATH') || define('COSTERED_BLOCKS_PATH', plugin_dir_path(__FILE__));
-defined('COSTERED_DEBUG') || define('COSTERED_DEBUG', false);
-
-if (defined('COSTERED_DEBUG') && COSTERED_DEBUG) {
-    $costered_debug_file = plugin_dir_path(__FILE__) . 'php/debug.php';
-
-    if (file_exists($costered_debug_file)) {
-        // We only load this in dev installs where the file is present.
-        require_once $costered_debug_file;
-    }
-}
-
 
 // critical includes
 if (file_exists(COSTERED_BLOCKS_PATH. '/vendor/autoload.php')) {
     require COSTERED_BLOCKS_PATH. '/vendor/autoload.php';
 }
+require_once COSTERED_BLOCKS_PATH . 'php/includes/bootstrap.php';
 require_once COSTERED_BLOCKS_PATH . 'php/includes/i18n.php';
+
+$costered_debug_tools_file = COSTERED_BLOCKS_PATH . 'php/includes/debug.php';
+
+if (file_exists($costered_debug_tools_file)) {
+    // We only load this in dev installs where the file is present.
+    require_once $costered_debug_tools_file;
+}
+
 
 // main includes
 require_once COSTERED_BLOCKS_PATH . 'php/includes/admin.php';
