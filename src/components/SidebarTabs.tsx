@@ -19,13 +19,7 @@ import GridItemControls from "@tabs/GridItemControls";
 import PositioningControls from "@tabs/PositioningControls";
 
 import type { ReactNode } from '@wordpress/element';
-import type { AugmentedAttributes } from "@types";
-
-type VisibleCtx = {
-    attributes: AugmentedAttributes;
-    parentAttrs: Record<string, unknown> | null;
-    blockName: string | null;
-}
+import type { AugmentedAttributes, VisibilityCtx } from "@types";
 
 type TabDef = {
     name: string;
@@ -33,7 +27,7 @@ type TabDef = {
     icon?: ReactNode;
     render?: () => ReactNode;
     content?: ReactNode | null;
-    isVisible?: (ctx: VisibleCtx) => boolean;
+    isVisible?: (ctx: VisibilityCtx) => boolean;
 };
 
 const tabs: readonly TabDef[] = [
@@ -104,7 +98,7 @@ export default function SidebarTabs({ className }: SidebarTabsProps) {
     const visibleTabs = useMemo(() => {
         return tabs.filter(tabDef => {
             if (typeof tabDef.isVisible === 'function') {
-                const ctx: VisibleCtx = { 
+                const ctx: VisibilityCtx = { 
                     attributes: augmentedAttributes,
                     parentAttrs,
                     blockName
@@ -133,21 +127,27 @@ export default function SidebarTabs({ className }: SidebarTabsProps) {
         return new Map(visibleTabs.map((t) => [t.name, t]));
     }, [visibleTabs]);
 
-    const [activeName, setActiveName] = useState<string | undefined>(visibleTabs[0]?.name);
+    const [activeName, setActiveName] = useState<string | undefined>(undefined);
 
-    useEffect(() => {
-        if (!visibleTabs.length) {
-            setActiveName(undefined);
-            return;
+    const safeActiveName = useMemo(() => {
+        if (!visibleTabs.length) return undefined;
+
+        if (activeName && visibleTabs.some((tab) => tab.name === activeName)) {
+            return activeName;
         }
-        if (!visibleTabs.find((tab) => tab.name === activeName)) {
-            setActiveName(visibleTabs[0]?.name);
-        }
+
+        return visibleTabs[0]?.name;
     }, [visibleTabs, activeName]);
 
+    useEffect(() => {
+        if (safeActiveName !== activeName) {
+            setActiveName(safeActiveName);
+        }
+    }, [safeActiveName, activeName]);
+
     const signature = useMemo(
-        () => `${activeBreakpoint}:${panelTabs.map((tab) => tab.name).join(',')}`,
-        [activeBreakpoint, panelTabs]
+        () => `${activeBreakpoint}:${safeActiveName ?? ''}:${panelTabs.map((tab) => tab.name).join(',')}`,
+        [activeBreakpoint, safeActiveName, panelTabs]
     );
             
     return (
@@ -156,7 +156,7 @@ export default function SidebarTabs({ className }: SidebarTabsProps) {
             className={['costered-blocks--tab-panel-outer', className].filter(Boolean).join(' ')}
             tabs={panelTabs}
             onSelect={setActiveName}
-            initialTabName={activeName}
+            initialTabName={safeActiveName}
         >
             {(tab: { name: string }) => {
                 const def = tabByName.get(tab.name);

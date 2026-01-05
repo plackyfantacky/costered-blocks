@@ -1,5 +1,7 @@
 // Basic primitives
 
+import type { AugmentedAttributes } from "./attributes.ts";
+
 export type CSSPrimitive = string | number;
 export type MeasurementMode = 'unit' | 'text';
 export type StyleMap = Record<string, string>; // cannonical shape for styles
@@ -13,9 +15,14 @@ export type GetterLike = {
     $get?: (key: string, options?: unknown) => unknown;
 } & Record<string, unknown>;
 
+export type VisibilityAttributesLike = 
+    | AugmentedAttributes
+    | Record<string, CSSPrimitive | undefined>;
+
 export type VisibilityCtx = {
-    attributes?: GetterLike | null | undefined;
-    parentAttrs?: GetterLike | null | undefined;
+    attributes?: VisibilityAttributesLike | null;
+    parentAttrs?: VisibilityAttributesLike | null;
+    blockName?: string | null;
 };
 
 // Grid data types

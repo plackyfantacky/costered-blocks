@@ -10,6 +10,7 @@ import NoBlockSelected from "@components/NoBlockSelected";
 import CosteredBlockControls from '@utils/slotFillUtils';
 
 import type { ReactNode } from '@wordpress/element';
+import type { VisibilityCtx } from '@types';
 
 function SelectedBlockIcon() {
     const blockname = useSelect((select: any) => {
@@ -50,6 +51,11 @@ export default {
     name: 'block-controls',
     title: (LABELS.blockControls?.tabTitle as ReactNode) ?? 'Block Controls',
     icon: <SelectedBlockIcon />,
-    render: BlockControlsTabBody,
-    isVisible: ({ blockName }: { blockName: string | null }) => !!blockName
+    isVisible: ({ blockName }: VisibilityCtx = {}) => {
+        if (!blockName) return false;
+        const blockType = getBlockType(blockName);
+
+        return Boolean(blockType?.supports?.costeredBlockControls);
+    },
+    render: () => <BlockControlsTabBody />
 }

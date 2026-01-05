@@ -6,7 +6,10 @@
     "category": "costered-blocks",
     "icon": "art",
     "description": "Render an SVG inline (sanitised) with optional link.",
-    "supports": { "html": false },
+    "supports": {
+        "html": false,
+        "costeredBlockControls": true
+    },
     "textdomain": "costered-blocks",
     "editorScript": "file:./index.tsx",
     "attributes": {
