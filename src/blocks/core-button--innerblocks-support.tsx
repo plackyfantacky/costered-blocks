@@ -196,6 +196,7 @@ addFilter(
 registerBlockType<{ content?: string }>('costered-blocks/button-text', {
     title: 'Button Text',
     category: 'text',
+    apiVersion: 3,
     icon: 'editor-textcolor',
     parent: ['core/button'],
     attributes: {

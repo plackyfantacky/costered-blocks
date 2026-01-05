@@ -305,7 +305,7 @@
     /**
      * Footer emitter: print a <link> tag for the Costered global stylesheet.
      */
-    function costered_print_collected_css_link() {
+    function costered_enqueue_collected_css() {
         // Preferred path: use the global stylesheet if it exists.
         $uploads = wp_upload_dir();
         
@@ -342,7 +342,7 @@
             $version = (string) @filemtime($path);
         }
 
-        wp_enqueue_style('costered-blocks-stylesheet', $url, array(), $version);
+        wp_enqueue_style('costered-blocks--stylesheet', $url, array(), $version);
         return;
     }
 
@@ -880,6 +880,24 @@
         $walker($blocks);
         return $written_count;
     }
+
+    /**
+     * Walk (and optionally rewrite) all blocks in a block list, including innerBlocks.
+     * 
+     * @param array    $blocks Parsed blocks from parse_blocks().
+     * @param callable $transform function(array $block): array
+     * @return array
+     */
+    function costered_map_blocks(array $blocks, callable $transform): array {
+        foreach ($blocks as $index => $block) {
+            if( !empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+                $blocks['innerBlocks'] = costered_map_blocks($block['innerBlocks'], $transform);
+            }
+
+            $blocks[$index] = $transform($block);
+        }
+        return $blocks;
+    }    
 
     /**
      * DEV ONLY: backfill per-block style records from existing content into costered_things.

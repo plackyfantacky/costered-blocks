@@ -293,17 +293,48 @@ add_action('rest_api_init', function () {
     ]);
 });
 
-// Sanitize inline SVGs on post save (before KSES).
+/**
+ * Sanitize Inline SVG block markup on post save (before KSES). We want to do this because, this plugin allows
+ * (trusted) users modify the SVG markup directly in the block editor. Letting this happen unchecked turns this feature
+ * into a potential attack vector should a malicious entity get access to admin screen where they could inject malicious
+ * code into the SVG. We want to allow users freedom to modify SVGs, but not comprimise security in the process.
+ * 
+ * Anyone got any better ideas?
+ */ 
 add_filter('content_save_pre', function (string $content) {
+
     if (!costered_contains_inline_svg_block($content)) {
         return $content;
     }
 
-    $content = preg_replace_callback('#<svg\b[^>]*>.*?</svg>#is', function ($m) {
-        $clean = costered_sanitize_svg_raw($m[0]);
-        return $clean ?: '';
-    }, $content) ?? $content;
+    $blocks = parse_blocks($content);
+    $did_change = false;
 
+    // Recursive block walker.
+    // `$did_change` is by reference so we can track whether any block content was modified.
+    $blocks = costered_map_blocks($blocks, function (array $block) use (&$did_change): array {
+        if (($block['blockName'] ?? '') !== 'costered-blocks/inline-svg') {
+            return $block;
+        }
+
+        $svg_markup = $block['attrs']['svgMarkup'] ?? '';
+        if (!is_string($svg_markup) || $svg_markup === '') {
+            return $block;
+        }
+
+        $clean = costered_sanitize_svg_raw($svg_markup);
+        if ($clean && $clean !== $svg_markup) {
+            $block['attrs']['svgMarkup'] = $clean;
+            $did_change = true;
+        }
+
+        return $block;
+    });
+
+    if ($did_change) {
+        $content = serialize_blocks($blocks);
+    }
+    
     return $content;
 }, 8);
 

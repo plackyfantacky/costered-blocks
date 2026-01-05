@@ -155,14 +155,22 @@ registerBlockType(metadata.name, {
         const { isSelected, attributes, setAttributes } = props;
         
         const io = useInlineSVG(attributes, setAttributes);
+        
+        const wrapperClassName = ['costered-blocks--inline-svg', attributes.linkURL ? 'is-linked' : '']
+            .filter(Boolean)
+            .join(' ');
+
         const blockProps = useBlockProps({
-            className: [
-                'costered-blocks--inline-svg',
-                attributes.linkURL ? 'is-linked' : '',
-            ]
+            className: wrapperClassName
         });
 
         const Inner = io.svgMarkup ? <RawHTML>{io.svgMarkup}</RawHTML> : null;
+
+        const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+
     
         return (
             <>
@@ -180,7 +188,6 @@ registerBlockType(metadata.name, {
                         />
                     </CosteredBlockControls.Fill>
                 )}
-                {/* Editor preview uses the exact markup that will be saved */}
                 <div {...blockProps}>
                     {Inner ? (
                         Inner
@@ -202,18 +209,32 @@ registerBlockType(metadata.name, {
         const svgMarkup = typeof attributes.svgMarkup === 'string' ? attributes.svgMarkup : '';
         if (!svgMarkup) return null;
 
-        const className = ['costered-blocks--inline-svg', attributes.svgClasses || ''].filter(Boolean).join(' ');
+        const wrapperClassName = ['costered-blocks--inline-svg', attributes.svgClasses || '']
+            .filter(Boolean)
+            .join(' ');
 
-        const blockProps = useBlockProps.save({ className });
+        const blockProps = useBlockProps.save({ wrapperClassName });
+        
+        const inner = <RawHTML>{ svgMarkup }</RawHTML>;
 
-        const Inner = (
+        if(attributes.linkURL) {
+            return (
+                <a 
+                    href={attributes.linkURL} 
+                    className={attributes.linkClasses || undefined}
+                >
+                    <div { ...blockProps }>
+                        {inner}              
+                    </div>
+                </a>
+            );
+        }
+
+
+        return (
             <div { ...blockProps }>
-                <RawHTML>{ svgMarkup }</RawHTML>
+                {inner}              
             </div>
-        );
-
-        return attributes.linkURL
-            ? <a href={attributes.linkURL} className={attributes.linkClasses || undefined}>{Inner}</a>
-            : Inner;
+        )
     }
 });

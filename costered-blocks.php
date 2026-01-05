@@ -83,4 +83,4 @@ register_activation_hook(__FILE__, function() {
 add_action('wp', 'costered_styles_reset', 1); // function in helpers.php
 
 // Print collected styles once per page.
-add_action('wp_footer', 'costered_print_collected_css_link', 999); // function in helpers.php
+add_action('wp_enqueue_scripts', 'costered_enqueue_collected_css', 999); // function in helpers.php
